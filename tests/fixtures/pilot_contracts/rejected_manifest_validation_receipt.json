@@ -1,0 +1,33 @@
+{
+  "receipt_schema_version": "pilot-validator-v1",
+  "receipt_type": "pilot_manifest_rejection_receipt",
+  "validation_receipt_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "status": "rejected",
+  "manifest_path_input_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "manifest_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "canonical_manifest_hash": null,
+  "manifest_scope": "formal_final_test",
+  "matrix_scope": "formal",
+  "pilot_family_matrix_hash": null,
+  "pilot_split_assignment_rule_hash": null,
+  "validator_policy_version": "pilot-validator-policy-v1",
+  "validator_code_hash": "9999999999999999999999999999999999999999999999999999999999999999",
+  "approved_pilot_data_root_id": "pilot-root-v1",
+  "checks_performed": ["schema", "scope"],
+  "checks_not_reached": ["path", "file_hash", "duplicate"],
+  "rejection_reasons": ["forbidden_manifest_scope", "formal_final_test_rejected"],
+  "accepted_record_count": 0,
+  "file_identity_check": "not_reached",
+  "file_identity_reason": "scope_rejected",
+  "no_final_test_input_proof": {
+    "status": "fail",
+    "reason": "final_test_scope_present"
+  },
+  "no_uncontrolled_glob_proof": {
+    "status": "not_reached"
+  },
+  "formal_evidence_eligible": false,
+  "started_at": "2026-08-11T00:00:00Z",
+  "ended_at": "2026-08-11T00:00:00Z",
+  "wall_time_ms": 1.0
+}

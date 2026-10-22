@@ -1,0 +1,34 @@
+{
+  "receipt_schema_version": "pilot-validator-v1",
+  "receipt_type": "pilot_manifest_validation_receipt",
+  "validation_receipt_id": "6666666666666666666666666666666666666666666666666666666666666666",
+  "status": "valid",
+  "manifest_path_input_hash": "7777777777777777777777777777777777777777777777777777777777777777",
+  "manifest_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+  "canonical_manifest_hash": "8888888888888888888888888888888888888888888888888888888888888888",
+  "manifest_scope": "pilot_nonformal",
+  "matrix_scope": "pilot",
+  "pilot_family_matrix_hash": "2222222222222222222222222222222222222222222222222222222222222222",
+  "pilot_split_assignment_rule_hash": "3333333333333333333333333333333333333333333333333333333333333333",
+  "validator_policy_version": "pilot-validator-policy-v1",
+  "validator_code_hash": "9999999999999999999999999999999999999999999999999999999999999999",
+  "approved_pilot_data_root_id": "pilot-root-v1",
+  "checks_performed": ["schema", "scope", "hash", "path", "duplicate", "no_final_test", "no_glob"],
+  "checks_not_reached": [],
+  "rejection_reasons": [],
+  "accepted_record_count": 1,
+  "file_identity_check": "supported_pass",
+  "file_identity_reason": null,
+  "no_final_test_input_proof": {
+    "status": "pass",
+    "scope": "validator_inputs_and_accepted_paths"
+  },
+  "no_uncontrolled_glob_proof": {
+    "status": "pass",
+    "input_kind": "single_manifest"
+  },
+  "formal_evidence_eligible": false,
+  "started_at": "2026-08-11T00:00:00Z",
+  "ended_at": "2026-08-11T00:00:00Z",
+  "wall_time_ms": 1.0
+}

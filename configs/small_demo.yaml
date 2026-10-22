@@ -1,0 +1,21 @@
+instance_path: data/R2_T10_0.txt
+solver:
+  algorithm: alns
+  constructor: round_robin
+  local_search:
+    enabled: true
+    max_iterations: 20
+    use_stronger: true
+  alns:
+    iterations: 80
+    acceptance: simulated_annealing
+    destroy_fraction: 0.3
+    use_dp_aware_insertion: false
+    frozen_operator_registry_path: ""
+    use_frozen_repair: false
+    use_frozen_destroy: false
+    advisor_mode: rule_based
+visualization:
+  output_dir: outputs
+  dpi: 100
+

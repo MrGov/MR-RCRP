@@ -1,0 +1,37 @@
+# Operator Evolution with LangChain LLM Provider
+#
+# Prerequisites:
+#   1. pip install mrta-rect-coverage[llm]
+#   2. Copy .env.example to .env and fill in your API key
+#
+# Usage:
+#   python experiments/operator_evolution_runner.py \
+#       --config configs/operator_evolution_langchain.yaml
+
+operator_evolution:
+  provider_name: langchain_openai_compatible
+  round_count: 3
+  repair_candidates_per_round: 3
+  destroy_candidates_per_round: 2
+  benchmark_instance_glob: "data/R*_T*_*.txt"
+  seeds: [0, 1, 2]
+  timeout_ms: 2000.0
+  # Fail closed: timeout_only is not a capability sandbox. Set true only after
+  # isolated-host setup, source review, and explicit residual-risk acknowledgement.
+  allow_unsafe_candidate_execution: false
+  top_k_to_keep: 2
+  operator_types_to_evolve:
+    - repair
+    - destroy
+  use_rich_prompts: true
+  generated_dir: generated_operators
+  output_dir: outputs/operator_evolution
+
+# LLM settings are read from environment variables (see .env.example):
+#   OPERATOR_LLM_PROVIDER=langchain_openai_compatible
+#   OPERATOR_LLM_API_KEY=sk-...
+#   OPERATOR_LLM_BASE_URL=https://api.openai.com/v1   (or any compatible endpoint)
+#   OPERATOR_LLM_MODEL=gpt-4o
+#   OPERATOR_LLM_TEMPERATURE=0.7
+#   OPERATOR_LLM_TIMEOUT=120
+#   OPERATOR_LLM_MAX_RETRIES=2

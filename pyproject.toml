@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mrta-rect-coverage"
+version = "0.1.0"
+description = "Baseline framework for multi-robot rectangular coverage routing problem"
+authors = [{ name = "MRTA Team" }]
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "numpy>=1.24",
+    "pyyaml>=6.0",
+    "matplotlib>=3.8"
+]
+
+[project.optional-dependencies]
+llm = [
+    "python-dotenv>=1.0",
+    "langchain-openai>=1.6.7,<2.0",
+    "langchain-core>=1.6.6,<2.0",
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

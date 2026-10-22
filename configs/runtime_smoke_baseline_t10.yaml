@@ -1,0 +1,20 @@
+instance_path: data/R2_T10_0.txt
+solver:
+  algorithm: baseline
+  constructor: spatial_sort
+  local_search:
+    enabled: false
+    max_iterations: 0
+    use_stronger: false
+  alns:
+    iterations: 20
+    acceptance: improvement_only
+    destroy_fraction: 0.25
+    use_dp_aware_insertion: false
+    frozen_operator_registry_path: ""
+    use_frozen_repair: false
+    use_frozen_destroy: false
+    advisor_mode: none
+visualization:
+  output_dir: outputs/r0_smoke
+  dpi: 100

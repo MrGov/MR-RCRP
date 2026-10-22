@@ -1,0 +1,18 @@
+{
+  "repair": [
+    {
+      "name": "repair_r000_000",
+      "operator_type": "repair",
+      "file_path": "D:\\vs_code\\20251217-yang\\R_MRTA_01\\mrta_rect_coverage\\src\\mrta_rect_coverage\\heuristics\\generated_best\\repair_r000_000.py",
+      "source_round": 0
+    }
+  ],
+  "destroy": [
+    {
+      "name": "destroy_r000_000",
+      "operator_type": "destroy",
+      "file_path": "D:\\vs_code\\20251217-yang\\R_MRTA_01\\mrta_rect_coverage\\src\\mrta_rect_coverage\\heuristics\\generated_best\\destroy_r000_000.py",
+      "source_round": 0
+    }
+  ]
+}
