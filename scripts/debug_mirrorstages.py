@@ -1,27 +1,10 @@
 import os
 import json
-from pathlib import Path
 
 from dotenv import load_dotenv
 import httpx
 
-# 当前文件：
-# mrta_rect_coverage/scripts/debug_mirrorstages.py
-#
-# 项目根目录：
-# mrta_rect_coverage/
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-ENV_FILE = PROJECT_ROOT / ".env"
-
-print("PROJECT_ROOT:", PROJECT_ROOT)
-print("ENV_FILE:", ENV_FILE)
-print("ENV EXISTS:", ENV_FILE.exists())
-
-load_dotenv(ENV_FILE)
-
-print("API KEY EXISTS:", bool(os.getenv("OPERATOR_LLM_API_KEY")))
-print("BASE URL EXISTS:", bool(os.getenv("OPERATOR_LLM_BASE_URL")))
-print("MODEL EXISTS:", bool(os.getenv("OPERATOR_LLM_MODEL")))
+load_dotenv()
 
 api_key = os.environ["OPERATOR_LLM_API_KEY"]
 base_url = os.environ["OPERATOR_LLM_BASE_URL"].rstrip("/")

@@ -22,7 +22,7 @@ class Config:
     local_search_max_iterations: int
     local_search_use_stronger: bool
     algorithm: str
-    alns_iterations: int
+    alns_iterations: int | None
     alns_acceptance: str
     alns_destroy_fraction: float
     alns_use_dp_aware_insertion: bool
@@ -32,6 +32,10 @@ class Config:
     advisor_mode: str
     visualization_output_dir: Path
     visualization_dpi: int
+    alns_profile: str = "B0"
+    alns_max_runtime_seconds: float | None = None
+    alns_time_per_task: float | None = None
+    alns_random_seed: int = 0
 
 
 def load_config(path: Optional[str | Path] = None) -> Config:
@@ -68,8 +72,8 @@ def _parse_config(raw: Dict[str, Any], base_path: Path) -> Config:
         local_search_max_iterations=int(local_search.get("max_iterations", 100)),
         local_search_use_stronger=bool(local_search.get("use_stronger", False)),
         algorithm=str(solver_conf.get("algorithm", "baseline")),
-        alns_iterations=int(alns_conf.get("iterations", 200)),
-        alns_acceptance=str(alns_conf.get("acceptance", "improvement_only")),
+        alns_iterations=(int(alns_conf.get("iterations", 200)) if alns_conf.get("iterations", 200) is not None else None),
+        alns_acceptance=str(alns_conf.get("acceptance", "simulated_annealing" if alns_conf.get("profile", "B0").upper() == "B1" else "improvement_only")),
         alns_destroy_fraction=float(alns_conf.get("destroy_fraction", 0.25)),
         alns_use_dp_aware_insertion=bool(alns_conf.get("use_dp_aware_insertion", False)),
         alns_frozen_operator_registry_path=str(alns_conf.get("frozen_operator_registry_path", "")),
@@ -78,4 +82,8 @@ def _parse_config(raw: Dict[str, Any], base_path: Path) -> Config:
         advisor_mode=str(alns_conf.get("advisor_mode", "none")),
         visualization_output_dir=output_dir,
         visualization_dpi=int(vis_conf.get("dpi", 120)),
+        alns_profile=str(alns_conf.get("profile", "B0")).upper(),
+        alns_max_runtime_seconds=(float(alns_conf["max_runtime_seconds"]) if alns_conf.get("max_runtime_seconds") is not None else None),
+        alns_time_per_task=(float(alns_conf["time_per_task"]) if alns_conf.get("time_per_task") is not None else None),
+        alns_random_seed=int(alns_conf.get("random_seed", 0)),
     )

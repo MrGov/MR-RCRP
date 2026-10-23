@@ -164,6 +164,30 @@ def build_f2_feedback(rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     return payload
 
 
+def build_f2d_feedback(rows: Sequence[Mapping[str, Any]], *, parent: Mapping[str, Any],
+                      source_reference: str) -> dict[str, Any]:
+    """F1 scalar base plus measured, parent-specific decision knowledge."""
+    from ..llm.operator_evolution.feedback_builder import select_decision_knowledge
+    payload = build_f1_feedback(rows)
+    payload["feedback_mode"] = "F2-D"
+    payload["decision_knowledge"] = select_decision_knowledge(
+        list(rows), parent_id=parent["operator_id"],
+        parent_source=Path(parent["source_path"]).read_text(encoding="utf-8"),
+        source_reference=source_reference)
+    return payload
+
+
+def build_f2g_feedback(rows: Sequence[Mapping[str, Any]], *, parent: Mapping[str, Any],
+                      diagnosed_operator: Mapping[str, Any], source_reference: str) -> dict[str, Any]:
+    """F1 scalar feedback plus the focused E4-B coverage-workload knowledge."""
+    from ..llm.operator_evolution.feedback_builder import coverage_mode_knowledge
+    payload = build_f1_feedback(rows)
+    payload["feedback_mode"] = "F2-G"
+    payload["geometry_knowledge"] = coverage_mode_knowledge(
+        parent=dict(parent), diagnosed_operator=dict(diagnosed_operator), source_reference=source_reference)
+    return payload
+
+
 def build_behavior_diagnosis(rows: Sequence[Mapping[str, Any]]) -> str:
     """Condense evaluator-derived trials into cautious revision guidance."""
     trials = [
@@ -245,6 +269,10 @@ def revision_prompt(parent: Mapping[str, Any], feedback: Mapping[str, Any], *, r
         for trial in parent.get("trials", [])]
     diagnosis = (f"Behavioral diagnosis (F2 only):\n{feedback['behavior_diagnosis']}\n"
                  if mode == "F2" else "")
+    if mode == "F2-D":
+        diagnosis = "Decision-oriented evaluator evidence and revision directions:\n" + json.dumps(feedback["decision_knowledge"], sort_keys=True) + "\n"
+    if mode == "F2-G":
+        diagnosis = "Coverage-mode-aware workload knowledge (authoritative scope and formulas):\n" + json.dumps(feedback["geometry_knowledge"], sort_keys=True) + "\n"
     return (
         f"E2 feedback mode: {mode}\nParent candidate ID: {parent['operator_id']}\n"
         f"Parent source SHA-256: {digest}\nParent source:\n```python\n{source}\n```\n"
@@ -260,7 +288,9 @@ def revision_prompt(parent: Mapping[str, Any], feedback: Mapping[str, Any], *, r
             previous_summary=feedback["summary"],
             top_operators=feedback["top_candidates"],
             weak_operators=feedback["weak_candidates"],
+            n=n,
         )
+        + ("\nF2-G scope reminder: apply the coverage-workload formulas to actual insertion workload and bottleneck hints; use only the listed real context attributes. No evaluator is exposed. Do not add mode-switch penalties or reimplement Route-DP. The geometry knowledge above overrides generic heuristic suggestions.\n" if mode == "F2-G" else "")
     )
 
 

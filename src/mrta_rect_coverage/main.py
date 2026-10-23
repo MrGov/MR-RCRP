@@ -64,11 +64,19 @@ def main() -> None:
 
     if config.algorithm.strip().lower() == "alns":
         advisor = _build_advisor(config.advisor_mode)
+        if config.alns_profile not in {"B0", "B1"}:
+            raise ValueError("alns profile must be B0 or B1")
+        config_factory = ALNSConfig.enhanced if config.alns_profile == "B1" else ALNSConfig
+        runtime = config.alns_max_runtime_seconds
+        if runtime is None and config.alns_time_per_task is not None:
+            runtime = config.alns_time_per_task * instance.task_count
         result = solve_with_alns(
             instance,
             constructor=config.constructor,
-            config=ALNSConfig(
+            config=config_factory(
                 iterations=config.alns_iterations,
+                max_runtime_seconds=runtime,
+                random_seed=config.alns_random_seed,
                 acceptance=config.alns_acceptance,
                 destroy_fraction=config.alns_destroy_fraction,
                 use_dp_aware_insertion=config.alns_use_dp_aware_insertion,
@@ -92,7 +100,10 @@ def main() -> None:
             filename=f"{instance.name}_operators.png",
             dpi=config.visualization_dpi,
         )
-        print(f"ALNS iterations: {config.alns_iterations}")
+        print(f"ALNS profile: {config.alns_profile}")
+        print(f"ALNS iterations: {result.iterations_completed}")
+        print(f"ALNS runtime: {result.runtime_seconds:.3f}s; termination: {result.termination_reason}")
+        print(f"Route-DP calls: {result.route_dp_calls}")
         print(f"Advisor mode: {config.advisor_mode}")
         print(f"Saved convergence plot to: {convergence_path}")
         print(f"Saved operator plot to: {usage_path}")

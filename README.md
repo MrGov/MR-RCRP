@@ -254,3 +254,76 @@ ALNS can load frozen operators via config fields under `solver.alns`:
 - `frozen_operator_registry_path`
 - `use_frozen_repair`
 - `use_frozen_destroy`
+
+### E3 search control profiles
+
+`ALNSConfig()` preserves B0: cumulative mean rewards, improvement-only acceptance,
+and 200 iterations. `ALNSConfig.enhanced()` selects B1: segment reaction weights
+and simulated annealing. Both use the same operators, rewards, local search,
+feasibility checks, and Exact Route-DP. Existing generated repair interfaces are unchanged.
+The CLI's `configs/default.yaml` now selects B1 and one second per task;
+`configs/e3_b0.yaml` preserves the B0 controls for matched-time comparisons.
+Existing programmatic callers of `ALNSConfig()` retain their earlier behavior.
+
+B1 updates used operators every 20 iterations with
+`w = max(0.1, (1 - 0.2) * w + 0.2 * segment_reward / segment_uses)`;
+unused operators retain their weights. Lifetime usage/reward statistics remain available.
+Its initial temperature is `T0 = -0.01 * initial_makespan / log(0.5)`:
+a 1% worsening initially has 50% acceptance probability. The temperature decreases
+geometrically to `0.01 * T0` over budget progress. Global best is retained independently
+of the accepted current solution.
+
+For task-scaled runtime use `iterations=None, max_runtime_seconds=instance.task_count`.
+The optional iteration and runtime bounds stop at the first reached. Runtime includes
+initial evaluation and all search work, but excludes solver construction. Bounds are
+checked between complete iterations, so an iteration can overrun the deadline;
+actual elapsed time is returned. Results and history include completed iterations,
+elapsed seconds, and Route-DP calls (including bounded generated repair calls).
+
+Run from the project directory in PowerShell with the existing environment:
+
+```powershell
+$env:PYTHONPATH='src'
+& 'G:\Anaconda\envs\mrta_env\python.exe' -m mrta_rect_coverage.main --config configs/e3_b1.yaml
+& 'G:\Anaconda\envs\mrta_env\python.exe' -m mrta_rect_coverage.main --config configs/e3_b0.yaml
+& 'G:\Anaconda\envs\mrta_env\python.exe' -m mrta_rect_coverage.experiments.e3_alns --output outputs/e3_alns_rerun
+```
+
+The E3 development comparison fixes four existing instances (10/20/40/80 tasks,
+2/4/8 robots), seeds 0 and 1, the spatial-sort constructor, and one second per task.
+Each run saves its exact configuration, initial/best routes, feasibility-checked
+makespan, actual runtime/overrun, DP calls/cache misses, and convergence history.
+Use a fresh output directory to preserve earlier results. This experiment does not
+call an LLM. `--smoke-only` separately checks an existing E2-R repair under B1.
+
+### E4-A decision-oriented DP feedback
+
+`select_decision_knowledge` in `llm/operator_evolution/feedback_builder.py` selects
+parent-specific failure evidence for bottleneck transfer, coverage/turning geometry,
+and route-state response. It uses canonical evaluator measurements, source references,
+code anchors, and an improving contrast case. Rules select by decision relevance and
+unique-instance support, without treating state switches or cascade as penalties.
+`build_f2d_feedback` and the existing parent revision prompt consume this payload.
+The repair contract still supplies no evaluator; generated code uses heuristic hints,
+while the external Exact Route-DP determines feasibility and makespan.
+
+The small E4 runner reuses frozen B1 and existing bounded candidate loading:
+
+```powershell
+$env:PYTHONPATH='src'
+& 'G:\Anaconda\envs\mrta_env\python.exe' -m mrta_rect_coverage.experiments.e4_decision_feedback --stage compatibility
+& 'G:\Anaconda\envs\mrta_env\python.exe' -m mrta_rect_coverage.experiments.e4_decision_feedback --stage evolve --condition F2-D
+& 'G:\Anaconda\envs\mrta_env\python.exe' -m mrta_rect_coverage.experiments.e4_decision_feedback --stage evolve --condition F1
+& 'G:\Anaconda\envs\mrta_env\python.exe' -m mrta_rect_coverage.experiments.e4_decision_feedback --stage evolve --condition F2
+& 'G:\Anaconda\envs\mrta_env\python.exe' -m mrta_rect_coverage.experiments.e4_decision_feedback --stage evaluate
+& 'G:\Anaconda\envs\mrta_env\python.exe' -m mrta_rect_coverage.experiments.e4_decision_feedback --stage short
+& 'G:\Anaconda\envs\mrta_env\python.exe' -m mrta_rect_coverage.experiments.e4_decision_feedback --stage analyze
+```
+
+`evolve` calls the provider only when a saved response is absent. The other stages
+run offline. Existing responses and per-run results are resumed. Add `--output` to
+use a separate experiment directory; a fresh evolution directory incurs new calls.
+E4 actual prompts, raw responses, sources/hashes, development selection, metrics,
+convergence and interpretation are in `outputs/e4a_decision_feedback/REPORT.md`.
+The saved F2-D prompt predates an interface wording clarification; its exact sent
+text is preserved and results are not attributed to the unsent clarified version.
