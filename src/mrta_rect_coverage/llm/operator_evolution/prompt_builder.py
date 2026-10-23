@@ -31,6 +31,7 @@ def build_revision_prompt(
     previous_summary: Dict[str, object],
     top_operators: List[Dict[str, object]],
     weak_operators: List[Dict[str, object]],
+    n: int = 3,
 ) -> str:
     if use_rich_prompts:
         return _rich_rev(
@@ -39,6 +40,7 @@ def build_revision_prompt(
             previous_summary=previous_summary,
             top_operators=top_operators,
             weak_operators=weak_operators,
+            n=n,
         )
     return _compact_revision_prompt(
         operator_type=operator_type,

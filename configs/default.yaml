@@ -7,7 +7,10 @@ solver:
     max_iterations: 100
     use_stronger: false
   alns:
-    iterations: 200
+    profile: B1
+    iterations: null
+    time_per_task: 1.0
+    random_seed: 0
     acceptance: simulated_annealing
     destroy_fraction: 0.25
     use_dp_aware_insertion: false

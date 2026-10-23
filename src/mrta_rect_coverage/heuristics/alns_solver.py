@@ -7,6 +7,7 @@ import math
 import random
 from dataclasses import dataclass, field
 from pathlib import Path
+from time import perf_counter
 from typing import Callable, Dict, List, Sequence
 
 from ..core.cost_matrix import CostMatrix
@@ -40,11 +41,19 @@ RepairFn = Callable[[MultiRobotSolution, List[int], SolutionEvaluation], MultiRo
 
 @dataclass
 class ALNSConfig:
-    iterations: int = 200
+    iterations: int | None = 200
+    max_runtime_seconds: float | None = None  # Both limits: stop at the first reached.
     destroy_fraction: float = 0.25
     acceptance: str = "improvement_only"  # or "simulated_annealing"
-    initial_temperature: float = 5.0
+    initial_temperature: float | None = 5.0  # None calibrates from initial makespan.
     cooling_rate: float = 0.985
+    cooling_schedule: str = "iteration"  # Legacy, or "progress" (time when bounded).
+    initial_worsening_fraction: float = 0.01
+    initial_acceptance_probability: float = 0.5
+    final_temperature_ratio: float = 0.01
+    weight_update: str = "cumulative"  # Legacy, or "segment".
+    segment_length: int = 20
+    reaction_factor: float = 0.2
     random_seed: int = 0
     use_dp_aware_insertion: bool = False
     frozen_operator_registry_path: str | None = None
@@ -55,6 +64,34 @@ class ALNSConfig:
     allow_real_provider_frozen_deployment: bool = False
     explicit_runtime_risk_ack: bool = False
     runtime_authorization_source: str = ""
+
+    @classmethod
+    def enhanced(cls, **overrides) -> "ALNSConfig":
+        """B1 preset; use iterations=None and max_runtime_seconds=n_tasks for E3."""
+        options = dict(acceptance="simulated_annealing", initial_temperature=None,
+                       cooling_schedule="progress", weight_update="segment")
+        options.update(overrides)
+        return cls(**options)
+
+    def __post_init__(self) -> None:
+        if self.iterations is None and self.max_runtime_seconds is None:
+            raise ValueError("at least one termination limit is required")
+        if self.iterations is not None and self.iterations < 0:
+            raise ValueError("iterations must be nonnegative")
+        if self.max_runtime_seconds is not None and (not math.isfinite(self.max_runtime_seconds) or self.max_runtime_seconds <= 0):
+            raise ValueError("max_runtime_seconds must be finite and positive")
+        if self.acceptance not in {"improvement_only", "simulated_annealing"}:
+            raise ValueError("unknown acceptance strategy")
+        if self.weight_update not in {"cumulative", "segment"} or self.cooling_schedule not in {"iteration", "progress"}:
+            raise ValueError("unknown weight update or cooling schedule")
+        if self.segment_length < 1 or not 0 < self.reaction_factor <= 1:
+            raise ValueError("segment_length >= 1 and 0 < reaction_factor <= 1 required")
+        if not 0 < self.initial_acceptance_probability < 1 or not 0 < self.initial_worsening_fraction < 1:
+            raise ValueError("initial probability and worsening fraction must be in (0, 1)")
+        if not 0 < self.final_temperature_ratio <= 1 or not 0 < self.cooling_rate <= 1:
+            raise ValueError("cooling factors must be in (0, 1]")
+        if self.initial_temperature is not None and (not math.isfinite(self.initial_temperature) or self.initial_temperature <= 0):
+            raise ValueError("initial_temperature must be finite and positive")
 
 
 @dataclass
@@ -70,6 +107,13 @@ class ALNSResult:
     iteration_history: List[dict]
     operator_usage_stats: Dict[str, Dict[str, OperatorRecord]]
     fallback_events: List[dict] = field(default_factory=list)
+    runtime_seconds: float = 0.0  # solve(), including initial evaluation, excluding setup.
+    iterations_completed: int = 0
+    route_dp_calls: int = 0
+    route_dp_cache_misses: int = 0
+    termination_reason: str = "iterations"
+    initial_temperature: float = 0.0
+    initial_makespan: float = 0.0
 
 
 class ALNSSolver:
@@ -133,6 +177,10 @@ class ALNSSolver:
             "destroy": {name: OperatorRecord() for name in self.destroy_ops},
             "repair": {name: OperatorRecord() for name in self.repair_ops},
         }
+        self.segment_stats = {
+            group: {name: OperatorRecord() for name in records}
+            for group, records in self.operator_stats.items()
+        }
 
     def register_development_repair(self, proxy: CandidateProxy, *, name: str) -> None:
         """Add a loader-validated, bounded repair for development experiments."""
@@ -144,8 +192,12 @@ class ALNSSolver:
         self.frozen_repair_ops.add(name)
         self.repair_weights[name] = 1.0
         self.operator_stats["repair"][name] = OperatorRecord()
+        self.segment_stats["repair"][name] = OperatorRecord()
 
     def solve(self) -> ALNSResult:
+        started_at = perf_counter()
+        calls_start = self.route_dp.statistics()["calls"] + self.generated_route_dp_calls
+        misses_start = self.route_dp.statistics()["cache_misses"] + self.generated_route_dp_cache_misses
         current_solution = MultiRobotSolution(routes=[list(route) for route in self.initial_solution.routes])
         current_eval = self.solution_evaluator.evaluate(current_solution)
 
@@ -153,10 +205,21 @@ class ALNSSolver:
         best_eval = current_eval
         history: List[dict] = []
 
-        temperature = self.config.initial_temperature
+        initial_makespan = current_eval.makespan
+        initial_temperature = self._initial_temperature(initial_makespan)
+        temperature = initial_temperature
         recent_best: List[float] = [best_eval.makespan]
 
-        for iteration in range(1, self.config.iterations + 1):
+        iteration = 0
+        termination_reason = "iterations"
+        while self.config.iterations is None or iteration < self.config.iterations:
+            elapsed = perf_counter() - started_at
+            if self.config.max_runtime_seconds is not None and elapsed >= self.config.max_runtime_seconds:
+                termination_reason = "time"
+                break
+            iteration += 1
+            if self.config.cooling_schedule == "progress":
+                temperature = self._progress_temperature(initial_temperature, elapsed, iteration - 1)
             context = self._build_context(best_eval, current_eval, recent_best)
             destroy_name, repair_name, phase = self._select_operators(context)
 
@@ -238,7 +301,8 @@ class ALNSSolver:
 
             self._update_operator_stats("destroy", destroy_name, destroy_reward)
             self._update_operator_stats("repair", repair_name, repair_reward)
-            self._update_weights()
+            if self.config.weight_update == "cumulative" or iteration % self.config.segment_length == 0:
+                self._update_weights()
 
             history.append(
                 {
@@ -251,6 +315,10 @@ class ALNSSolver:
                     "current_makespan": current_eval.makespan,
                     "best_makespan": best_eval.makespan,
                     "temperature": temperature,
+                    "elapsed_seconds": perf_counter() - started_at,
+                    "route_dp_calls": self.route_dp.statistics()["calls"] + self.generated_route_dp_calls - calls_start,
+                    "candidate_makespan": refined_eval.makespan,
+                    "candidate_delta": refined_eval.makespan - previous_eval.makespan,
                     "fallback_used": fallback_used,
                     "fallback_reason": fallback_reason,
                     "llm_operator_success": generated_selected and not fallback_used,
@@ -270,7 +338,27 @@ class ALNSSolver:
             iteration_history=history,
             operator_usage_stats=self.operator_stats,
             fallback_events=list(self.fallback_events),
+            runtime_seconds=perf_counter() - started_at,
+            iterations_completed=iteration,
+            route_dp_calls=self.route_dp.statistics()["calls"] + self.generated_route_dp_calls - calls_start,
+            route_dp_cache_misses=self.route_dp.statistics()["cache_misses"] + self.generated_route_dp_cache_misses - misses_start,
+            termination_reason=termination_reason,
+            initial_temperature=initial_temperature,
+            initial_makespan=initial_makespan,
         )
+
+    def _initial_temperature(self, makespan: float) -> float:
+        if self.config.initial_temperature is not None:
+            return self.config.initial_temperature
+        # A 1% worsening has probability p at the start; no extra DP evaluations.
+        return max(1e-9, -self.config.initial_worsening_fraction * makespan /
+                   math.log(self.config.initial_acceptance_probability))
+
+    def _progress_temperature(self, initial: float, elapsed: float, completed: int) -> float:
+        progress = (elapsed / self.config.max_runtime_seconds
+                    if self.config.max_runtime_seconds is not None
+                    else completed / max(1, self.config.iterations or 1))
+        return initial * self.config.final_temperature_ratio ** min(1.0, max(0.0, progress))
 
     def _register_frozen_operators(self) -> None:
         registry_path = self.config.frozen_operator_registry_path
@@ -748,8 +836,22 @@ class ALNSSolver:
         rec = self.operator_stats[group][name]
         rec.uses += 1
         rec.score += reward
+        segment = self.segment_stats[group][name]
+        segment.uses += 1
+        segment.score += reward
 
     def _update_weights(self) -> None:
+        if self.config.weight_update == "segment":
+            # React to the last segment, retaining (1-rho) of the prior weight.
+            # Unused operators retain their weight; a small floor keeps exploration.
+            rho = self.config.reaction_factor
+            for group, weights in (("destroy", self.destroy_weights), ("repair", self.repair_weights)):
+                for name, rec in self.segment_stats[group].items():
+                    if rec.uses:
+                        weights[name] = max(0.1, (1 - rho) * weights[name] + rho * rec.score / rec.uses)
+                    rec.uses = 0
+                    rec.score = 0.0
+            return
         for name, rec in self.operator_stats["destroy"].items():
             self.destroy_weights[name] = 1.0 + rec.score / max(1, rec.uses)
         for name in self.repair_weights:

@@ -1,0 +1,14 @@
+instance_path: data/R2_T10_0.txt
+solver:
+  algorithm: alns
+  constructor: spatial_sort
+  alns:
+    profile: B1
+    iterations: null
+    time_per_task: 1.0
+    random_seed: 0
+    destroy_fraction: 0.25
+    advisor_mode: none
+visualization:
+  output_dir: outputs/e3_alns/demo
+  dpi: 150
