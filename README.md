@@ -418,3 +418,27 @@ for a fresh run. Existing stages resume saved evaluations and the frozen selecti
 The default directory `outputs/e8_repair_portfolio/` contains the source inventory,
 intrinsic structure labels, canonical DP evidence, selection decision, complete
 solutions, operator usage/accepted/best counts, convergence figure and report.
+
+### E9 portfolio mechanism check and consolidated versions
+
+`e9_portfolio_diagnosis` reads the existing 24 E8 runs unchanged. It adds only
+eight PORT-ALL runs: three manual repairs plus R* and the frozen E8 auxiliary,
+with the same four destroys, independent roulette and one second per task.
+Five repair slots change sampling as well as manual-operator retention; this
+is a diagnostic, not an isolated causal test of balancing or complementarity.
+No provider calls, candidate reselection or B1/DP changes occur.
+
+```powershell
+$env:PYTHONPATH='src'
+foreach ($stage in @('prepare','diagnose','benchmark','analyze')) {
+  & 'G:\Anaconda\envs\mrta_env\python.exe' -m mrta_rect_coverage.experiments.e9_portfolio_diagnosis --stage $stage
+  if ($LASTEXITCODE -ne 0) { throw "E9 failed at $stage" }
+}
+```
+
+Outputs in `outputs/e9_portfolio_diagnosis/` include operator usage, bounded
+execution timing, wall-time search checkpoints, PORT-ALL results and diagnosis.
+`algorithm_versions.json` freezes source hashes, exact pool order, per-instance
+parameters and reproduction commands for V1, V2, AUX, PORT and PORT-ALL. V1
+remains the stable main version; C2 remains an exploratory prototype without
+established reliable gains. Use a fresh `--output` to repeat only PORT-ALL.
