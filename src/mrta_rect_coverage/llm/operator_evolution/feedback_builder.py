@@ -6,6 +6,57 @@ from typing import Dict, List
 from .eligibility_policy import candidate_is_selection_eligible
 
 
+def build_pair_feedback(parent_row, *, destroy_identity, source_reference):
+    """E7: link observed removal, restoration and external DP response.
+
+    Select contrasting cases by decision outcome, never by largest state change.
+    Sources index real evaluator trials; absence is explicit, not a zero metric.
+    """
+    metrics = ("dp_state_switch_fraction", "hv_mode_switch_fraction",
+        "entry_corner_switch_fraction", "exit_corner_switch_fraction", "dp_cascade_count",
+        "dp_cascade_ratio", "bottleneck_relief", "travel_change", "coverage_change", "turning_change")
+    valid = [(i,t) for i,t in enumerate(parent_row["trials"]) if t.get("feasible")]
+    losses = sorted([(i,t) for i,t in valid if t.get("parent_relative_improvement", t.get("relative_improvement",0)) < -1e-9],
+                    key=lambda p: p[1].get("parent_relative_improvement",p[1].get("relative_improvement",0)))
+    gains = sorted([(i,t) for i,t in valid if t.get("parent_relative_improvement", t.get("relative_improvement",0)) > 1e-9],
+                   key=lambda p: -p[1].get("parent_relative_improvement",p[1].get("relative_improvement",0)))
+    transfers = [(i,t) for i,t in losses if set(t.get("bottleneck_after",[])) - set(t.get("bottleneck_before",[]))]
+    selected, seen = [], set()
+    for category, pool in (("degradation",losses),("improvement",gains),("bottleneck_transfer",transfers)):
+        for i,t in pool:
+            if i in seen:
+                if category == "bottleneck_transfer":
+                    next(x for x in selected if x["trial_index"] == i)["also_bottleneck_transfer"] = True
+                continue
+            obs = dict(t)
+            behavior = t.get("parent_to_candidate_behavior")
+            obs["parent_to_candidate_behavior"] = {k: behavior.get(k,"unavailable") if isinstance(behavior,dict) else "unavailable" for k in metrics}
+            selected.append(dict(category=category, trial_index=i,
+                source=f"{source_reference}#/trials/{i}", observation=obs))
+            seen.add(i)
+            break
+    if not selected and valid:
+        i,t = valid[0]
+        selected.append(dict(category="tie",trial_index=i,source=f"{source_reference}#/trials/{i}",observation=t))
+    return dict(feedback_mode="E7-pair-aware", fixed_destroy=destroy_identity,
+        parent_repair_hash=parent_row["source_hash"],
+        summary=dict(executed=len(parent_row["trials"]),feasible=len(valid),
+            improved=len(gains),degraded=len(losses),bottleneck_transfer_losses=len(transfers),
+            mean_final_makespan=sum(t["candidate_makespan"] for _,t in valid)/len(valid) if valid else None),
+        representative_cases=selected,
+        unavailable_outcomes=[k for k,pool in (("degradation",losses),("improvement",gains),("bottleneck_transfer_loss",transfers)) if not pool],
+        revision_directions=("Adapt restoration to the fixed destroy's released edge bundles, not generic random removals. "
+            "Use removed_task_moves and full route sequences to inspect where slack was consumed and a new bottleneck appeared. "
+            "Revise robot choice and insertion position jointly with incremental workload estimates anchored in measured partial route costs. "
+            "The parent uses area-scaled work and Euclidean center detours; consider real H/V sweep/turning workload and Manhattan/depot features as approximations. "
+            "Update projected loads after each insertion; avoid blindly protecting the original bottleneck once other routes become critical. "
+            "Choose your own repair strategy; retain successful behavior. State/cascade changes are not objectives or penalties."),
+        limitations=("All evidence is external complete-solution evaluator output. Associations are not causal proof; "
+            "aggregate travel/coverage/turning deltas are totals across robots, not critical-route deltas. "
+            "Final positions do not expose chronological insertion steps or intermediate estimated loads (unavailable). "
+            "No per-insertion counterfactual DP evaluation is provided. Feasibility and full Exact-DP makespan decide quality."))
+
+
 def coverage_mode_knowledge(*, parent: dict, diagnosed_operator: dict,
                             source_reference: str) -> dict:
     """E4-B: one geometry/workload direction, grounded in saved evaluator trials."""

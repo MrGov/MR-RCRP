@@ -327,3 +327,66 @@ E4 actual prompts, raw responses, sources/hashes, development selection, metrics
 convergence and interpretation are in `outputs/e4a_decision_feedback/REPORT.md`.
 The saved F2-D prompt predates an interface wording clarification; its exact sent
 text is preserved and results are not attributed to the unsent clarified version.
+
+### E6 optional Destroy–Repair pair action
+
+`ALNSConfig` defaults to `pair_selection_mode="independent"` (E5 V1).
+V2 uses `pair_selection_mode="coupled"` and names an already registered
+`coupled_destroy_operator` / `coupled_repair_operator`; it registers no new copies.
+The action can select that pair or retain independent operator roulette.
+The pair's roulette probability supplies the prior odds, adjusted every B1 segment
+by the relative mean pair/independent reward with reaction factor 0.2.
+This prior adds a pair-selection opportunity: the initial active probability is
+6.25% in the 4×4 pool, and total pair probability including independent coincidence
+is 12.109375%. Measured frequency must accompany all performance comparisons.
+Single-operator reward statistics and pair-action statistics describe different
+selection decisions; their scores are not additive causal contributions.
+Fallback pair attempts receive zero reward and no successful/accepted/best credit.
+
+The result exposes `pair_action_stats`, `timing_breakdown_seconds`, and
+`generated_operator_execution`. Full-evaluation time is a nested diagnostic:
+local-search evaluations are already included in local-search phase time.
+Bounded process wall time and run-request wait time locate lifecycle overhead
+without changing candidate execution or feasibility checks.
+
+The E6 runner reuses the E5 selected source/hash records, makes no LLM calls,
+and preserves E5 history. It runs B1+R (3×4), V1 (4×4), V2 (4×4), four development
+instances, seeds 0/1, and one second per task. Existing E6 runs resume only with
+identical saved configuration and implementation hashes.
+
+```powershell
+$env:PYTHONPATH='src'
+& 'G:\Anaconda\envs\mrta_env\python.exe' -m mrta_rect_coverage.experiments.e6_pair_selection --stage smoke
+& 'G:\Anaconda\envs\mrta_env\python.exe' -m mrta_rect_coverage.experiments.e6_pair_selection --stage benchmark
+& 'G:\Anaconda\envs\mrta_env\python.exe' -m mrta_rect_coverage.experiments.e6_pair_selection --stage analyze
+```
+
+Add `--output outputs/e6_pair_selection_rerun` to each command for a fresh run.
+The output directory contains exact configs, frozen identities, an E5 solver
+snapshot, complete solutions, action/phase histories, CSV summaries, and
+wall-time convergence figures. Results remain development/exploratory evidence.
+
+### E7 pair-aware repair evolution
+
+`e7_cooperative_evolution` freezes E5 D*/R* and the E6 solver. It saves one D*
+output per complete parent/seed, then evaluates every repair on those identical
+partial routes and removed tasks. Feedback links removal origins, final insertion
+positions, route costs and canonical R3 DP behavior. No evaluator is exposed to
+candidate code. One real revision request produces at most two repair children.
+Short coupled B1 runs on three predeclared development instances determine whether
+to adopt a child; the original repair remains available. Four different development
+instances evaluate V1/V2/V3 with equal task-count time budgets and 4 x 4 pools.
+If no child qualifies, V3 explicitly retains R* and is a repeat of V2.
+
+```powershell
+$env:PYTHONPATH='src'
+foreach ($stage in @('prepare','evolve','evaluate','short','select','smoke','benchmark','analyze')) {
+  & 'G:\Anaconda\envs\mrta_env\python.exe' -m mrta_rect_coverage.experiments.e7_cooperative_evolution --stage $stage
+  if ($LASTEXITCODE -ne 0) { throw "E7 failed at $stage" }
+}
+```
+
+Saved stages resume without new provider calls. A fresh `--output` directory
+creates a new exploratory evolution run. Exact sent prompts, raw response,
+lineage, fixed-pair trials, selection records, complete ALNS histories and results
+are preserved in `outputs/e7_cooperative_evolution/`; see its `REPORT.md`.

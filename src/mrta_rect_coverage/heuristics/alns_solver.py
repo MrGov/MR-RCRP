@@ -54,6 +54,9 @@ class ALNSConfig:
     weight_update: str = "cumulative"  # Legacy, or "segment".
     segment_length: int = 20
     reaction_factor: float = 0.2
+    pair_selection_mode: str = "independent"  # Legacy V1, or "coupled" adaptive pair action.
+    coupled_destroy_operator: str | None = None
+    coupled_repair_operator: str | None = None
     random_seed: int = 0
     use_dp_aware_insertion: bool = False
     frozen_operator_registry_path: str | None = None
@@ -114,6 +117,9 @@ class ALNSResult:
     termination_reason: str = "iterations"
     initial_temperature: float = 0.0
     initial_makespan: float = 0.0
+    pair_action_stats: Dict[str, float | int] = field(default_factory=dict)
+    timing_breakdown_seconds: Dict[str, float] = field(default_factory=dict)
+    generated_operator_execution: Dict[str, Dict[str, dict]] = field(default_factory=dict)
 
 
 class ALNSSolver:
@@ -134,6 +140,12 @@ class ALNSSolver:
                 "dp_aware_insertion is a compatibility alias for greedy_insertion, "
                 "not an independent repair operator"
             )
+        if self.config.pair_selection_mode not in {"independent", "coupled"}:
+            raise ValueError("pair_selection_mode must be independent or coupled")
+        if self.config.pair_selection_mode == "coupled" and not (
+            self.config.coupled_destroy_operator and self.config.coupled_repair_operator
+        ):
+            raise ValueError("coupled selection requires a configured destroy/repair pair")
         self.advisor = advisor
         self.rng = random.Random(self.config.random_seed)
 
@@ -147,6 +159,19 @@ class ALNSSolver:
         self.solution_evaluator = MultiRobotSolutionEvaluator(
             self.route_dp, instance=instance
         )
+        self._full_evaluation_scope: str | None = None
+        self._full_evaluation_time = {"initial": 0.0, "local_search": 0.0}
+        original_full_evaluate = self.solution_evaluator.evaluate
+
+        def timed_full_evaluate(solution):
+            started = perf_counter()
+            try:
+                return original_full_evaluate(solution)
+            finally:
+                if self._full_evaluation_scope is not None:
+                    self._full_evaluation_time[self._full_evaluation_scope] += perf_counter() - started
+
+        self.solution_evaluator.evaluate = timed_full_evaluate
 
         self.initial_solution = resolve_constructor(constructor)(instance)
 
@@ -181,6 +206,22 @@ class ALNSSolver:
             group: {name: OperatorRecord() for name in records}
             for group, records in self.operator_stats.items()
         }
+        self._last_selection_action = "independent"
+        self.coupled_selection_preference = 1.0
+        self.pair_action_stats = {
+            "uses": 0,
+            "successful_uses": 0,
+            "accepted": 0,
+            "global_best": 0,
+            "reward": 0.0,
+            "fallbacks": 0,
+            "independent_coincidental_uses": 0,
+        }
+        self.pair_selection_segment = {
+            "independent": OperatorRecord(),
+            "coupled": OperatorRecord(),
+        }
+        self.generated_operator_execution = {"destroy": {}, "repair": {}}
 
     def register_development_repair(self, proxy: CandidateProxy, *, name: str) -> None:
         """Add a loader-validated, bounded repair for development experiments."""
@@ -208,10 +249,18 @@ class ALNSSolver:
 
     def solve(self) -> ALNSResult:
         started_at = perf_counter()
+        if self.config.pair_selection_mode == "coupled" and (
+            self.config.coupled_destroy_operator not in self.destroy_ops
+            or self.config.coupled_repair_operator not in self.repair_ops
+        ):
+            raise ValueError("configured coupled pair must be registered before solve()")
         calls_start = self.route_dp.statistics()["calls"] + self.generated_route_dp_calls
         misses_start = self.route_dp.statistics()["cache_misses"] + self.generated_route_dp_cache_misses
         current_solution = MultiRobotSolution(routes=[list(route) for route in self.initial_solution.routes])
+        self._full_evaluation_scope = "initial"
         current_eval = self.solution_evaluator.evaluate(current_solution)
+        self._full_evaluation_scope = None
+        initial_full_evaluation_seconds = self._full_evaluation_time["initial"]
 
         best_solution = MultiRobotSolution(routes=[list(route) for route in current_solution.routes])
         best_eval = current_eval
@@ -221,6 +270,12 @@ class ALNSSolver:
         initial_temperature = self._initial_temperature(initial_makespan)
         temperature = initial_temperature
         recent_best: List[float] = [best_eval.makespan]
+        phase_seconds = {
+            "destroy_execution_seconds": 0.0,
+            "partial_evaluation_seconds": 0.0,
+            "repair_execution_seconds": 0.0,
+            "local_search_seconds": 0.0,
+        }
 
         iteration = 0
         termination_reason = "iterations"
@@ -230,9 +285,13 @@ class ALNSSolver:
                 termination_reason = "time"
                 break
             iteration += 1
+            iteration_started = perf_counter()
             if self.config.cooling_schedule == "progress":
                 temperature = self._progress_temperature(initial_temperature, elapsed, iteration - 1)
             context = self._build_context(best_eval, current_eval, recent_best)
+            self._last_selection_action = "independent"
+            selection_probability = (self._coupled_selection_probability()
+                                     if self.config.pair_selection_mode == "coupled" else 0.0)
             destroy_name, repair_name, phase = self._select_operators(context)
 
             destroy_fn = self.destroy_ops[destroy_name]
@@ -240,16 +299,33 @@ class ALNSSolver:
             fallback_event_start = len(self.fallback_events)
 
             remove_count = max(1, int(self.config.destroy_fraction * self.instance.task_count))
+            stage_started = perf_counter()
             partial_solution, removed_tasks = destroy_fn(current_solution, current_eval, remove_count)
+            destroy_seconds = perf_counter() - stage_started
+            phase_seconds["destroy_execution_seconds"] += destroy_seconds
+
+            stage_started = perf_counter()
             partial_eval = self.solution_evaluator.evaluate_partial(partial_solution)
+            partial_evaluation_seconds = perf_counter() - stage_started
+            phase_seconds["partial_evaluation_seconds"] += partial_evaluation_seconds
 
+            stage_started = perf_counter()
             repaired_solution = repair_fn(partial_solution, removed_tasks, partial_eval)
+            repair_seconds = perf_counter() - stage_started
+            phase_seconds["repair_execution_seconds"] += repair_seconds
 
-            refined_solution, refined_eval = run_stronger_local_search(
-                repaired_solution,
-                self.solution_evaluator,
-                max_iterations=1,
-            )
+            stage_started = perf_counter()
+            self._full_evaluation_scope = "local_search"
+            try:
+                refined_solution, refined_eval = run_stronger_local_search(
+                    repaired_solution,
+                    self.solution_evaluator,
+                    max_iterations=1,
+                )
+            finally:
+                self._full_evaluation_scope = None
+            local_search_seconds = perf_counter() - stage_started
+            phase_seconds["local_search_seconds"] += local_search_seconds
 
             previous_eval = current_eval
             accepted, reason = self._accept(current_eval, refined_eval, temperature)
@@ -281,6 +357,11 @@ class ALNSSolver:
             )
             generated_destroy = destroy_name in self.frozen_destroy_ops
             generated_repair = repair_name in self.frozen_repair_ops
+            selected_configured_pair = (
+                destroy_name == self.config.coupled_destroy_operator
+                and repair_name == self.config.coupled_repair_operator
+            )
+            coupled_pair_selected = self._last_selection_action == "coupled" and selected_configured_pair
             attribution_ambiguous = (
                 fallback_used and generated_destroy and generated_repair
             )
@@ -311,10 +392,34 @@ class ALNSSolver:
                     else "credited",
                 }
 
+            coupled_pair_fallback = coupled_pair_selected and fallback_used
+            if coupled_pair_selected:
+                self.pair_action_stats["uses"] += 1
+                self.pair_selection_segment["coupled"].uses += 1
+                if coupled_pair_fallback:
+                    self.pair_action_stats["fallbacks"] += 1
+                else:
+                    self.pair_action_stats["successful_uses"] += 1
+                    self.pair_action_stats["accepted"] += int(accepted)
+                    new_global_best = score >= 8.0
+                    self.pair_action_stats["global_best"] += int(new_global_best)
+                    self.pair_action_stats["reward"] += score
+                    self.pair_selection_segment["coupled"].score += score
+            elif self.config.pair_selection_mode == "coupled":
+                self.pair_selection_segment["independent"].uses += 1
+                self.pair_selection_segment["independent"].score += score
+
             self._update_operator_stats("destroy", destroy_name, destroy_reward)
             self._update_operator_stats("repair", repair_name, repair_reward)
             if self.config.weight_update == "cumulative" or iteration % self.config.segment_length == 0:
                 self._update_weights()
+            if (self.config.pair_selection_mode == "coupled"
+                    and iteration % self.config.segment_length == 0):
+                self._update_coupled_selection_preference()
+
+            iteration_elapsed = perf_counter() - iteration_started
+            measured_stage_seconds = destroy_seconds + partial_evaluation_seconds + repair_seconds + local_search_seconds
+            other_iteration_seconds = max(0.0, iteration_elapsed - measured_stage_seconds)
 
             history.append(
                 {
@@ -329,6 +434,7 @@ class ALNSSolver:
                     "temperature": temperature,
                     "elapsed_seconds": perf_counter() - started_at,
                     "route_dp_calls": self.route_dp.statistics()["calls"] + self.generated_route_dp_calls - calls_start,
+                    "route_dp_cache_misses": self.route_dp.statistics()["cache_misses"] + self.generated_route_dp_cache_misses - misses_start,
                     "candidate_makespan": refined_eval.makespan,
                     "candidate_delta": refined_eval.makespan - previous_eval.makespan,
                     "fallback_used": fallback_used,
@@ -336,6 +442,22 @@ class ALNSSolver:
                     "llm_operator_success": generated_selected and not fallback_used,
                     "attribution_ambiguous": attribution_ambiguous,
                     "reward_attribution": reward_attribution,
+                    "selection_action": self._last_selection_action,
+                    "actively_selected_frozen_pair": coupled_pair_selected,
+                    "independent_selection_coincidental_frozen_pair": (
+                        self._last_selection_action == "independent"
+                        and selected_configured_pair
+                    ),
+                    "coupled_pair_fallback": coupled_pair_fallback,
+                    "stage_timings_seconds": {
+                        "destroy_execution": destroy_seconds,
+                        "partial_evaluation": partial_evaluation_seconds,
+                        "repair_execution": repair_seconds,
+                        "local_search": local_search_seconds,
+                        "other": other_iteration_seconds,
+                    },
+                    "coupled_selection_probability": selection_probability,
+                    "coupled_selection_preference": self.coupled_selection_preference,
                 }
             )
 
@@ -357,6 +479,18 @@ class ALNSSolver:
             termination_reason=termination_reason,
             initial_temperature=initial_temperature,
             initial_makespan=initial_makespan,
+            pair_action_stats=dict(self.pair_action_stats),
+            timing_breakdown_seconds={
+                **phase_seconds,
+                "initial_full_evaluation_seconds": initial_full_evaluation_seconds,
+                "local_search_full_evaluation_seconds": self._full_evaluation_time["local_search"],
+                "full_evaluation_seconds": sum(self._full_evaluation_time.values()),
+                "other_seconds": max(
+                    0.0,
+                    perf_counter() - started_at - initial_full_evaluation_seconds - sum(phase_seconds.values()),
+                ),
+            },
+            generated_operator_execution=self.generated_operator_execution,
         )
 
     def _initial_temperature(self, makespan: float) -> float:
@@ -597,7 +731,25 @@ class ALNSSolver:
 
     def _execute_external(self, external_fn, args: tuple) -> CandidateExecutionResult:
         if isinstance(external_fn, CandidateProxy):
-            return external_fn.execute(args, timeout_ms=external_fn.timeout_ms)
+            outcome = external_fn.execute(args, timeout_ms=external_fn.timeout_ms)
+            stats = self.generated_operator_execution[external_fn.operator_type]
+            row = stats.setdefault(external_fn.path.stem, {
+                "calls": 0,
+                "successes": 0,
+                "failures": 0,
+                "wall_time_seconds": 0.0,
+                "run_request_seconds": 0.0,
+                "route_dp_calls": 0,
+                "route_dp_cache_misses": 0,
+            })
+            row["calls"] += 1
+            row["successes"] += int(outcome.status == "success")
+            row["failures"] += int(outcome.status != "success")
+            row["wall_time_seconds"] += outcome.wall_time_ms / 1000.0
+            row["run_request_seconds"] += outcome.runtime_ms / 1000.0
+            row["route_dp_calls"] += outcome.route_dp_calls
+            row["route_dp_cache_misses"] += outcome.route_dp_cache_misses
+            return outcome
         try:
             result = external_fn(*args)
             return CandidateExecutionResult(status="success", runtime_ms=0.0, result=result)
@@ -816,11 +968,55 @@ class ALNSSolver:
             destroy_name = suggestion.get("destroy_operator")
             repair_name = suggestion.get("repair_operator")
             if destroy_name in self.destroy_ops and repair_name in self.repair_weights:
+                self._last_selection_action = "advisor"
                 return str(destroy_name), str(repair_name), phase
 
+        if self.config.pair_selection_mode == "coupled":
+            if self.rng.random() < self._coupled_selection_probability():
+                self._last_selection_action = "coupled"
+                return (
+                    str(self.config.coupled_destroy_operator),
+                    str(self.config.coupled_repair_operator),
+                    phase,
+                )
+        self._last_selection_action = "independent"
         destroy_name = self._weighted_pick(self.destroy_weights)
         repair_name = self._weighted_pick(self.repair_weights)
+        if (destroy_name == self.config.coupled_destroy_operator
+                and repair_name == self.config.coupled_repair_operator):
+            self.pair_action_stats["independent_coincidental_uses"] += 1
         return destroy_name, repair_name, phase
+
+    def _coupled_selection_probability(self) -> float:
+        """Use the configured pair's independent roulette chance as its prior."""
+        destroy_name = self.config.coupled_destroy_operator
+        repair_name = self.config.coupled_repair_operator
+        if destroy_name not in self.destroy_weights or repair_name not in self.repair_weights:
+            return 0.0
+        destroy_total = sum(max(1e-6, value) for value in self.destroy_weights.values())
+        repair_total = sum(max(1e-6, value) for value in self.repair_weights.values())
+        baseline = (
+            max(1e-6, self.destroy_weights[destroy_name]) / destroy_total
+            * max(1e-6, self.repair_weights[repair_name]) / repair_total
+        )
+        odds = (baseline / max(1e-12, 1.0 - baseline)) * self.coupled_selection_preference
+        return min(0.5, max(1e-6, odds / (1.0 + odds)))
+
+    def _update_coupled_selection_preference(self) -> None:
+        """React to relative mean action reward while keeping the roulette prior."""
+        pair = self.pair_selection_segment["coupled"]
+        independent = self.pair_selection_segment["independent"]
+        if pair.uses and independent.uses:
+            pair_mean = max(0.1, pair.score / pair.uses)
+            independent_mean = max(0.1, independent.score / independent.uses)
+            self.coupled_selection_preference *= (
+                pair_mean / independent_mean
+            ) ** self.config.reaction_factor
+            self.coupled_selection_preference = min(
+                20.0, max(0.05, self.coupled_selection_preference)
+            )
+        pair.uses = pair.score = 0.0
+        independent.uses = independent.score = 0.0
 
     def _weighted_pick(self, weights: Dict[str, float]) -> str:
         names = list(weights.keys())

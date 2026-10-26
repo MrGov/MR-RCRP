@@ -42,6 +42,133 @@ class DestroyBenchmarkCase:
     full_evaluation: SolutionEvaluation
 
 
+@dataclass
+class PairedRepairBenchmarkCase(RepairBenchmarkCase):
+    """One frozen D* invocation, shared by all repair versions (no re-destroy)."""
+
+    solver_seed: int
+    fixed_destroy_hash: str
+    destroy_runtime_ms: float
+    input_id: str
+
+
+def prepare_paired_repair_cases(cases, *, fixed_destroy, seeds, timeout_ms,
+                                parent_label="initial"):
+    prepared = []
+    for case in cases:
+        for seed in seeds:
+            count = max(1, case.instance.task_count // 4)
+            context = DestroyContext(case.instance, list(case.full_evaluation.per_robot_costs),
+                                     case.full_evaluation.makespan, count)
+            outcome = _invoke_candidate(fixed_destroy, (clone_solution(case.full_solution), context,
+                                                        random.Random(seed)), timeout_ms)
+            if outcome.status != "success":
+                raise RuntimeError(f"fixed destroy {outcome.status}: {outcome.error_message}")
+            partial, removed = outcome.result.partial_solution, outcome.result.removed_tasks
+            if (not _is_valid_partial_solution(partial, case.instance)
+                or not isinstance(removed, list) or len(removed) != count
+                or any(type(t) is not int for t in removed) or len(set(removed)) != count):
+                raise ValueError("fixed destroy returned invalid removal count/type")
+            expected = [[t for t in r if t not in set(removed)] for r in case.full_solution.routes]
+            if partial.routes != expected or not set(removed) <= {t for r in case.full_solution.routes for t in r}:
+                raise ValueError("fixed destroy changed retained tasks/order or removed unknown tasks")
+            prepared.append(PairedRepairBenchmarkCase(
+                case.instance, case.evaluator, clone_solution(case.full_solution), case.full_evaluation,
+                clone_solution(partial), case.evaluator.evaluate_partial(partial), list(removed),
+                seed, fixed_destroy.validation.code_hash, outcome.runtime_ms,
+                f"{case.instance.name}/{parent_label}/{seed}"))
+    return prepared
+
+
+def evaluate_paired_repair_candidates(candidates, cases, *, timeout_ms,
+                                     behavior_callback=None, reference_trials=None):
+    """Evaluate repairs on saved D* outputs using the existing bounded executor.
+
+    Canonical behavior is supplied by the same callback as E5. Parent-to-result
+    and R*-to-result comparisons are distinct; partial costs are never mistaken
+    for full-solution improvements. No evaluator is exposed to generated code.
+    """
+    references = {t["input_id"]: t for t in reference_trials or []}
+    rows = []
+    for candidate in candidates:
+        trials = []
+        for case in cases:
+            started = perf_counter()
+            stats_before = case.evaluator.route_evaluator.statistics()
+            before = case.full_evaluation
+            trial = dict(input_id=case.input_id, instance_id=case.instance.name,
+                solver_seed=case.solver_seed, fixed_destroy_hash=case.fixed_destroy_hash,
+                parent_routes=case.full_solution.routes, parent_makespan=before.makespan,
+                parent_route_costs=before.per_robot_costs, partial_routes=case.partial_solution.routes,
+                partial_route_costs=case.partial_evaluation.per_robot_costs,
+                removed_tasks=list(case.removed_tasks), destroy_runtime_ms=case.destroy_runtime_ms,
+                feasible=False, status="error", fallback_used=False,
+                exact_dp_behavior="unavailable", parent_to_candidate_behavior="unavailable")
+            context = RepairContext(case.instance, list(case.partial_evaluation.per_robot_costs),
+                                    case.partial_evaluation.makespan, _bottleneck_route(case.partial_evaluation))
+            outcome = _invoke_candidate(candidate, (clone_solution(case.partial_solution), list(case.removed_tasks),
+                                                    context, random.Random(case.solver_seed)), timeout_ms)
+            trial.update(status=outcome.status, repair_runtime_ms=outcome.runtime_ms)
+            try:
+                if outcome.status != "success":
+                    raise RuntimeError(outcome.error_message)
+                solution = outcome.result.solution
+                if not _is_valid_complete_solution(solution, case.instance):
+                    trial["status"] = "invalid_solution"
+                    raise ValueError("repair did not return a complete feasible solution")
+                after = case.evaluator.evaluate(solution)
+                baseline_solution, baseline_eval = case.full_solution, before
+                if references:
+                    ref = references[case.input_id]
+                    if (ref["partial_routes"] != case.partial_solution.routes
+                        or ref["removed_tasks"] != case.removed_tasks
+                        or ref["parent_routes"] != case.full_solution.routes):
+                        raise ValueError("reference repair used a different destroy input")
+                    baseline_solution = MultiRobotSolution(ref["candidate_routes"])
+                    baseline_eval = case.evaluator.evaluate(baseline_solution)
+                    if baseline_eval.makespan != ref["candidate_makespan"]:
+                        raise ValueError("reference evaluator mismatch")
+                origins = {t: (r, p) for r, route in enumerate(case.full_solution.routes) for p, t in enumerate(route)}
+                destinations = {t: (r, p) for r, route in enumerate(solution.routes) for p, t in enumerate(route)}
+                moves = []
+                for task in case.removed_tasks:
+                    robot, pos = destinations[task]
+                    route = solution.routes[robot]
+                    moves.append(dict(task_id=task, origin_robot=origins[task][0], origin_position=origins[task][1],
+                        destination_robot=robot, destination_position=pos,
+                        predecessor=route[pos-1] if pos else "depot",
+                        successor=route[pos+1] if pos+1 < len(route) else "depot"))
+                trial.update(feasible=True, status="success", candidate_routes=solution.routes,
+                    candidate_makespan=after.makespan, candidate_route_costs=after.per_robot_costs,
+                    route_cost_changes=[b-a for a,b in zip(before.per_robot_costs, after.per_robot_costs)],
+                    baseline_makespan=baseline_eval.makespan,
+                    relative_improvement=1-after.makespan/max(1e-6, baseline_eval.makespan),
+                    parent_relative_improvement=1-after.makespan/max(1e-6, before.makespan),
+                    bottleneck_before=[i for i,c in enumerate(before.per_robot_costs) if abs(c-before.makespan)<1e-9],
+                    bottleneck_after=[i for i,c in enumerate(after.per_robot_costs) if abs(c-after.makespan)<1e-9],
+                    removed_task_moves=moves)
+                if behavior_callback is not None:
+                    trial["parent_to_candidate_behavior"] = behavior_callback(case.full_solution, solution, before, after, instance=case.instance)
+                    trial["exact_dp_behavior"] = behavior_callback(baseline_solution, solution, baseline_eval, after, instance=case.instance)
+            except Exception as exc:
+                trial.update(feasible=False, error=f"{type(exc).__name__}: {exc}")
+                if trial["status"] == "success":
+                    trial["status"] = "evaluation_error"
+            stats_after = case.evaluator.route_evaluator.statistics()
+            trial.update(wall_seconds=perf_counter()-started,
+                route_dp_calls=stats_after["calls"]-stats_before["calls"],
+                route_dp_cache_misses=stats_after["cache_misses"]-stats_before["cache_misses"])
+            trials.append(trial)
+        valid = [t for t in trials if t["feasible"]]
+        rows.append(dict(operator_id=candidate.validation.operator_id, source_hash=candidate.validation.code_hash,
+            validation_status=candidate.validation.validation_status, trials=trials,
+            feasible_count=len(valid), executed_count=len(trials),
+            mean_makespan=sum(t["candidate_makespan"] for t in valid)/len(valid) if valid else None,
+            avg_relative_improvement=sum(t["relative_improvement"] for t in valid)/len(valid) if valid else None,
+            avg_runtime_ms=sum(t["repair_runtime_ms"] for t in trials)/max(1,len(trials))))
+    return rows
+
+
 def build_repair_benchmark_cases(
     instance_paths: Sequence[Path],
     *,
