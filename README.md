@@ -390,3 +390,31 @@ Saved stages resume without new provider calls. A fresh `--output` directory
 creates a new exploratory evolution run. Exact sent prompts, raw response,
 lineage, fixed-pair trials, selection records, complete ALNS histories and results
 are preserved in `outputs/e7_cooperative_evolution/`; see its `REPORT.md`.
+
+### E8 historical complementary repair portfolio
+
+`e8_repair_portfolio` deduplicates real E2/E4/E7 repair sources and checks their
+saved provider responses, hashes and current bounded execution. Uniform saved
+D* partials on three development instances establish measured crossovers and
+R* weak-case relief. A predeclared short independent B1 quality check freezes
+at most one auxiliary; final comparison instances are different. No LLM is called.
+
+All three deployed methods use independent B1 roulette, frozen D*, and 4 x 4
+operator pools. V1 is unchanged. AUX replaces only R* with the auxiliary. PORT
+retains R* and replaces the predeclared manual `bottleneck_balancing_insertion`
+slot with the auxiliary. Equal pool counts do not remove the member-replacement
+confound; final results are exploratory rather than causal complementarity proof.
+
+```powershell
+$env:PYTHONPATH='src'
+foreach ($stage in @('inventory','evaluate','screen','short','select','smoke','benchmark','analyze')) {
+  & 'G:\Anaconda\envs\mrta_env\python.exe' -m mrta_rect_coverage.experiments.e8_repair_portfolio --stage $stage
+  if ($LASTEXITCODE -ne 0) { throw "E8 failed at $stage" }
+}
+```
+
+Use the same `--output outputs/e8_repair_portfolio_rerun` argument at every stage
+for a fresh run. Existing stages resume saved evaluations and the frozen selection.
+The default directory `outputs/e8_repair_portfolio/` contains the source inventory,
+intrinsic structure labels, canonical DP evidence, selection decision, complete
+solutions, operator usage/accepted/best counts, convergence figure and report.
