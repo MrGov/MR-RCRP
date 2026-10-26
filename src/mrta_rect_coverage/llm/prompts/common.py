@@ -156,6 +156,20 @@ def destroy(solution, context, rng) -> DestroyResult:
 """
 
 DESTROY_HEURISTIC_DIRECTIONS = """\
+Contract: use only DestroyContext.instance, per_robot_costs, route_costs_makespan,
+and remove_count. No evaluator, bottleneck_route_id or internal DP state chain is
+exposed. Derive critical routes from per_robot_costs. Instance exposes tasks,
+robot_count, depot, sweep_width, sweep_speed, travel_speed and turning_time;
+tasks expose task_id, x_left, x_right, y_bottom, y_top, width and height.
+Import MultiRobotSolution from mrta_rect_coverage.core.models and DestroyResult
+from mrta_rect_coverage.llm.operator_evolution.protocols.
+Remove exactly min(context.remove_count, instance.task_count) distinct tasks.
+Preserve robot membership and relative order of retained tasks. Do not mutate
+the input. Return a consistent partition of original tasks, no additions.
+Optimize the final feasible makespan after repair, not partial makespan alone.
+H/V processing or Manhattan geometry are approximate selection features;
+state switching has no separate penalty and Exact Route-DP remains external.
+
 Heuristic directions for destroy operators (MRTA-rectangle-specific):
 1. Bottleneck-route destroy: remove tasks from the slowest route to create \
 rebalancing opportunities.

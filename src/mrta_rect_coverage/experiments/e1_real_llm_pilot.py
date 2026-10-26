@@ -188,7 +188,7 @@ def build_f2g_feedback(rows: Sequence[Mapping[str, Any]], *, parent: Mapping[str
     return payload
 
 
-def build_behavior_diagnosis(rows: Sequence[Mapping[str, Any]]) -> str:
+def build_behavior_diagnosis(rows: Sequence[Mapping[str, Any]], *, operation: str = "repair") -> str:
     """Condense evaluator-derived trials into cautious revision guidance."""
     trials = [
         (str(row.get("operator_id", "")), trial)
@@ -234,6 +234,8 @@ def build_behavior_diagnosis(rows: Sequence[Mapping[str, Any]]) -> str:
             )
         if float(trial['relative_improvement']) < -1e-9:
             lines.append(
+                "  Inspect which removal sets leave the former critical route costly or cause the fixed repair to overload another robot; compare removed task geometry, route loads and cross-route opportunities. These are complete destroy-repair associations, not per-task causal evidence."
+                if operation == "destroy" else
                 "  Inspect insertion order and route slack: reassignment/state changes accompanied "
                 "a worse bottleneck. Avoid chasing aggregate travel savings at the expense of the slowest route."
             )
@@ -243,11 +245,48 @@ def build_behavior_diagnosis(rows: Sequence[Mapping[str, Any]]) -> str:
                 "and coverage/turning trade-offs while leaving state choice to Exact-DP."
             )
     lines.append(
+        "Revise task removal selection, not the fixed repair. Do not treat state changes or cascade as penalties. Keep exact remove_count and a valid partition. Feasible makespan is final; do not invent DP metrics or call an evaluator in DestroyContext."
+        if operation == "destroy" else
         "Consider whether insertion order or bottleneck-route load balancing may be worth revising; "
         "retain full-solution feasibility and exact makespan as final criteria. "
         "Do not invent DP measurements or replace the Route-DP evaluator."
     )
     return "\n".join(lines)
+
+
+def build_destroy_feedback(rows: Sequence[Mapping[str, Any]], *, parent: Mapping[str, Any]) -> dict[str, Any]:
+    """Scalar ranking plus actual parent-specific removal and DP response evidence."""
+    payload = build_f1_feedback(rows)
+    payload["feedback_mode"] = "Exact-DP-guided destroy"
+    payload["behavior_diagnosis"] = build_behavior_diagnosis([parent], operation="destroy")
+    trials = [t for t in parent.get("trials", []) if t.get("feasible")]
+    ordered = sorted(trials, key=lambda t: t["relative_improvement"])
+    representatives = [ordered[0]] if ordered else []
+    if len(ordered)>1 and ordered[-1] != ordered[0]:
+        representatives.append(ordered[-1])
+    payload["removal_evidence"] = representatives
+    payload["source_reference"] = dict(source_hash=parent["source_hash"], operator_id=parent["operator_id"],
+        scope="saved parent trials; candidate vs manual destroy with identical fixed repair; associations only")
+    return payload
+
+
+def destroy_revision_prompt(parent: Mapping[str, Any], feedback: Mapping[str, Any], *, n: int = 2) -> str:
+    """Use the existing rich destroy template with the actual evaluated parent."""
+    from ..llm.prompts.operator_revision import build_destroy_revision_prompt
+    source = Path(parent["source_path"]).read_text(encoding="utf-8")
+    if hashlib.sha256(source.encode()).hexdigest() != parent["source_hash"]:
+        raise ValueError("destroy parent source hash changed before revision")
+    return (f"E5 parent source SHA-256: {parent['source_hash']}\nParent source:\n```python\n{source}\n```\n"
+        + "Actual parent evaluation and removal evidence:\n" + json.dumps(feedback, sort_keys=True) + "\n"
+        + build_destroy_revision_prompt(round_id=1,
+            previous_summary=feedback["summary"], top_operators=feedback["top_candidates"],
+            weak_operators=feedback["weak_candidates"], n=n)
+        + "\nRevise removal decisions of this actual parent using the measured successes and failures. "
+        "The frozen repair is unchanged. No evaluator or internal state chain is exposed in DestroyContext. "
+        "Use only instance, per_robot_costs, route_costs_makespan, remove_count and solution.routes. "
+        "Return DestroyResult with exactly min(remove_count, task_count) distinct removed task IDs, "
+        "preserve the remaining route order and robot membership, never mutate the input. "
+        "DP metrics describe observed associations, not proven causality. Do not invent measurements.\n")
 
 
 def revision_prompt(parent: Mapping[str, Any], feedback: Mapping[str, Any], *, round_id: int = 1, n: int = 2) -> str:

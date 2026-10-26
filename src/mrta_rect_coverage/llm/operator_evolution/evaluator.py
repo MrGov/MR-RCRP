@@ -238,8 +238,21 @@ def evaluate_destroy_candidates(
     *,
     seeds: Sequence[int],
     timeout_ms: float,
+    fixed_repair: LoadedOperator | None = None,
+    reference_destroy=None,
+    behavior_callback=None,
 ) -> List[dict]:
-    """Lightweight destroy evaluation with a fixed built-in greedy repair."""
+    """Evaluate destroy; optionally pair against manual destroy with one fixed repair.
+
+    The optional behavior callback consumes real complete evaluator results. It
+    permits reuse of canonical experiment diagnostics without a second metric
+    implementation or exposing the evaluator to generated operators.
+    """
+    if fixed_repair is not None:
+        if reference_destroy is None:
+            raise ValueError("paired fixed-repair evaluation requires reference_destroy")
+        return [_evaluate_paired_destroy(c, cases, seeds, timeout_ms, fixed_repair,
+                                        reference_destroy, behavior_callback) for c in candidates]
 
     rows: List[dict] = []
 
@@ -353,6 +366,100 @@ def evaluate_destroy_candidates(
             }
         )
     return rows
+
+
+def _evaluate_paired_destroy(candidate, cases, seeds, timeout_ms, fixed_repair,
+                             reference_destroy, behavior_callback):
+    metrics, records = [], []
+    for case in cases:
+        for seed in seeds:
+            started = perf_counter()
+            calls_start = case.evaluator.route_evaluator.statistics()["calls"]
+            count = max(1, case.instance.task_count // 4)
+            record = dict(instance_id=case.instance.name, solver_seed=seed, remove_count=count,
+                          fixed_repair_hash=fixed_repair.validation.code_hash,
+                          parent_makespan=case.full_evaluation.makespan,
+                          parent_route_costs=case.full_evaluation.per_robot_costs,
+                          parent_routes=case.full_solution.routes, feasible=False,
+                          fallback_used=False, status="error")
+            runtime_ms = 0.0
+            status = "success"
+            def complete(partial, removed):
+                nonlocal runtime_ms, status
+                if (not _is_valid_partial_solution(partial, case.instance)
+                    or not isinstance(removed, list) or len(removed) != count
+                    or any(type(t) is not int for t in removed)
+                    or len(set(removed)) != count):
+                    status = "invalid_solution"
+                    raise ValueError("wrong removal count/type")
+                remaining = [t for r in partial.routes for t in r]
+                original = [t for r in case.full_solution.routes for t in r]
+                if Counter(remaining) + Counter(removed) != Counter(original) or set(remaining) & set(removed):
+                    status = "invalid_solution"
+                    raise ValueError("inconsistent destroy partition")
+                partial_eval = case.evaluator.evaluate_partial(partial)
+                context = RepairContext(case.instance, list(partial_eval.per_robot_costs),
+                                        partial_eval.makespan, _bottleneck_route(partial_eval))
+                outcome = _invoke_candidate(fixed_repair, (clone_solution(partial), list(removed),
+                                                          context, random.Random(seed)), timeout_ms)
+                runtime_ms += outcome.runtime_ms
+                if outcome.status != "success":
+                    status = outcome.status
+                    raise RuntimeError(f"fixed repair {outcome.status}: {outcome.error_message}")
+                repaired = outcome.result.solution
+                if not _is_valid_complete_solution(repaired, case.instance):
+                    status = "invalid_solution"
+                    raise ValueError("fixed repair returned incomplete solution")
+                return repaired, case.evaluator.evaluate(repaired)
+            try:
+                partial, removed = reference_destroy(clone_solution(case.full_solution),
+                    case.full_evaluation, count, random.Random(seed))
+                baseline_solution, baseline_eval = complete(partial, removed)
+                record.update(reference_removed_tasks=removed, baseline_makespan=baseline_eval.makespan,
+                              baseline_route_costs=baseline_eval.per_robot_costs, baseline_routes=baseline_solution.routes)
+                context = DestroyContext(case.instance, list(case.full_evaluation.per_robot_costs),
+                                         case.full_evaluation.makespan, count)
+                outcome = _invoke_candidate(candidate, (clone_solution(case.full_solution), context,
+                                                        random.Random(seed)), timeout_ms)
+                runtime_ms += outcome.runtime_ms
+                if outcome.status != "success":
+                    status = outcome.status
+                    raise RuntimeError(f"destroy {outcome.status}: {outcome.error_message}")
+                destroyed = outcome.result
+                record["removed_tasks"] = destroyed.removed_tasks
+                repaired, evaluated = complete(destroyed.partial_solution, destroyed.removed_tasks)
+                delta = baseline_eval.makespan - evaluated.makespan
+                relative = delta / max(1e-6, baseline_eval.makespan)
+                reassigned = sum(next(i for i,r in enumerate(baseline_solution.routes) if t in r) !=
+                                 next(i for i,r in enumerate(repaired.routes) if t in r)
+                                 for t in (task.task_id for task in case.instance.tasks))
+                record.update(feasible=True, status="success", candidate_makespan=evaluated.makespan,
+                              candidate_route_costs=evaluated.per_robot_costs, candidate_routes=repaired.routes,
+                              relative_improvement=relative, reassigned_task_count=reassigned)
+                if behavior_callback is not None:
+                    record["exact_dp_behavior"] = behavior_callback(baseline_solution, repaired,
+                        baseline_eval, evaluated, instance=case.instance)
+                    record["parent_to_candidate_behavior"] = behavior_callback(case.full_solution, repaired,
+                        case.full_evaluation, evaluated, instance=case.instance)
+            except (ValueError, TypeError, AttributeError, RuntimeError) as exc:
+                record.update(status=status if status != "success" else "runtime_error",
+                              error=f"{type(exc).__name__}: {exc}")
+            record.update(runtime_ms=runtime_ms, wall_seconds=perf_counter()-started,
+                          route_dp_calls=case.evaluator.route_evaluator.statistics()["calls"]-calls_start)
+            records.append(record)
+            metrics.append(TrialMetric(makespan_delta=record.get("baseline_makespan", 0)-record.get("candidate_makespan", record.get("baseline_makespan", 0)),
+                relative_improvement=record.get("relative_improvement", 0), runtime_ms=runtime_ms,
+                success=record.get("relative_improvement", 0)>1e-9,
+                timeout=record["status"]=="timeout",
+                error=not record["feasible"] and record["status"] not in ("timeout", "invalid_solution"),
+                invalid_solution=record["status"]=="invalid_solution"))
+    summary = summarize_trials(metrics)
+    from dataclasses import asdict
+    return dict(operator_id=candidate.validation.operator_id, operator_type="destroy",
+                code_hash=candidate.validation.code_hash, validation_status=candidate.validation.validation_status,
+                execution_status=_summary_execution_status(summary), trials=records,
+                feasible_count=sum(r["feasible"] for r in records), executed_count=len(records),
+                failure_type_breakdown=_trial_failure_breakdown(metrics), fallback_used=False, **asdict(summary))
 
 
 def _invoke_candidate(

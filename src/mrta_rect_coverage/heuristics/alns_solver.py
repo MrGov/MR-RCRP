@@ -194,6 +194,18 @@ class ALNSSolver:
         self.operator_stats["repair"][name] = OperatorRecord()
         self.segment_stats["repair"][name] = OperatorRecord()
 
+    def register_development_destroy(self, proxy: CandidateProxy, *, name: str) -> None:
+        """Add a loader-validated, bounded destroy to the existing adaptive pool."""
+        if not isinstance(proxy, CandidateProxy) or not proxy.expected_code_hash:
+            raise ValueError("development destroy requires a hash-bound CandidateProxy")
+        if name in self.destroy_ops:
+            raise ValueError(f"duplicate destroy name: {name}")
+        self.destroy_ops[name] = self._wrap_external_destroy(proxy, name)
+        self.frozen_destroy_ops.add(name)
+        self.destroy_weights[name] = 1.0
+        self.operator_stats["destroy"][name] = OperatorRecord()
+        self.segment_stats["destroy"][name] = OperatorRecord()
+
     def solve(self) -> ALNSResult:
         started_at = perf_counter()
         calls_start = self.route_dp.statistics()["calls"] + self.generated_route_dp_calls
@@ -707,7 +719,7 @@ class ALNSSolver:
                 self._record_execution_fallback("destroy", operator_name, contract_error)
                 return self._random_destroy(solution, evaluation, remove_count)
 
-            if not self._is_valid_destroy_partition(
+            if len(removed_tasks) != min(remove_count, self.instance.task_count) or not self._is_valid_destroy_partition(
                 solution, partial_solution, removed_tasks
             ):
                 self._record_fallback(
