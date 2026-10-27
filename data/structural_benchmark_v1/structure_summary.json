@@ -1,0 +1,44 @@
+{
+  "BASE": {
+    "relative_hv_gap_mean": 0.0,
+    "workload_cv": 0.286,
+    "preferred_turning_share_mean": 0.21,
+    "travel_work_pressure": 4.184
+  },
+  "HV-GEOM": {
+    "relative_hv_gap_mean": 0.343,
+    "workload_cv": 0.151,
+    "preferred_turning_share_mean": 0.053,
+    "travel_work_pressure": 4.311
+  },
+  "SPATIAL": {
+    "relative_hv_gap_mean": 0.0,
+    "workload_cv": 0.286,
+    "preferred_turning_share_mean": 0.21,
+    "travel_work_pressure": 6.281
+  },
+  "BOTTLENECK": {
+    "relative_hv_gap_mean": 0.0,
+    "workload_cv": 1.599,
+    "preferred_turning_share_mean": 0.264,
+    "travel_work_pressure": 4.189
+  },
+  "TURN-HIGH": {
+    "relative_hv_gap_mean": 0.0,
+    "workload_cv": 0.271,
+    "preferred_turning_share_mean": 0.347,
+    "travel_work_pressure": 3.472
+  },
+  "TRAVEL-HIGH": {
+    "relative_hv_gap_mean": 0.0,
+    "workload_cv": 0.286,
+    "preferred_turning_share_mean": 0.21,
+    "travel_work_pressure": 8.368
+  },
+  "SWEEP-NARROW": {
+    "relative_hv_gap_mean": 0.0,
+    "workload_cv": 0.274,
+    "preferred_turning_share_mean": 0.225,
+    "travel_work_pressure": 2.683
+  }
+}

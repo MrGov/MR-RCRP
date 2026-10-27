@@ -1,0 +1,6098 @@
+{
+  "dataset_version": "mr-rcrp-structural-crossscale-v1",
+  "source_commit": "2c7b14aea4943126e1dcceb0e54d9fd5c1c61274",
+  "format": "six-line MR-RCRP TXT, legacy production-loader compatible",
+  "units": "model time and coordinate units (not calibrated physical units)",
+  "robot_model": "homogeneous within each instance; common depot=(0,0)",
+  "splits": {
+    "development": 2,
+    "validation": 2,
+    "test": 4
+  },
+  "sizes": [
+    [
+      2,
+      10
+    ],
+    [
+      2,
+      20
+    ],
+    [
+      4,
+      40
+    ],
+    [
+      4,
+      60
+    ],
+    [
+      8,
+      80
+    ],
+    [
+      8,
+      100
+    ]
+  ],
+  "scenarios": [
+    "BASE",
+    "HV-GEOM",
+    "SPATIAL",
+    "BOTTLENECK",
+    "TURN-HIGH",
+    "TRAVEL-HIGH",
+    "SWEEP-NARROW"
+  ],
+  "generation": "deterministic SHA256 seed per split/size/rep; seven variants share same geometry seed",
+  "entries": [
+    {
+      "instance_id": "development/BASE/R2_T10_0",
+      "split": "development",
+      "scenario": "BASE",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 0,
+      "generation_seed": 6979636556295884974,
+      "pair_id": "development/R2_T10_0",
+      "path": "development/BASE/R2_T10_0.txt",
+      "sha256": "2c17f311f31ce2f948f52eb3b2b526f65b2168cbf4980460e1d861e353c82430",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/HV-GEOM/R2_T10_0",
+      "split": "development",
+      "scenario": "HV-GEOM",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 0,
+      "generation_seed": 6979636556295884974,
+      "pair_id": "development/R2_T10_0",
+      "path": "development/HV-GEOM/R2_T10_0.txt",
+      "sha256": "8528dc184847c766074e8071af4aef8c7c70111119584520c8b881cbf1110a4d",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/SPATIAL/R2_T10_0",
+      "split": "development",
+      "scenario": "SPATIAL",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 0,
+      "generation_seed": 6979636556295884974,
+      "pair_id": "development/R2_T10_0",
+      "path": "development/SPATIAL/R2_T10_0.txt",
+      "sha256": "6d6b8ec999aa14a4f6e2f5e830b44c8159c52c4e8a4dd0cba8caf86270a1b16f",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/BOTTLENECK/R2_T10_0",
+      "split": "development",
+      "scenario": "BOTTLENECK",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 0,
+      "generation_seed": 6979636556295884974,
+      "pair_id": "development/R2_T10_0",
+      "path": "development/BOTTLENECK/R2_T10_0.txt",
+      "sha256": "bb32833b957201a8c67739309bf88220838ddaec4faf634b89b154ed330b1b4e",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/TURN-HIGH/R2_T10_0",
+      "split": "development",
+      "scenario": "TURN-HIGH",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 0,
+      "generation_seed": 6979636556295884974,
+      "pair_id": "development/R2_T10_0",
+      "path": "development/TURN-HIGH/R2_T10_0.txt",
+      "sha256": "1dcc538581d184f07eee14a44d59a5febe36faba8304dec00c527f906463f7cb",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "development/TRAVEL-HIGH/R2_T10_0",
+      "split": "development",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 0,
+      "generation_seed": 6979636556295884974,
+      "pair_id": "development/R2_T10_0",
+      "path": "development/TRAVEL-HIGH/R2_T10_0.txt",
+      "sha256": "fe4f43acca670741e31ecef24679e64100d957f69478decb58b5534cce203751",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/SWEEP-NARROW/R2_T10_0",
+      "split": "development",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 0,
+      "generation_seed": 6979636556295884974,
+      "pair_id": "development/R2_T10_0",
+      "path": "development/SWEEP-NARROW/R2_T10_0.txt",
+      "sha256": "d2548beec980362239c02535581b8964562ca1220cf0e84d24db6327e908256b",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/BASE/R2_T10_1",
+      "split": "development",
+      "scenario": "BASE",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 1,
+      "generation_seed": 15083474638747872803,
+      "pair_id": "development/R2_T10_1",
+      "path": "development/BASE/R2_T10_1.txt",
+      "sha256": "5e40e0864cc5faa94796bfd56d36cf9403f0f406750606fe4cc898b331fd1647",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/HV-GEOM/R2_T10_1",
+      "split": "development",
+      "scenario": "HV-GEOM",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 1,
+      "generation_seed": 15083474638747872803,
+      "pair_id": "development/R2_T10_1",
+      "path": "development/HV-GEOM/R2_T10_1.txt",
+      "sha256": "69ae11e7ecdd26b464597becccc32b52cd5642b90d14d72931d680773a891abf",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/SPATIAL/R2_T10_1",
+      "split": "development",
+      "scenario": "SPATIAL",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 1,
+      "generation_seed": 15083474638747872803,
+      "pair_id": "development/R2_T10_1",
+      "path": "development/SPATIAL/R2_T10_1.txt",
+      "sha256": "ac3e55c7f44fa6c78bae198328963e94d826f05c5334183af4aa59d278aea115",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/BOTTLENECK/R2_T10_1",
+      "split": "development",
+      "scenario": "BOTTLENECK",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 1,
+      "generation_seed": 15083474638747872803,
+      "pair_id": "development/R2_T10_1",
+      "path": "development/BOTTLENECK/R2_T10_1.txt",
+      "sha256": "5cd0e499f6c2fe33b477f2481ad396e58472d3512f5773b9d0d2f22c6224c764",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/TURN-HIGH/R2_T10_1",
+      "split": "development",
+      "scenario": "TURN-HIGH",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 1,
+      "generation_seed": 15083474638747872803,
+      "pair_id": "development/R2_T10_1",
+      "path": "development/TURN-HIGH/R2_T10_1.txt",
+      "sha256": "e8c884e3c21a334b8f777b37495f1633d3daa9bf562559ef70d8a99be98c3e95",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "development/TRAVEL-HIGH/R2_T10_1",
+      "split": "development",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 1,
+      "generation_seed": 15083474638747872803,
+      "pair_id": "development/R2_T10_1",
+      "path": "development/TRAVEL-HIGH/R2_T10_1.txt",
+      "sha256": "b5716719121323dba9699dc597b5ea890fcda1f6043f6cbc1c2909fb5965ead7",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/SWEEP-NARROW/R2_T10_1",
+      "split": "development",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 1,
+      "generation_seed": 15083474638747872803,
+      "pair_id": "development/R2_T10_1",
+      "path": "development/SWEEP-NARROW/R2_T10_1.txt",
+      "sha256": "bfb3cbbb2fb04faf3f60512890cbb15bfee3a4f459d1a444030785b64962e2bd",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/BASE/R2_T20_0",
+      "split": "development",
+      "scenario": "BASE",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 0,
+      "generation_seed": 2571328635597211596,
+      "pair_id": "development/R2_T20_0",
+      "path": "development/BASE/R2_T20_0.txt",
+      "sha256": "03ffebb30d3cf2b4d31a919ee188bdf2503e35594226f075d687849971895830",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/HV-GEOM/R2_T20_0",
+      "split": "development",
+      "scenario": "HV-GEOM",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 0,
+      "generation_seed": 2571328635597211596,
+      "pair_id": "development/R2_T20_0",
+      "path": "development/HV-GEOM/R2_T20_0.txt",
+      "sha256": "80d26e9d030281a1df1fd93af043752434969b2bdb20237ce31f85b5cfb37e4b",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/SPATIAL/R2_T20_0",
+      "split": "development",
+      "scenario": "SPATIAL",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 0,
+      "generation_seed": 2571328635597211596,
+      "pair_id": "development/R2_T20_0",
+      "path": "development/SPATIAL/R2_T20_0.txt",
+      "sha256": "aa511401ac580a388896e59d686758cdbcabad4b438a92bbf59a1ebc640fed81",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/BOTTLENECK/R2_T20_0",
+      "split": "development",
+      "scenario": "BOTTLENECK",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 0,
+      "generation_seed": 2571328635597211596,
+      "pair_id": "development/R2_T20_0",
+      "path": "development/BOTTLENECK/R2_T20_0.txt",
+      "sha256": "65a6f77f99a03d6cb0ce15ac29bec0c609bf6d7b39cc482a6dba5313c16cb0a4",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/TURN-HIGH/R2_T20_0",
+      "split": "development",
+      "scenario": "TURN-HIGH",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 0,
+      "generation_seed": 2571328635597211596,
+      "pair_id": "development/R2_T20_0",
+      "path": "development/TURN-HIGH/R2_T20_0.txt",
+      "sha256": "db69668908c06afe20307a8921102110c9082077489472fe8a1dd9c7d0782a31",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "development/TRAVEL-HIGH/R2_T20_0",
+      "split": "development",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 0,
+      "generation_seed": 2571328635597211596,
+      "pair_id": "development/R2_T20_0",
+      "path": "development/TRAVEL-HIGH/R2_T20_0.txt",
+      "sha256": "8a932757240cb439d2752ebd7042b2d87ce695a678a81f553eadf9c722459f37",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/SWEEP-NARROW/R2_T20_0",
+      "split": "development",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 0,
+      "generation_seed": 2571328635597211596,
+      "pair_id": "development/R2_T20_0",
+      "path": "development/SWEEP-NARROW/R2_T20_0.txt",
+      "sha256": "1f8b05385c48d438aae983d70fbc3ea479ceea2ddc8c6ab30bc4ac20187c4344",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/BASE/R2_T20_1",
+      "split": "development",
+      "scenario": "BASE",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 1,
+      "generation_seed": 8074652332348953639,
+      "pair_id": "development/R2_T20_1",
+      "path": "development/BASE/R2_T20_1.txt",
+      "sha256": "f05940743461741963e9b7ada8a66cceedeb15a3bb6977d402e1fd0e2922edb1",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/HV-GEOM/R2_T20_1",
+      "split": "development",
+      "scenario": "HV-GEOM",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 1,
+      "generation_seed": 8074652332348953639,
+      "pair_id": "development/R2_T20_1",
+      "path": "development/HV-GEOM/R2_T20_1.txt",
+      "sha256": "949e01502ba7e70dd16d2eb36493f73f21c107f4185259482b37edc553ce931d",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/SPATIAL/R2_T20_1",
+      "split": "development",
+      "scenario": "SPATIAL",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 1,
+      "generation_seed": 8074652332348953639,
+      "pair_id": "development/R2_T20_1",
+      "path": "development/SPATIAL/R2_T20_1.txt",
+      "sha256": "abae46311dcaaec4ffd20517714c21d832ae4ae854a7d7ae801b5396f565c4d5",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/BOTTLENECK/R2_T20_1",
+      "split": "development",
+      "scenario": "BOTTLENECK",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 1,
+      "generation_seed": 8074652332348953639,
+      "pair_id": "development/R2_T20_1",
+      "path": "development/BOTTLENECK/R2_T20_1.txt",
+      "sha256": "88d1454958d45dc51ae98af6334211abaee7e29ebe33d5311522d33c9e87b95f",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/TURN-HIGH/R2_T20_1",
+      "split": "development",
+      "scenario": "TURN-HIGH",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 1,
+      "generation_seed": 8074652332348953639,
+      "pair_id": "development/R2_T20_1",
+      "path": "development/TURN-HIGH/R2_T20_1.txt",
+      "sha256": "aef25003d27e97f21fa87974518c417aa0a60f488e3a45eecb883edb79357157",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "development/TRAVEL-HIGH/R2_T20_1",
+      "split": "development",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 1,
+      "generation_seed": 8074652332348953639,
+      "pair_id": "development/R2_T20_1",
+      "path": "development/TRAVEL-HIGH/R2_T20_1.txt",
+      "sha256": "84f4ca12ff148bda08dcdad1ab56f02e1ce6a7305983913af38b2a304ccf3f0a",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/SWEEP-NARROW/R2_T20_1",
+      "split": "development",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 1,
+      "generation_seed": 8074652332348953639,
+      "pair_id": "development/R2_T20_1",
+      "path": "development/SWEEP-NARROW/R2_T20_1.txt",
+      "sha256": "034f930dd81f6ff03588f33f52de1bf0c564f0d17a03629e26fcda1914f3e81d",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/BASE/R4_T40_0",
+      "split": "development",
+      "scenario": "BASE",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 0,
+      "generation_seed": 2247317254790021543,
+      "pair_id": "development/R4_T40_0",
+      "path": "development/BASE/R4_T40_0.txt",
+      "sha256": "12e5f1e48ddfac241a92ce056760fb7ec8e64c73ac86637a9c17b258eaa2ffd2",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/HV-GEOM/R4_T40_0",
+      "split": "development",
+      "scenario": "HV-GEOM",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 0,
+      "generation_seed": 2247317254790021543,
+      "pair_id": "development/R4_T40_0",
+      "path": "development/HV-GEOM/R4_T40_0.txt",
+      "sha256": "aa18f067677b7c3f60a239dfeece87288def2154dc723629c0b85521d4856b31",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/SPATIAL/R4_T40_0",
+      "split": "development",
+      "scenario": "SPATIAL",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 0,
+      "generation_seed": 2247317254790021543,
+      "pair_id": "development/R4_T40_0",
+      "path": "development/SPATIAL/R4_T40_0.txt",
+      "sha256": "293ba8a5b5782c3b2469bc4fd322b750b648b58dc3168899c199849693b3c54e",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/BOTTLENECK/R4_T40_0",
+      "split": "development",
+      "scenario": "BOTTLENECK",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 0,
+      "generation_seed": 2247317254790021543,
+      "pair_id": "development/R4_T40_0",
+      "path": "development/BOTTLENECK/R4_T40_0.txt",
+      "sha256": "ec660f5348e3280d819d8550ff20923b2d2a7390ad4fbb66f2cd864d1f8ab80d",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/TURN-HIGH/R4_T40_0",
+      "split": "development",
+      "scenario": "TURN-HIGH",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 0,
+      "generation_seed": 2247317254790021543,
+      "pair_id": "development/R4_T40_0",
+      "path": "development/TURN-HIGH/R4_T40_0.txt",
+      "sha256": "c76b03973503afe1474ba85334ce1c648d1b0d7dc8bc7505efcd4c6b120e7795",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "development/TRAVEL-HIGH/R4_T40_0",
+      "split": "development",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 0,
+      "generation_seed": 2247317254790021543,
+      "pair_id": "development/R4_T40_0",
+      "path": "development/TRAVEL-HIGH/R4_T40_0.txt",
+      "sha256": "ab47c64b2203262d8cf54d9f0b1a2a913a03e222ba73975ed1aba5b8346961f6",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/SWEEP-NARROW/R4_T40_0",
+      "split": "development",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 0,
+      "generation_seed": 2247317254790021543,
+      "pair_id": "development/R4_T40_0",
+      "path": "development/SWEEP-NARROW/R4_T40_0.txt",
+      "sha256": "82088d19361cdd1dec01617fe912146e74466555cdcefe4118b03318e1e59207",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/BASE/R4_T40_1",
+      "split": "development",
+      "scenario": "BASE",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 1,
+      "generation_seed": 13337026423550462441,
+      "pair_id": "development/R4_T40_1",
+      "path": "development/BASE/R4_T40_1.txt",
+      "sha256": "bd5be40f63dfe437491e20d9e85145bae5571dc7cbd0b3aabdfbf73f795f0414",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/HV-GEOM/R4_T40_1",
+      "split": "development",
+      "scenario": "HV-GEOM",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 1,
+      "generation_seed": 13337026423550462441,
+      "pair_id": "development/R4_T40_1",
+      "path": "development/HV-GEOM/R4_T40_1.txt",
+      "sha256": "faeb96d25f7edf5dfc14d826c7523b98ccde3795a539bf05add2f300b193c079",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/SPATIAL/R4_T40_1",
+      "split": "development",
+      "scenario": "SPATIAL",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 1,
+      "generation_seed": 13337026423550462441,
+      "pair_id": "development/R4_T40_1",
+      "path": "development/SPATIAL/R4_T40_1.txt",
+      "sha256": "bd6324b75ad9b4ab4a820dc32abbe1f53c75fa088e6749c1d5bf0fee135b3163",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/BOTTLENECK/R4_T40_1",
+      "split": "development",
+      "scenario": "BOTTLENECK",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 1,
+      "generation_seed": 13337026423550462441,
+      "pair_id": "development/R4_T40_1",
+      "path": "development/BOTTLENECK/R4_T40_1.txt",
+      "sha256": "8ea8c06a77f992ae03320baaf1a6fe2e5f35b0c62a82c244480f7cc7d3e21fc3",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/TURN-HIGH/R4_T40_1",
+      "split": "development",
+      "scenario": "TURN-HIGH",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 1,
+      "generation_seed": 13337026423550462441,
+      "pair_id": "development/R4_T40_1",
+      "path": "development/TURN-HIGH/R4_T40_1.txt",
+      "sha256": "b467eb8f022b62a74b4c2d2ba4da0a94651949817bc956870d47cb67872a914b",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "development/TRAVEL-HIGH/R4_T40_1",
+      "split": "development",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 1,
+      "generation_seed": 13337026423550462441,
+      "pair_id": "development/R4_T40_1",
+      "path": "development/TRAVEL-HIGH/R4_T40_1.txt",
+      "sha256": "3a960a62e34dff6796efb7767a403671666f2dce4693811c4d742a4732f73042",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/SWEEP-NARROW/R4_T40_1",
+      "split": "development",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 1,
+      "generation_seed": 13337026423550462441,
+      "pair_id": "development/R4_T40_1",
+      "path": "development/SWEEP-NARROW/R4_T40_1.txt",
+      "sha256": "4f40b646ff8e3dc58dbf769403bdd42b3294cc8f75b00c9bdc0df796c85cfd92",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/BASE/R4_T60_0",
+      "split": "development",
+      "scenario": "BASE",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 0,
+      "generation_seed": 15581556533263141351,
+      "pair_id": "development/R4_T60_0",
+      "path": "development/BASE/R4_T60_0.txt",
+      "sha256": "dc1f2922db713124b97836a34e3b854634e2c28530f93e3a7de7b330e608ebc5",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/HV-GEOM/R4_T60_0",
+      "split": "development",
+      "scenario": "HV-GEOM",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 0,
+      "generation_seed": 15581556533263141351,
+      "pair_id": "development/R4_T60_0",
+      "path": "development/HV-GEOM/R4_T60_0.txt",
+      "sha256": "ba42dbce41a384a4c206fe04f1b0dbe7d70d7d63745f3901f78cc83ec8a81285",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/SPATIAL/R4_T60_0",
+      "split": "development",
+      "scenario": "SPATIAL",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 0,
+      "generation_seed": 15581556533263141351,
+      "pair_id": "development/R4_T60_0",
+      "path": "development/SPATIAL/R4_T60_0.txt",
+      "sha256": "a8e39f3a70077d2331d7760755fd6c90409740a823c2dce46d2f83beb646f732",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/BOTTLENECK/R4_T60_0",
+      "split": "development",
+      "scenario": "BOTTLENECK",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 0,
+      "generation_seed": 15581556533263141351,
+      "pair_id": "development/R4_T60_0",
+      "path": "development/BOTTLENECK/R4_T60_0.txt",
+      "sha256": "dc3bfb6c95dce47790cd152467010783d38f27a3d3798b9f242df62b85452ba1",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/TURN-HIGH/R4_T60_0",
+      "split": "development",
+      "scenario": "TURN-HIGH",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 0,
+      "generation_seed": 15581556533263141351,
+      "pair_id": "development/R4_T60_0",
+      "path": "development/TURN-HIGH/R4_T60_0.txt",
+      "sha256": "75f5f54c8f36722c93762126032385bab340a24993c1bf7224363424eef82218",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "development/TRAVEL-HIGH/R4_T60_0",
+      "split": "development",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 0,
+      "generation_seed": 15581556533263141351,
+      "pair_id": "development/R4_T60_0",
+      "path": "development/TRAVEL-HIGH/R4_T60_0.txt",
+      "sha256": "69f2b6939cbb2ee48b16dd19653847d5221b72371b71195aef15591cecfe3194",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/SWEEP-NARROW/R4_T60_0",
+      "split": "development",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 0,
+      "generation_seed": 15581556533263141351,
+      "pair_id": "development/R4_T60_0",
+      "path": "development/SWEEP-NARROW/R4_T60_0.txt",
+      "sha256": "cf730652f780a4c48189a320f298513632a2ab6a8bec25ed71ecec92f927b9cc",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/BASE/R4_T60_1",
+      "split": "development",
+      "scenario": "BASE",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 1,
+      "generation_seed": 5156903555557087636,
+      "pair_id": "development/R4_T60_1",
+      "path": "development/BASE/R4_T60_1.txt",
+      "sha256": "120480809de72f603b46d61d9b64484b5c4c1195bfeff7e55c22713e19d59505",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/HV-GEOM/R4_T60_1",
+      "split": "development",
+      "scenario": "HV-GEOM",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 1,
+      "generation_seed": 5156903555557087636,
+      "pair_id": "development/R4_T60_1",
+      "path": "development/HV-GEOM/R4_T60_1.txt",
+      "sha256": "9eeda4c9c478830e250a81021b5227b3a6c26771f90bfeb75f479b86901b88f9",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/SPATIAL/R4_T60_1",
+      "split": "development",
+      "scenario": "SPATIAL",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 1,
+      "generation_seed": 5156903555557087636,
+      "pair_id": "development/R4_T60_1",
+      "path": "development/SPATIAL/R4_T60_1.txt",
+      "sha256": "dfe0d377da0225bdf45fb9122a5c872f51d3c5acf8566e4d35bcd2fd31487cb6",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/BOTTLENECK/R4_T60_1",
+      "split": "development",
+      "scenario": "BOTTLENECK",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 1,
+      "generation_seed": 5156903555557087636,
+      "pair_id": "development/R4_T60_1",
+      "path": "development/BOTTLENECK/R4_T60_1.txt",
+      "sha256": "44ef72e788195d2da7cb9fc7b4e4419003e9fbdf49a21269897ab02b9d5e2df4",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/TURN-HIGH/R4_T60_1",
+      "split": "development",
+      "scenario": "TURN-HIGH",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 1,
+      "generation_seed": 5156903555557087636,
+      "pair_id": "development/R4_T60_1",
+      "path": "development/TURN-HIGH/R4_T60_1.txt",
+      "sha256": "969cdfeeecd3c6fa65e730e5f7e769bf8de859c7fede4d4ef77ebaca2916160c",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "development/TRAVEL-HIGH/R4_T60_1",
+      "split": "development",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 1,
+      "generation_seed": 5156903555557087636,
+      "pair_id": "development/R4_T60_1",
+      "path": "development/TRAVEL-HIGH/R4_T60_1.txt",
+      "sha256": "6467f1782672081b6ae8c9169d502e2159562f38bf68392a53e802b2058172aa",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/SWEEP-NARROW/R4_T60_1",
+      "split": "development",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 1,
+      "generation_seed": 5156903555557087636,
+      "pair_id": "development/R4_T60_1",
+      "path": "development/SWEEP-NARROW/R4_T60_1.txt",
+      "sha256": "8155ea513ddf87d65d2773de29185c8bb4e89daecae23c9bdaa6bd27f396df35",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/BASE/R8_T80_0",
+      "split": "development",
+      "scenario": "BASE",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 0,
+      "generation_seed": 9043334657546928943,
+      "pair_id": "development/R8_T80_0",
+      "path": "development/BASE/R8_T80_0.txt",
+      "sha256": "bed21295e6a3b7139eac3a73a2bb906e0b4e613ec205f3aa9cc76a9cfb6f9ba5",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/HV-GEOM/R8_T80_0",
+      "split": "development",
+      "scenario": "HV-GEOM",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 0,
+      "generation_seed": 9043334657546928943,
+      "pair_id": "development/R8_T80_0",
+      "path": "development/HV-GEOM/R8_T80_0.txt",
+      "sha256": "849efa2b2d3d0745d053dcd64cc2700770a3039ff6732eab79add73b0d0d52dd",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/SPATIAL/R8_T80_0",
+      "split": "development",
+      "scenario": "SPATIAL",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 0,
+      "generation_seed": 9043334657546928943,
+      "pair_id": "development/R8_T80_0",
+      "path": "development/SPATIAL/R8_T80_0.txt",
+      "sha256": "d9b9efdd7106b75a36279abfc8c7d6bfda4469ceda6330521dee686fbcbbb72b",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/BOTTLENECK/R8_T80_0",
+      "split": "development",
+      "scenario": "BOTTLENECK",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 0,
+      "generation_seed": 9043334657546928943,
+      "pair_id": "development/R8_T80_0",
+      "path": "development/BOTTLENECK/R8_T80_0.txt",
+      "sha256": "73c832d87d71e22562b7d6865e8f89f9eb7ca57f13db439dc576f1a45de550fb",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/TURN-HIGH/R8_T80_0",
+      "split": "development",
+      "scenario": "TURN-HIGH",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 0,
+      "generation_seed": 9043334657546928943,
+      "pair_id": "development/R8_T80_0",
+      "path": "development/TURN-HIGH/R8_T80_0.txt",
+      "sha256": "812aedb1f6de304eb73d2f49607339a5503e380b792a074c06730102f2f86a77",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "development/TRAVEL-HIGH/R8_T80_0",
+      "split": "development",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 0,
+      "generation_seed": 9043334657546928943,
+      "pair_id": "development/R8_T80_0",
+      "path": "development/TRAVEL-HIGH/R8_T80_0.txt",
+      "sha256": "fb107e0dd1ba67bb2272f627c7887fcb78c00cd7c4af7894d8996db5561ab3bb",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/SWEEP-NARROW/R8_T80_0",
+      "split": "development",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 0,
+      "generation_seed": 9043334657546928943,
+      "pair_id": "development/R8_T80_0",
+      "path": "development/SWEEP-NARROW/R8_T80_0.txt",
+      "sha256": "e671e4a7386ef3d6f8c5355d2002dacb9a9699d78f655faf622f7397a6ffe085",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/BASE/R8_T80_1",
+      "split": "development",
+      "scenario": "BASE",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 1,
+      "generation_seed": 6932787289796144059,
+      "pair_id": "development/R8_T80_1",
+      "path": "development/BASE/R8_T80_1.txt",
+      "sha256": "fe0b40df236b69b7ac035bd324f385bc64ca2dd2893b37a7d3f9eb496791583a",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/HV-GEOM/R8_T80_1",
+      "split": "development",
+      "scenario": "HV-GEOM",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 1,
+      "generation_seed": 6932787289796144059,
+      "pair_id": "development/R8_T80_1",
+      "path": "development/HV-GEOM/R8_T80_1.txt",
+      "sha256": "de903977668547b0e811ab3e39b960ad85c881fa268cffef3c50a4b6340e5e48",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/SPATIAL/R8_T80_1",
+      "split": "development",
+      "scenario": "SPATIAL",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 1,
+      "generation_seed": 6932787289796144059,
+      "pair_id": "development/R8_T80_1",
+      "path": "development/SPATIAL/R8_T80_1.txt",
+      "sha256": "861a76a4dc14c78ca17f4cafc83be72ae78e5bda1cb4a8471bbb59afe58f5cdf",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/BOTTLENECK/R8_T80_1",
+      "split": "development",
+      "scenario": "BOTTLENECK",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 1,
+      "generation_seed": 6932787289796144059,
+      "pair_id": "development/R8_T80_1",
+      "path": "development/BOTTLENECK/R8_T80_1.txt",
+      "sha256": "b2adf62770672c9f7c33eb877edaceb3426a47059017e849e9f4695fb42c109b",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/TURN-HIGH/R8_T80_1",
+      "split": "development",
+      "scenario": "TURN-HIGH",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 1,
+      "generation_seed": 6932787289796144059,
+      "pair_id": "development/R8_T80_1",
+      "path": "development/TURN-HIGH/R8_T80_1.txt",
+      "sha256": "9d14bc8e32848ef7749a6248e436d580dc47f2a19828243007a7b6caf2c33368",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "development/TRAVEL-HIGH/R8_T80_1",
+      "split": "development",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 1,
+      "generation_seed": 6932787289796144059,
+      "pair_id": "development/R8_T80_1",
+      "path": "development/TRAVEL-HIGH/R8_T80_1.txt",
+      "sha256": "d2f415682ed415c643caa01d3e14b4d3007b243e58a35918f6fc1000613943e2",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/SWEEP-NARROW/R8_T80_1",
+      "split": "development",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 1,
+      "generation_seed": 6932787289796144059,
+      "pair_id": "development/R8_T80_1",
+      "path": "development/SWEEP-NARROW/R8_T80_1.txt",
+      "sha256": "7df52b73e1888ea34b7219026d8675d173fa0a9de781e92f9e7a6be53790985d",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/BASE/R8_T100_0",
+      "split": "development",
+      "scenario": "BASE",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 0,
+      "generation_seed": 7421963700453252996,
+      "pair_id": "development/R8_T100_0",
+      "path": "development/BASE/R8_T100_0.txt",
+      "sha256": "bb6cda757859ac885a971584217376791ba9959ad06ac0c57b8949c42216ff26",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/HV-GEOM/R8_T100_0",
+      "split": "development",
+      "scenario": "HV-GEOM",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 0,
+      "generation_seed": 7421963700453252996,
+      "pair_id": "development/R8_T100_0",
+      "path": "development/HV-GEOM/R8_T100_0.txt",
+      "sha256": "2990626d4e6cfee56c5b4ab5f9286365edfd08cfd856e66bfb16926d8579b375",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/SPATIAL/R8_T100_0",
+      "split": "development",
+      "scenario": "SPATIAL",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 0,
+      "generation_seed": 7421963700453252996,
+      "pair_id": "development/R8_T100_0",
+      "path": "development/SPATIAL/R8_T100_0.txt",
+      "sha256": "eac170f6102f2a0372d7209deb06b1883a9d251c94053b0e9a1485189861d80b",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/BOTTLENECK/R8_T100_0",
+      "split": "development",
+      "scenario": "BOTTLENECK",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 0,
+      "generation_seed": 7421963700453252996,
+      "pair_id": "development/R8_T100_0",
+      "path": "development/BOTTLENECK/R8_T100_0.txt",
+      "sha256": "94bff341012f14892199e297a7df6a2d11659795b765114bce41fbdf84814472",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/TURN-HIGH/R8_T100_0",
+      "split": "development",
+      "scenario": "TURN-HIGH",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 0,
+      "generation_seed": 7421963700453252996,
+      "pair_id": "development/R8_T100_0",
+      "path": "development/TURN-HIGH/R8_T100_0.txt",
+      "sha256": "745f75fbc235e448cd8b594e92e6a886aa1bd72ee94b08457f5ab0c590dd5922",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "development/TRAVEL-HIGH/R8_T100_0",
+      "split": "development",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 0,
+      "generation_seed": 7421963700453252996,
+      "pair_id": "development/R8_T100_0",
+      "path": "development/TRAVEL-HIGH/R8_T100_0.txt",
+      "sha256": "633d834d80dce727deea7a0c3f10200927fdde293a47db3fc9ec279398e58061",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/SWEEP-NARROW/R8_T100_0",
+      "split": "development",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 0,
+      "generation_seed": 7421963700453252996,
+      "pair_id": "development/R8_T100_0",
+      "path": "development/SWEEP-NARROW/R8_T100_0.txt",
+      "sha256": "06b31d8f224bf286a8f911dba583b9c680df4d58784378130b283050beb4382f",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/BASE/R8_T100_1",
+      "split": "development",
+      "scenario": "BASE",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 1,
+      "generation_seed": 3853093150088059919,
+      "pair_id": "development/R8_T100_1",
+      "path": "development/BASE/R8_T100_1.txt",
+      "sha256": "c788cb21dc822d03e8dd1359f3db0d3a586cafb7b3e4a933b3d23b62bdd5f48e",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/HV-GEOM/R8_T100_1",
+      "split": "development",
+      "scenario": "HV-GEOM",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 1,
+      "generation_seed": 3853093150088059919,
+      "pair_id": "development/R8_T100_1",
+      "path": "development/HV-GEOM/R8_T100_1.txt",
+      "sha256": "023bf342482aa718615bdfa13c63a8d36085b3e56dcab39186f63c386f9e86ab",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/SPATIAL/R8_T100_1",
+      "split": "development",
+      "scenario": "SPATIAL",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 1,
+      "generation_seed": 3853093150088059919,
+      "pair_id": "development/R8_T100_1",
+      "path": "development/SPATIAL/R8_T100_1.txt",
+      "sha256": "bf4ca82d159b4064d970c0baf08d29675a3942cf5c9be405a6cb9fa5cb7d9821",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/BOTTLENECK/R8_T100_1",
+      "split": "development",
+      "scenario": "BOTTLENECK",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 1,
+      "generation_seed": 3853093150088059919,
+      "pair_id": "development/R8_T100_1",
+      "path": "development/BOTTLENECK/R8_T100_1.txt",
+      "sha256": "d38e3f14596b0772161bb962e368bc967d954362c1af7c054a95c735310460ac",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/TURN-HIGH/R8_T100_1",
+      "split": "development",
+      "scenario": "TURN-HIGH",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 1,
+      "generation_seed": 3853093150088059919,
+      "pair_id": "development/R8_T100_1",
+      "path": "development/TURN-HIGH/R8_T100_1.txt",
+      "sha256": "f0e3375c092223069bba74ff86d81d885aada5b3bf8c30f61a3f525fd1f3b4b9",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "development/TRAVEL-HIGH/R8_T100_1",
+      "split": "development",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 1,
+      "generation_seed": 3853093150088059919,
+      "pair_id": "development/R8_T100_1",
+      "path": "development/TRAVEL-HIGH/R8_T100_1.txt",
+      "sha256": "90dd6f449bd3b69fa2b3c121488d838d1a1fed3f95dbc62dac26cf8627331459",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "development/SWEEP-NARROW/R8_T100_1",
+      "split": "development",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 1,
+      "generation_seed": 3853093150088059919,
+      "pair_id": "development/R8_T100_1",
+      "path": "development/SWEEP-NARROW/R8_T100_1.txt",
+      "sha256": "ef26005d97ee5bb45c9dc64790e231a1f70e4a8451f3031574d29a2afe7eaf6c",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/BASE/R2_T10_0",
+      "split": "validation",
+      "scenario": "BASE",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 0,
+      "generation_seed": 11357812619969165019,
+      "pair_id": "validation/R2_T10_0",
+      "path": "validation/BASE/R2_T10_0.txt",
+      "sha256": "bed31009496a972ed71fb8bb370e1a841a4334b123d019b163c5adb403a31c23",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/HV-GEOM/R2_T10_0",
+      "split": "validation",
+      "scenario": "HV-GEOM",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 0,
+      "generation_seed": 11357812619969165019,
+      "pair_id": "validation/R2_T10_0",
+      "path": "validation/HV-GEOM/R2_T10_0.txt",
+      "sha256": "4fa192804c2d968426393b4e8a1ff9073b1cb1ee2c1b360f6ed176796f11d074",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/SPATIAL/R2_T10_0",
+      "split": "validation",
+      "scenario": "SPATIAL",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 0,
+      "generation_seed": 11357812619969165019,
+      "pair_id": "validation/R2_T10_0",
+      "path": "validation/SPATIAL/R2_T10_0.txt",
+      "sha256": "88f8c517736657d0e281409e6855bb14e47aca5daa72a5e7da8e797d98ee2665",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/BOTTLENECK/R2_T10_0",
+      "split": "validation",
+      "scenario": "BOTTLENECK",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 0,
+      "generation_seed": 11357812619969165019,
+      "pair_id": "validation/R2_T10_0",
+      "path": "validation/BOTTLENECK/R2_T10_0.txt",
+      "sha256": "3e56ef8120b0e96b827ce7e61e7ac853f0da948639039dbcf04902f2c39916d0",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/TURN-HIGH/R2_T10_0",
+      "split": "validation",
+      "scenario": "TURN-HIGH",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 0,
+      "generation_seed": 11357812619969165019,
+      "pair_id": "validation/R2_T10_0",
+      "path": "validation/TURN-HIGH/R2_T10_0.txt",
+      "sha256": "e32ea6a1397b31e993fe98f233ef878c143f85f94ba7529f702c964b708d7950",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "validation/TRAVEL-HIGH/R2_T10_0",
+      "split": "validation",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 0,
+      "generation_seed": 11357812619969165019,
+      "pair_id": "validation/R2_T10_0",
+      "path": "validation/TRAVEL-HIGH/R2_T10_0.txt",
+      "sha256": "165221ce41e6cde689d3f7ff9f91a436951b88359cf05cb9f91044b603f7e3f2",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/SWEEP-NARROW/R2_T10_0",
+      "split": "validation",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 0,
+      "generation_seed": 11357812619969165019,
+      "pair_id": "validation/R2_T10_0",
+      "path": "validation/SWEEP-NARROW/R2_T10_0.txt",
+      "sha256": "846f5fdd3c58a9712c5839a6c03314a98262965d260d53dd8d915053e0801f3e",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/BASE/R2_T10_1",
+      "split": "validation",
+      "scenario": "BASE",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 1,
+      "generation_seed": 6193502800551692419,
+      "pair_id": "validation/R2_T10_1",
+      "path": "validation/BASE/R2_T10_1.txt",
+      "sha256": "9173109e793032d28c804225348972997a6f31cc394d37f16b33aa7d3a86adea",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/HV-GEOM/R2_T10_1",
+      "split": "validation",
+      "scenario": "HV-GEOM",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 1,
+      "generation_seed": 6193502800551692419,
+      "pair_id": "validation/R2_T10_1",
+      "path": "validation/HV-GEOM/R2_T10_1.txt",
+      "sha256": "43781fc48a5971f7e7fbb5ac9887f7b2ddbe825e97ff302f1e2c492bb7f7e88d",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/SPATIAL/R2_T10_1",
+      "split": "validation",
+      "scenario": "SPATIAL",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 1,
+      "generation_seed": 6193502800551692419,
+      "pair_id": "validation/R2_T10_1",
+      "path": "validation/SPATIAL/R2_T10_1.txt",
+      "sha256": "14815fa3af550b5e0841bedfc0e7dcf092f36e32c75d0e324a5b7e07237e9885",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/BOTTLENECK/R2_T10_1",
+      "split": "validation",
+      "scenario": "BOTTLENECK",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 1,
+      "generation_seed": 6193502800551692419,
+      "pair_id": "validation/R2_T10_1",
+      "path": "validation/BOTTLENECK/R2_T10_1.txt",
+      "sha256": "dc61db776f758380ab562312f4811e0ebdf55a6ebc705050d02ee3cc5896b014",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/TURN-HIGH/R2_T10_1",
+      "split": "validation",
+      "scenario": "TURN-HIGH",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 1,
+      "generation_seed": 6193502800551692419,
+      "pair_id": "validation/R2_T10_1",
+      "path": "validation/TURN-HIGH/R2_T10_1.txt",
+      "sha256": "78db4fd7b833e727d4cd580aa57b7a8318ed423e986fee57ebf0447d0c09e71e",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "validation/TRAVEL-HIGH/R2_T10_1",
+      "split": "validation",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 1,
+      "generation_seed": 6193502800551692419,
+      "pair_id": "validation/R2_T10_1",
+      "path": "validation/TRAVEL-HIGH/R2_T10_1.txt",
+      "sha256": "035a1bb4bc23b642f777f608b050bbcd520dfd4f9ccab0d412c97b0eaaca39f4",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/SWEEP-NARROW/R2_T10_1",
+      "split": "validation",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 1,
+      "generation_seed": 6193502800551692419,
+      "pair_id": "validation/R2_T10_1",
+      "path": "validation/SWEEP-NARROW/R2_T10_1.txt",
+      "sha256": "7fb508514c2d5fc7cb0abc9b0d4bd2360dce57148940ac1e4112c4dd1ed14858",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/BASE/R2_T20_0",
+      "split": "validation",
+      "scenario": "BASE",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 0,
+      "generation_seed": 7690097696141994560,
+      "pair_id": "validation/R2_T20_0",
+      "path": "validation/BASE/R2_T20_0.txt",
+      "sha256": "df32054ad808350eadaf323ce77a433f2a383f6870e73a6d29569ddd69ebb37f",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/HV-GEOM/R2_T20_0",
+      "split": "validation",
+      "scenario": "HV-GEOM",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 0,
+      "generation_seed": 7690097696141994560,
+      "pair_id": "validation/R2_T20_0",
+      "path": "validation/HV-GEOM/R2_T20_0.txt",
+      "sha256": "0c4856dacb6244d8be489ea96231f0dbbdfe57b48e2d802a35dd9389b418be6f",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/SPATIAL/R2_T20_0",
+      "split": "validation",
+      "scenario": "SPATIAL",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 0,
+      "generation_seed": 7690097696141994560,
+      "pair_id": "validation/R2_T20_0",
+      "path": "validation/SPATIAL/R2_T20_0.txt",
+      "sha256": "b506ddc20ece3d34c73bdabc58668d1f1a7b829562a9b566ba8dbfc8f4442e3d",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/BOTTLENECK/R2_T20_0",
+      "split": "validation",
+      "scenario": "BOTTLENECK",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 0,
+      "generation_seed": 7690097696141994560,
+      "pair_id": "validation/R2_T20_0",
+      "path": "validation/BOTTLENECK/R2_T20_0.txt",
+      "sha256": "e1a061344415e27d9d533e8763bfb0e68cd79b1624f86213b32a96602f188c2d",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/TURN-HIGH/R2_T20_0",
+      "split": "validation",
+      "scenario": "TURN-HIGH",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 0,
+      "generation_seed": 7690097696141994560,
+      "pair_id": "validation/R2_T20_0",
+      "path": "validation/TURN-HIGH/R2_T20_0.txt",
+      "sha256": "5e903da95781059a3f8dc89d4106b9f666a75091426a56340952ba9148bca27c",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "validation/TRAVEL-HIGH/R2_T20_0",
+      "split": "validation",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 0,
+      "generation_seed": 7690097696141994560,
+      "pair_id": "validation/R2_T20_0",
+      "path": "validation/TRAVEL-HIGH/R2_T20_0.txt",
+      "sha256": "511f6f8dfa7434321f8e6d2ec555766648f37d2b1cf2b2a14d4077500595982b",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/SWEEP-NARROW/R2_T20_0",
+      "split": "validation",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 0,
+      "generation_seed": 7690097696141994560,
+      "pair_id": "validation/R2_T20_0",
+      "path": "validation/SWEEP-NARROW/R2_T20_0.txt",
+      "sha256": "9238459adad39ea8f397f819e9930b2612cddf98c98f08277fe6789d111b1819",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/BASE/R2_T20_1",
+      "split": "validation",
+      "scenario": "BASE",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 1,
+      "generation_seed": 3886755191929662806,
+      "pair_id": "validation/R2_T20_1",
+      "path": "validation/BASE/R2_T20_1.txt",
+      "sha256": "a35430fe1dee0275907948b75be03acbaa227ce72b96f761f2ccf9263a2c61ab",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/HV-GEOM/R2_T20_1",
+      "split": "validation",
+      "scenario": "HV-GEOM",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 1,
+      "generation_seed": 3886755191929662806,
+      "pair_id": "validation/R2_T20_1",
+      "path": "validation/HV-GEOM/R2_T20_1.txt",
+      "sha256": "5487049d3bf46dd70f67cef1a56b67cd3d5bf596b83ed87b3dc3896a5bbb235c",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/SPATIAL/R2_T20_1",
+      "split": "validation",
+      "scenario": "SPATIAL",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 1,
+      "generation_seed": 3886755191929662806,
+      "pair_id": "validation/R2_T20_1",
+      "path": "validation/SPATIAL/R2_T20_1.txt",
+      "sha256": "8b70bc530c15cd236988f1aee8161f23db4ba5a433b9a724e4619dc344857158",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/BOTTLENECK/R2_T20_1",
+      "split": "validation",
+      "scenario": "BOTTLENECK",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 1,
+      "generation_seed": 3886755191929662806,
+      "pair_id": "validation/R2_T20_1",
+      "path": "validation/BOTTLENECK/R2_T20_1.txt",
+      "sha256": "a9b92f753986672df132da2fb4046a41579fcc256996d051b5aeb7324ca3b080",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/TURN-HIGH/R2_T20_1",
+      "split": "validation",
+      "scenario": "TURN-HIGH",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 1,
+      "generation_seed": 3886755191929662806,
+      "pair_id": "validation/R2_T20_1",
+      "path": "validation/TURN-HIGH/R2_T20_1.txt",
+      "sha256": "96bb82f18e97d7e63e1caaa7c1b4793648b5ed83ec1c066b5cd6e6eb42147f24",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "validation/TRAVEL-HIGH/R2_T20_1",
+      "split": "validation",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 1,
+      "generation_seed": 3886755191929662806,
+      "pair_id": "validation/R2_T20_1",
+      "path": "validation/TRAVEL-HIGH/R2_T20_1.txt",
+      "sha256": "bb18da29ca864db93cc95d76fb694b686e6711ad81de4955ca33f61b42a3038a",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/SWEEP-NARROW/R2_T20_1",
+      "split": "validation",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 1,
+      "generation_seed": 3886755191929662806,
+      "pair_id": "validation/R2_T20_1",
+      "path": "validation/SWEEP-NARROW/R2_T20_1.txt",
+      "sha256": "65622de3e3615d8befcd8d71c8e5d83e97c3f845a4150925c5ce930d20f589de",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/BASE/R4_T40_0",
+      "split": "validation",
+      "scenario": "BASE",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 0,
+      "generation_seed": 15882656069317620769,
+      "pair_id": "validation/R4_T40_0",
+      "path": "validation/BASE/R4_T40_0.txt",
+      "sha256": "5f242bcf78848b517155135ed15cbd229216462e58c65d7fc878d2965899468f",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/HV-GEOM/R4_T40_0",
+      "split": "validation",
+      "scenario": "HV-GEOM",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 0,
+      "generation_seed": 15882656069317620769,
+      "pair_id": "validation/R4_T40_0",
+      "path": "validation/HV-GEOM/R4_T40_0.txt",
+      "sha256": "33b010fb45ee6cf00cf0a0d9363505f93695435ac4b87a9a4f11404e8eeb90a7",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/SPATIAL/R4_T40_0",
+      "split": "validation",
+      "scenario": "SPATIAL",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 0,
+      "generation_seed": 15882656069317620769,
+      "pair_id": "validation/R4_T40_0",
+      "path": "validation/SPATIAL/R4_T40_0.txt",
+      "sha256": "e72f1ecdc1a0f32f735134ef70106253d39719fe3084ccd0f884d8f84459b3f8",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/BOTTLENECK/R4_T40_0",
+      "split": "validation",
+      "scenario": "BOTTLENECK",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 0,
+      "generation_seed": 15882656069317620769,
+      "pair_id": "validation/R4_T40_0",
+      "path": "validation/BOTTLENECK/R4_T40_0.txt",
+      "sha256": "df4cf099c9ae79d3d29e07e1f8b84a8011eb1150a044eddd8d8c008f2ce6a5c8",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/TURN-HIGH/R4_T40_0",
+      "split": "validation",
+      "scenario": "TURN-HIGH",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 0,
+      "generation_seed": 15882656069317620769,
+      "pair_id": "validation/R4_T40_0",
+      "path": "validation/TURN-HIGH/R4_T40_0.txt",
+      "sha256": "82e143796dc2ed317cc81147e3cd0dd251a4e37af1e5efe7396937d2e94f8543",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "validation/TRAVEL-HIGH/R4_T40_0",
+      "split": "validation",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 0,
+      "generation_seed": 15882656069317620769,
+      "pair_id": "validation/R4_T40_0",
+      "path": "validation/TRAVEL-HIGH/R4_T40_0.txt",
+      "sha256": "04fe1ca7c133ae68f431db6ec4e6bdda6830f54d66bf0882e3dab8b6710ce56c",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/SWEEP-NARROW/R4_T40_0",
+      "split": "validation",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 0,
+      "generation_seed": 15882656069317620769,
+      "pair_id": "validation/R4_T40_0",
+      "path": "validation/SWEEP-NARROW/R4_T40_0.txt",
+      "sha256": "71699a4f6bd5c1b6a61de96caec4e53470814728226eb497e8e1bb3adfbefb4d",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/BASE/R4_T40_1",
+      "split": "validation",
+      "scenario": "BASE",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 1,
+      "generation_seed": 109235811615190121,
+      "pair_id": "validation/R4_T40_1",
+      "path": "validation/BASE/R4_T40_1.txt",
+      "sha256": "4c71f51bc714be396447a0a3cde44ed7c3f583fd5c7bb6549fab7adf212d5890",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/HV-GEOM/R4_T40_1",
+      "split": "validation",
+      "scenario": "HV-GEOM",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 1,
+      "generation_seed": 109235811615190121,
+      "pair_id": "validation/R4_T40_1",
+      "path": "validation/HV-GEOM/R4_T40_1.txt",
+      "sha256": "0eff7895b09b3af166291d5f161d8b4ddaa8aa8dabb58a3980df747732f6aab1",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/SPATIAL/R4_T40_1",
+      "split": "validation",
+      "scenario": "SPATIAL",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 1,
+      "generation_seed": 109235811615190121,
+      "pair_id": "validation/R4_T40_1",
+      "path": "validation/SPATIAL/R4_T40_1.txt",
+      "sha256": "0103aa8f8f8fa4c5e5f48354bcece8aee820a5c691b2922ec82cd3dff9a2dfac",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/BOTTLENECK/R4_T40_1",
+      "split": "validation",
+      "scenario": "BOTTLENECK",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 1,
+      "generation_seed": 109235811615190121,
+      "pair_id": "validation/R4_T40_1",
+      "path": "validation/BOTTLENECK/R4_T40_1.txt",
+      "sha256": "fe30b230c829c56f0e54bb39aa411a873b3e566673d5d8f047d0d8685ac8df10",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/TURN-HIGH/R4_T40_1",
+      "split": "validation",
+      "scenario": "TURN-HIGH",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 1,
+      "generation_seed": 109235811615190121,
+      "pair_id": "validation/R4_T40_1",
+      "path": "validation/TURN-HIGH/R4_T40_1.txt",
+      "sha256": "52c9c04a7f8223679aa17dd14b2ba7f93f87e3583fb58745ae6988b2c5463e03",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "validation/TRAVEL-HIGH/R4_T40_1",
+      "split": "validation",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 1,
+      "generation_seed": 109235811615190121,
+      "pair_id": "validation/R4_T40_1",
+      "path": "validation/TRAVEL-HIGH/R4_T40_1.txt",
+      "sha256": "5e25e77c5c9c85d69aea7c6f9dbc6ecc179e2d2ad05dec1c25a7aeac67a08ff1",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/SWEEP-NARROW/R4_T40_1",
+      "split": "validation",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 1,
+      "generation_seed": 109235811615190121,
+      "pair_id": "validation/R4_T40_1",
+      "path": "validation/SWEEP-NARROW/R4_T40_1.txt",
+      "sha256": "be6f37bd1e29c959d69f99d08f0c1c78f8cff3e2aa2f7db10c1616bb703eb035",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/BASE/R4_T60_0",
+      "split": "validation",
+      "scenario": "BASE",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 0,
+      "generation_seed": 10332311750511667644,
+      "pair_id": "validation/R4_T60_0",
+      "path": "validation/BASE/R4_T60_0.txt",
+      "sha256": "8408240ed0c85700f3b6eb361198b2bbfc5a7ae0502c0fafc5af3cb18805bb5a",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/HV-GEOM/R4_T60_0",
+      "split": "validation",
+      "scenario": "HV-GEOM",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 0,
+      "generation_seed": 10332311750511667644,
+      "pair_id": "validation/R4_T60_0",
+      "path": "validation/HV-GEOM/R4_T60_0.txt",
+      "sha256": "6b212d4aee7d972f7fcc7976ff7ab9ef2a171ec1c16445e1f47846783b73a3d2",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/SPATIAL/R4_T60_0",
+      "split": "validation",
+      "scenario": "SPATIAL",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 0,
+      "generation_seed": 10332311750511667644,
+      "pair_id": "validation/R4_T60_0",
+      "path": "validation/SPATIAL/R4_T60_0.txt",
+      "sha256": "9a9906defd40ee08901a8399fd513e087aa6431c91e0e249bf07091f694b151b",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/BOTTLENECK/R4_T60_0",
+      "split": "validation",
+      "scenario": "BOTTLENECK",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 0,
+      "generation_seed": 10332311750511667644,
+      "pair_id": "validation/R4_T60_0",
+      "path": "validation/BOTTLENECK/R4_T60_0.txt",
+      "sha256": "6b40fbcd600b920f3ffcc695a52ccf2fe1a9de2c59a9cb63dc9cef1fc8e373e8",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/TURN-HIGH/R4_T60_0",
+      "split": "validation",
+      "scenario": "TURN-HIGH",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 0,
+      "generation_seed": 10332311750511667644,
+      "pair_id": "validation/R4_T60_0",
+      "path": "validation/TURN-HIGH/R4_T60_0.txt",
+      "sha256": "05cb449420fdb5872c223f0f58bb76aabda9cc5fdd92555e67947b7af4733e1d",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "validation/TRAVEL-HIGH/R4_T60_0",
+      "split": "validation",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 0,
+      "generation_seed": 10332311750511667644,
+      "pair_id": "validation/R4_T60_0",
+      "path": "validation/TRAVEL-HIGH/R4_T60_0.txt",
+      "sha256": "6b8d90a7781df8985897d8a18812ead88d401fc0463c135a3da7b945cbb98023",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/SWEEP-NARROW/R4_T60_0",
+      "split": "validation",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 0,
+      "generation_seed": 10332311750511667644,
+      "pair_id": "validation/R4_T60_0",
+      "path": "validation/SWEEP-NARROW/R4_T60_0.txt",
+      "sha256": "e5097a193b6d3da39015920c4938921c10fa580ac8802d4664b811eaf590a0a7",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/BASE/R4_T60_1",
+      "split": "validation",
+      "scenario": "BASE",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 1,
+      "generation_seed": 2294139803348036025,
+      "pair_id": "validation/R4_T60_1",
+      "path": "validation/BASE/R4_T60_1.txt",
+      "sha256": "038deb6408dce8ed8a814545b550035d5efd91092444e97eb5cc752244419a2a",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/HV-GEOM/R4_T60_1",
+      "split": "validation",
+      "scenario": "HV-GEOM",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 1,
+      "generation_seed": 2294139803348036025,
+      "pair_id": "validation/R4_T60_1",
+      "path": "validation/HV-GEOM/R4_T60_1.txt",
+      "sha256": "57e6e6b1c55db7435151e21afe5d661abc32492e40894a770798f263a8b379e6",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/SPATIAL/R4_T60_1",
+      "split": "validation",
+      "scenario": "SPATIAL",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 1,
+      "generation_seed": 2294139803348036025,
+      "pair_id": "validation/R4_T60_1",
+      "path": "validation/SPATIAL/R4_T60_1.txt",
+      "sha256": "f9e5cf73051282c79469c412613cb27a36535ce3d7882df89cdd8417fcf77e44",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/BOTTLENECK/R4_T60_1",
+      "split": "validation",
+      "scenario": "BOTTLENECK",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 1,
+      "generation_seed": 2294139803348036025,
+      "pair_id": "validation/R4_T60_1",
+      "path": "validation/BOTTLENECK/R4_T60_1.txt",
+      "sha256": "181bb0783265f0ccd3d07c80216f7b952721ab0891b7dd58519291af52b3d69d",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/TURN-HIGH/R4_T60_1",
+      "split": "validation",
+      "scenario": "TURN-HIGH",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 1,
+      "generation_seed": 2294139803348036025,
+      "pair_id": "validation/R4_T60_1",
+      "path": "validation/TURN-HIGH/R4_T60_1.txt",
+      "sha256": "adcc467f15ac658c85cb0ce73fdcb21fb8f842baa19b7a4d6285b3bfaba3bffe",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "validation/TRAVEL-HIGH/R4_T60_1",
+      "split": "validation",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 1,
+      "generation_seed": 2294139803348036025,
+      "pair_id": "validation/R4_T60_1",
+      "path": "validation/TRAVEL-HIGH/R4_T60_1.txt",
+      "sha256": "379b7d2dde9ed453584618639cb4f40542d86d599f1036d5a29d98089000d133",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/SWEEP-NARROW/R4_T60_1",
+      "split": "validation",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 1,
+      "generation_seed": 2294139803348036025,
+      "pair_id": "validation/R4_T60_1",
+      "path": "validation/SWEEP-NARROW/R4_T60_1.txt",
+      "sha256": "58e4f50b0e27f01f5f549fe816db0b1153ae246287ad28864ecfd01d20d61a8a",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/BASE/R8_T80_0",
+      "split": "validation",
+      "scenario": "BASE",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 0,
+      "generation_seed": 14090625405266151452,
+      "pair_id": "validation/R8_T80_0",
+      "path": "validation/BASE/R8_T80_0.txt",
+      "sha256": "425aeee72828eaa140ee29a892661d4e951a96f87fcde652c8947fa2bf636e8e",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/HV-GEOM/R8_T80_0",
+      "split": "validation",
+      "scenario": "HV-GEOM",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 0,
+      "generation_seed": 14090625405266151452,
+      "pair_id": "validation/R8_T80_0",
+      "path": "validation/HV-GEOM/R8_T80_0.txt",
+      "sha256": "fe413057e524547b82e52d4e1aca04340a4e0575073f868671fdc97b330808e6",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/SPATIAL/R8_T80_0",
+      "split": "validation",
+      "scenario": "SPATIAL",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 0,
+      "generation_seed": 14090625405266151452,
+      "pair_id": "validation/R8_T80_0",
+      "path": "validation/SPATIAL/R8_T80_0.txt",
+      "sha256": "4d2b352af0f94c3937e2b4fffe7a3e4f54ce4f6c5172a672b2f821a490d01ae6",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/BOTTLENECK/R8_T80_0",
+      "split": "validation",
+      "scenario": "BOTTLENECK",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 0,
+      "generation_seed": 14090625405266151452,
+      "pair_id": "validation/R8_T80_0",
+      "path": "validation/BOTTLENECK/R8_T80_0.txt",
+      "sha256": "9a9f98a85a9e1bfa104300f757dbf6483e9d97864187ba653fe60b20692f86f4",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/TURN-HIGH/R8_T80_0",
+      "split": "validation",
+      "scenario": "TURN-HIGH",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 0,
+      "generation_seed": 14090625405266151452,
+      "pair_id": "validation/R8_T80_0",
+      "path": "validation/TURN-HIGH/R8_T80_0.txt",
+      "sha256": "0ed3d190130b2f5795e3bda1a8f7ae718715bf0f2ff98aa4a0a683b574e26018",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "validation/TRAVEL-HIGH/R8_T80_0",
+      "split": "validation",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 0,
+      "generation_seed": 14090625405266151452,
+      "pair_id": "validation/R8_T80_0",
+      "path": "validation/TRAVEL-HIGH/R8_T80_0.txt",
+      "sha256": "14cfe1bff21917f5ad7cb91ea8a7fdd0e8327946cc84dfe3805a7d39090724fe",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/SWEEP-NARROW/R8_T80_0",
+      "split": "validation",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 0,
+      "generation_seed": 14090625405266151452,
+      "pair_id": "validation/R8_T80_0",
+      "path": "validation/SWEEP-NARROW/R8_T80_0.txt",
+      "sha256": "41ac24e729b191aef3486362e571cbc5f6d33c0b903f941f937ff37b08baa42a",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/BASE/R8_T80_1",
+      "split": "validation",
+      "scenario": "BASE",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 1,
+      "generation_seed": 2358910199583421999,
+      "pair_id": "validation/R8_T80_1",
+      "path": "validation/BASE/R8_T80_1.txt",
+      "sha256": "13e86b6c7586644ac96de7cb3cf2920b799232d9f0a15d67e8758d5979bb437f",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/HV-GEOM/R8_T80_1",
+      "split": "validation",
+      "scenario": "HV-GEOM",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 1,
+      "generation_seed": 2358910199583421999,
+      "pair_id": "validation/R8_T80_1",
+      "path": "validation/HV-GEOM/R8_T80_1.txt",
+      "sha256": "5592f7275931a689dd16bfad71e6fc3c035dba7da25d2d6a54b906284b2007d7",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/SPATIAL/R8_T80_1",
+      "split": "validation",
+      "scenario": "SPATIAL",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 1,
+      "generation_seed": 2358910199583421999,
+      "pair_id": "validation/R8_T80_1",
+      "path": "validation/SPATIAL/R8_T80_1.txt",
+      "sha256": "9c80cd24cc43f4bdc1b7db09bda501bfe11e51ee76e636c702c6adf341f5738f",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/BOTTLENECK/R8_T80_1",
+      "split": "validation",
+      "scenario": "BOTTLENECK",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 1,
+      "generation_seed": 2358910199583421999,
+      "pair_id": "validation/R8_T80_1",
+      "path": "validation/BOTTLENECK/R8_T80_1.txt",
+      "sha256": "eda47993b75ebfbe2cb64fbb4f02b8dca018c74d47a28b48690094ede318e11c",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/TURN-HIGH/R8_T80_1",
+      "split": "validation",
+      "scenario": "TURN-HIGH",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 1,
+      "generation_seed": 2358910199583421999,
+      "pair_id": "validation/R8_T80_1",
+      "path": "validation/TURN-HIGH/R8_T80_1.txt",
+      "sha256": "44294607af062a32d2131bbe61cb5d0856beac438eef81f5da7f7aa4f0a9619c",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "validation/TRAVEL-HIGH/R8_T80_1",
+      "split": "validation",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 1,
+      "generation_seed": 2358910199583421999,
+      "pair_id": "validation/R8_T80_1",
+      "path": "validation/TRAVEL-HIGH/R8_T80_1.txt",
+      "sha256": "03d81dd73af773e19f3a4aecb89be4cd3c26093558a4bf0bb0a30273d42509b5",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/SWEEP-NARROW/R8_T80_1",
+      "split": "validation",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 1,
+      "generation_seed": 2358910199583421999,
+      "pair_id": "validation/R8_T80_1",
+      "path": "validation/SWEEP-NARROW/R8_T80_1.txt",
+      "sha256": "016bd20e9cb2cf417a76303b26a570bcc03ee60e571aca914e7ee1cf671e38db",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/BASE/R8_T100_0",
+      "split": "validation",
+      "scenario": "BASE",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 0,
+      "generation_seed": 212458867211406643,
+      "pair_id": "validation/R8_T100_0",
+      "path": "validation/BASE/R8_T100_0.txt",
+      "sha256": "94085288b65f08ec3e4c02ded755ae9f258141f0cccddb802229f19d813b8699",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/HV-GEOM/R8_T100_0",
+      "split": "validation",
+      "scenario": "HV-GEOM",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 0,
+      "generation_seed": 212458867211406643,
+      "pair_id": "validation/R8_T100_0",
+      "path": "validation/HV-GEOM/R8_T100_0.txt",
+      "sha256": "7548bfb8611e47bbc196bc6afafda1c951ec93efa7383585a177dff8285500a0",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/SPATIAL/R8_T100_0",
+      "split": "validation",
+      "scenario": "SPATIAL",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 0,
+      "generation_seed": 212458867211406643,
+      "pair_id": "validation/R8_T100_0",
+      "path": "validation/SPATIAL/R8_T100_0.txt",
+      "sha256": "6067617e9b4b7b1a8899423d5742c4e346e3205a5fbebf8a2e242274588b4705",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/BOTTLENECK/R8_T100_0",
+      "split": "validation",
+      "scenario": "BOTTLENECK",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 0,
+      "generation_seed": 212458867211406643,
+      "pair_id": "validation/R8_T100_0",
+      "path": "validation/BOTTLENECK/R8_T100_0.txt",
+      "sha256": "6db421bbe805d40a72599735fb09155abefc75528a87acf08090eae874675494",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/TURN-HIGH/R8_T100_0",
+      "split": "validation",
+      "scenario": "TURN-HIGH",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 0,
+      "generation_seed": 212458867211406643,
+      "pair_id": "validation/R8_T100_0",
+      "path": "validation/TURN-HIGH/R8_T100_0.txt",
+      "sha256": "b85dc655b9ebc4974cf181273d3d50a671f5ca2cba7409f479a1790ee6995633",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "validation/TRAVEL-HIGH/R8_T100_0",
+      "split": "validation",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 0,
+      "generation_seed": 212458867211406643,
+      "pair_id": "validation/R8_T100_0",
+      "path": "validation/TRAVEL-HIGH/R8_T100_0.txt",
+      "sha256": "13eb3389f4a9b20ffae0ba7d6c4470ff2d766da0a5e8271fc2fbc1e34453b80c",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/SWEEP-NARROW/R8_T100_0",
+      "split": "validation",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 0,
+      "generation_seed": 212458867211406643,
+      "pair_id": "validation/R8_T100_0",
+      "path": "validation/SWEEP-NARROW/R8_T100_0.txt",
+      "sha256": "6e5fafc378086cafa1c59d204929c04c324b1dbb46cf0af9c921b9f7f5a7e54a",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/BASE/R8_T100_1",
+      "split": "validation",
+      "scenario": "BASE",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 1,
+      "generation_seed": 2521066050703699415,
+      "pair_id": "validation/R8_T100_1",
+      "path": "validation/BASE/R8_T100_1.txt",
+      "sha256": "4238bd4aff883889d8aee13d80cbab55bcf2f6e85548be4fe9a6fb06d8c1b11d",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/HV-GEOM/R8_T100_1",
+      "split": "validation",
+      "scenario": "HV-GEOM",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 1,
+      "generation_seed": 2521066050703699415,
+      "pair_id": "validation/R8_T100_1",
+      "path": "validation/HV-GEOM/R8_T100_1.txt",
+      "sha256": "4acafd8c6eff8af75c2e550900770fb4f21571bae3562563966bb953d05395cf",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/SPATIAL/R8_T100_1",
+      "split": "validation",
+      "scenario": "SPATIAL",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 1,
+      "generation_seed": 2521066050703699415,
+      "pair_id": "validation/R8_T100_1",
+      "path": "validation/SPATIAL/R8_T100_1.txt",
+      "sha256": "215196974aa690bb5f122e0b69dc9adda0552eaa59f011ea6146fc749d11932e",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/BOTTLENECK/R8_T100_1",
+      "split": "validation",
+      "scenario": "BOTTLENECK",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 1,
+      "generation_seed": 2521066050703699415,
+      "pair_id": "validation/R8_T100_1",
+      "path": "validation/BOTTLENECK/R8_T100_1.txt",
+      "sha256": "39ad7249f103d9e57f62a2750fb5da2b4eab2ee8f5df0528fd6ce88e2d68e9ef",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/TURN-HIGH/R8_T100_1",
+      "split": "validation",
+      "scenario": "TURN-HIGH",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 1,
+      "generation_seed": 2521066050703699415,
+      "pair_id": "validation/R8_T100_1",
+      "path": "validation/TURN-HIGH/R8_T100_1.txt",
+      "sha256": "ad1115b5f35dfe862804721b60e08666cec3ccace294f1b44f69e4a9068475b6",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "validation/TRAVEL-HIGH/R8_T100_1",
+      "split": "validation",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 1,
+      "generation_seed": 2521066050703699415,
+      "pair_id": "validation/R8_T100_1",
+      "path": "validation/TRAVEL-HIGH/R8_T100_1.txt",
+      "sha256": "455c88fab66db3930d8d410a4c0258aa1baf35933c2ef9483d44fe896355af31",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "validation/SWEEP-NARROW/R8_T100_1",
+      "split": "validation",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 1,
+      "generation_seed": 2521066050703699415,
+      "pair_id": "validation/R8_T100_1",
+      "path": "validation/SWEEP-NARROW/R8_T100_1.txt",
+      "sha256": "944a9498a364b248e111ae0a93d4e1e525c3b59f928babf7f3d8d142829d5253",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BASE/R2_T10_0",
+      "split": "test",
+      "scenario": "BASE",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 0,
+      "generation_seed": 4703788962585820007,
+      "pair_id": "test/R2_T10_0",
+      "path": "test/BASE/R2_T10_0.txt",
+      "sha256": "1e71f2bd47e77bfd13b956e60db9dc1ac32e16e4236cef4b669e66c60e3191f5",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/HV-GEOM/R2_T10_0",
+      "split": "test",
+      "scenario": "HV-GEOM",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 0,
+      "generation_seed": 4703788962585820007,
+      "pair_id": "test/R2_T10_0",
+      "path": "test/HV-GEOM/R2_T10_0.txt",
+      "sha256": "aed4ce2c2f431531e2a94812ec1b95e7ce81987d32823121eab400c2dd024a78",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SPATIAL/R2_T10_0",
+      "split": "test",
+      "scenario": "SPATIAL",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 0,
+      "generation_seed": 4703788962585820007,
+      "pair_id": "test/R2_T10_0",
+      "path": "test/SPATIAL/R2_T10_0.txt",
+      "sha256": "01ab6245c264812f9023097ad5f5d61e8b60ceb8f77c2729bc40647687ada2b5",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BOTTLENECK/R2_T10_0",
+      "split": "test",
+      "scenario": "BOTTLENECK",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 0,
+      "generation_seed": 4703788962585820007,
+      "pair_id": "test/R2_T10_0",
+      "path": "test/BOTTLENECK/R2_T10_0.txt",
+      "sha256": "30e3f4e59b2c17a2815f1337031b4c61557946ad50835fd04e792903d54d788e",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/TURN-HIGH/R2_T10_0",
+      "split": "test",
+      "scenario": "TURN-HIGH",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 0,
+      "generation_seed": 4703788962585820007,
+      "pair_id": "test/R2_T10_0",
+      "path": "test/TURN-HIGH/R2_T10_0.txt",
+      "sha256": "8c7d3fefb2809e2964d2584751048573e4bec92521d5f0f56a2d395f110ba4f1",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "test/TRAVEL-HIGH/R2_T10_0",
+      "split": "test",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 0,
+      "generation_seed": 4703788962585820007,
+      "pair_id": "test/R2_T10_0",
+      "path": "test/TRAVEL-HIGH/R2_T10_0.txt",
+      "sha256": "f95b83aed561dcf26524a3b2eae40cd4ee4bc787936ae667ae977777eacf95ab",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SWEEP-NARROW/R2_T10_0",
+      "split": "test",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 0,
+      "generation_seed": 4703788962585820007,
+      "pair_id": "test/R2_T10_0",
+      "path": "test/SWEEP-NARROW/R2_T10_0.txt",
+      "sha256": "daa02ebbb2eabf6ff46b7ad10b8845eab3c7400f6d01ca110e38df2712052926",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BASE/R2_T10_1",
+      "split": "test",
+      "scenario": "BASE",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 1,
+      "generation_seed": 3026852344380064990,
+      "pair_id": "test/R2_T10_1",
+      "path": "test/BASE/R2_T10_1.txt",
+      "sha256": "f73b958c5fd038b097c5ebe3377ab8f2d44b3f6d6e80b8d8716a922b4e1b983b",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/HV-GEOM/R2_T10_1",
+      "split": "test",
+      "scenario": "HV-GEOM",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 1,
+      "generation_seed": 3026852344380064990,
+      "pair_id": "test/R2_T10_1",
+      "path": "test/HV-GEOM/R2_T10_1.txt",
+      "sha256": "f39f6a6f9f8810194630bfa0ca4d872c2fe0121ca80dda6b6d9c409ddcc0078c",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SPATIAL/R2_T10_1",
+      "split": "test",
+      "scenario": "SPATIAL",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 1,
+      "generation_seed": 3026852344380064990,
+      "pair_id": "test/R2_T10_1",
+      "path": "test/SPATIAL/R2_T10_1.txt",
+      "sha256": "3857314d1098b77508a8d17115558a239dd9734d6c2289a929c50c83674aae24",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BOTTLENECK/R2_T10_1",
+      "split": "test",
+      "scenario": "BOTTLENECK",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 1,
+      "generation_seed": 3026852344380064990,
+      "pair_id": "test/R2_T10_1",
+      "path": "test/BOTTLENECK/R2_T10_1.txt",
+      "sha256": "e75b7d86afc57f4baf1758738c4e83bef514811cdbe1cbcdf9bc34a3234920f4",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/TURN-HIGH/R2_T10_1",
+      "split": "test",
+      "scenario": "TURN-HIGH",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 1,
+      "generation_seed": 3026852344380064990,
+      "pair_id": "test/R2_T10_1",
+      "path": "test/TURN-HIGH/R2_T10_1.txt",
+      "sha256": "00cf5faefa0f8a79b4f32bd31075223fcb1b807689e8700054c7ea7fcd5ad1b1",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "test/TRAVEL-HIGH/R2_T10_1",
+      "split": "test",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 1,
+      "generation_seed": 3026852344380064990,
+      "pair_id": "test/R2_T10_1",
+      "path": "test/TRAVEL-HIGH/R2_T10_1.txt",
+      "sha256": "a4207119f0c933d75a00661dd0f3355c4bfcdc583e6197b929e79409c68a3fa7",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SWEEP-NARROW/R2_T10_1",
+      "split": "test",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 1,
+      "generation_seed": 3026852344380064990,
+      "pair_id": "test/R2_T10_1",
+      "path": "test/SWEEP-NARROW/R2_T10_1.txt",
+      "sha256": "257d626ca5c8c3c7f2323dc684064e55bd137210bdad6b1d92b797e3fa9db2da",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BASE/R2_T10_2",
+      "split": "test",
+      "scenario": "BASE",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 2,
+      "generation_seed": 8053408951238625520,
+      "pair_id": "test/R2_T10_2",
+      "path": "test/BASE/R2_T10_2.txt",
+      "sha256": "ee439b25129c53b9b1c3b4e455162a2f1cd2cd25ae925feb44d105b0cb2d505e",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/HV-GEOM/R2_T10_2",
+      "split": "test",
+      "scenario": "HV-GEOM",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 2,
+      "generation_seed": 8053408951238625520,
+      "pair_id": "test/R2_T10_2",
+      "path": "test/HV-GEOM/R2_T10_2.txt",
+      "sha256": "c95e5f80e61f6cef8ebb2ec618d24ff52ef08804baa0260f367c2fa3aa524d3a",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SPATIAL/R2_T10_2",
+      "split": "test",
+      "scenario": "SPATIAL",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 2,
+      "generation_seed": 8053408951238625520,
+      "pair_id": "test/R2_T10_2",
+      "path": "test/SPATIAL/R2_T10_2.txt",
+      "sha256": "a0f271d493a6880749926c1ec909c7442c9f2f368c9c161ba7d9519f7571a15f",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BOTTLENECK/R2_T10_2",
+      "split": "test",
+      "scenario": "BOTTLENECK",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 2,
+      "generation_seed": 8053408951238625520,
+      "pair_id": "test/R2_T10_2",
+      "path": "test/BOTTLENECK/R2_T10_2.txt",
+      "sha256": "c23e6f8b8540bbe69e3fe284fa947e1e8cfb3aa0cbf13f34b3eb2714ff9de661",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/TURN-HIGH/R2_T10_2",
+      "split": "test",
+      "scenario": "TURN-HIGH",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 2,
+      "generation_seed": 8053408951238625520,
+      "pair_id": "test/R2_T10_2",
+      "path": "test/TURN-HIGH/R2_T10_2.txt",
+      "sha256": "4af146e4fa0a63c795f3924aa56a81e31d403e2c94ec9400d68d4d6f71bf1a02",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "test/TRAVEL-HIGH/R2_T10_2",
+      "split": "test",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 2,
+      "generation_seed": 8053408951238625520,
+      "pair_id": "test/R2_T10_2",
+      "path": "test/TRAVEL-HIGH/R2_T10_2.txt",
+      "sha256": "a123bb598d79a570cdd4c247146729bff68060b0c919d0f86c5bb52c32731802",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SWEEP-NARROW/R2_T10_2",
+      "split": "test",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 2,
+      "generation_seed": 8053408951238625520,
+      "pair_id": "test/R2_T10_2",
+      "path": "test/SWEEP-NARROW/R2_T10_2.txt",
+      "sha256": "a6e7eb67f1060e42b9e2bac0c858fa1effe1f5c296c94f44555b3259f1184655",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BASE/R2_T10_3",
+      "split": "test",
+      "scenario": "BASE",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 3,
+      "generation_seed": 15758798495049926647,
+      "pair_id": "test/R2_T10_3",
+      "path": "test/BASE/R2_T10_3.txt",
+      "sha256": "cd595023716088ff0ed1f32ca0ac907969ea8f0fc575f70840eaa089e4e6a302",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/HV-GEOM/R2_T10_3",
+      "split": "test",
+      "scenario": "HV-GEOM",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 3,
+      "generation_seed": 15758798495049926647,
+      "pair_id": "test/R2_T10_3",
+      "path": "test/HV-GEOM/R2_T10_3.txt",
+      "sha256": "ac57d556900c9744761a069f88cfdf25aae26d1ee0a70e05d7a9e99e47cb0856",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SPATIAL/R2_T10_3",
+      "split": "test",
+      "scenario": "SPATIAL",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 3,
+      "generation_seed": 15758798495049926647,
+      "pair_id": "test/R2_T10_3",
+      "path": "test/SPATIAL/R2_T10_3.txt",
+      "sha256": "c22d5070d4f594261077e477e886ebdef11f5fb421808f78cfd7056a84faecca",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BOTTLENECK/R2_T10_3",
+      "split": "test",
+      "scenario": "BOTTLENECK",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 3,
+      "generation_seed": 15758798495049926647,
+      "pair_id": "test/R2_T10_3",
+      "path": "test/BOTTLENECK/R2_T10_3.txt",
+      "sha256": "86202ad412fc1db39fa34a6d19e5170e6544cd61673eeeb443865d5c46c93789",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/TURN-HIGH/R2_T10_3",
+      "split": "test",
+      "scenario": "TURN-HIGH",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 3,
+      "generation_seed": 15758798495049926647,
+      "pair_id": "test/R2_T10_3",
+      "path": "test/TURN-HIGH/R2_T10_3.txt",
+      "sha256": "a06dcf0a8fbf84aad1384801aa427b56fd8a1f2a2cc9d64d827402fa59fab6dc",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "test/TRAVEL-HIGH/R2_T10_3",
+      "split": "test",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 3,
+      "generation_seed": 15758798495049926647,
+      "pair_id": "test/R2_T10_3",
+      "path": "test/TRAVEL-HIGH/R2_T10_3.txt",
+      "sha256": "9a43d1816749e3dce9427adea7b8d06f03e6aa9cb251a1102bcf7c84e593d398",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SWEEP-NARROW/R2_T10_3",
+      "split": "test",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 2,
+      "n_tasks": 10,
+      "replicate": 3,
+      "generation_seed": 15758798495049926647,
+      "pair_id": "test/R2_T10_3",
+      "path": "test/SWEEP-NARROW/R2_T10_3.txt",
+      "sha256": "773a0579df1377351eefc56ab6fa413fcb78d3ff312e039ffb67fcbc117ffe5d",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BASE/R2_T20_0",
+      "split": "test",
+      "scenario": "BASE",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 0,
+      "generation_seed": 5128957564893392600,
+      "pair_id": "test/R2_T20_0",
+      "path": "test/BASE/R2_T20_0.txt",
+      "sha256": "d31958218e2c7836f455ad6a57c25e759d61df59ef063c84796a74bc8dfa5b15",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/HV-GEOM/R2_T20_0",
+      "split": "test",
+      "scenario": "HV-GEOM",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 0,
+      "generation_seed": 5128957564893392600,
+      "pair_id": "test/R2_T20_0",
+      "path": "test/HV-GEOM/R2_T20_0.txt",
+      "sha256": "3e65820477d03f46e1b359b0ef4f21cee1d7e373a59adff97fe58096372a3023",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SPATIAL/R2_T20_0",
+      "split": "test",
+      "scenario": "SPATIAL",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 0,
+      "generation_seed": 5128957564893392600,
+      "pair_id": "test/R2_T20_0",
+      "path": "test/SPATIAL/R2_T20_0.txt",
+      "sha256": "04d0deadadfe1790cc2206f5624ec218b30860f7e3f44aa8f94f61d3e92d7c0f",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BOTTLENECK/R2_T20_0",
+      "split": "test",
+      "scenario": "BOTTLENECK",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 0,
+      "generation_seed": 5128957564893392600,
+      "pair_id": "test/R2_T20_0",
+      "path": "test/BOTTLENECK/R2_T20_0.txt",
+      "sha256": "d0351c86034944c10d1616616233e3427fad18b98dffb111e4771e5c36c707ea",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/TURN-HIGH/R2_T20_0",
+      "split": "test",
+      "scenario": "TURN-HIGH",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 0,
+      "generation_seed": 5128957564893392600,
+      "pair_id": "test/R2_T20_0",
+      "path": "test/TURN-HIGH/R2_T20_0.txt",
+      "sha256": "33216867bf20c998abafa8c6f196fd1d900eb7518064721b4423990e67f4084e",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "test/TRAVEL-HIGH/R2_T20_0",
+      "split": "test",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 0,
+      "generation_seed": 5128957564893392600,
+      "pair_id": "test/R2_T20_0",
+      "path": "test/TRAVEL-HIGH/R2_T20_0.txt",
+      "sha256": "822bc28cb5cfc918502406749919aca6af7687700658e47a62e1611cc19a42e7",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SWEEP-NARROW/R2_T20_0",
+      "split": "test",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 0,
+      "generation_seed": 5128957564893392600,
+      "pair_id": "test/R2_T20_0",
+      "path": "test/SWEEP-NARROW/R2_T20_0.txt",
+      "sha256": "c2d32119474d872504b5f5a5d3909424721bbc309ebcacf9756bf59532c7ed79",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BASE/R2_T20_1",
+      "split": "test",
+      "scenario": "BASE",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 1,
+      "generation_seed": 1555008730980795946,
+      "pair_id": "test/R2_T20_1",
+      "path": "test/BASE/R2_T20_1.txt",
+      "sha256": "04b8b2d9d3c3cc756808dbee1f44230483559e0a592223d49e8d3e26a88537e0",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/HV-GEOM/R2_T20_1",
+      "split": "test",
+      "scenario": "HV-GEOM",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 1,
+      "generation_seed": 1555008730980795946,
+      "pair_id": "test/R2_T20_1",
+      "path": "test/HV-GEOM/R2_T20_1.txt",
+      "sha256": "2817a93c21959fc7681ab4039d58b54cb8e9c8ad69dc9c7290203ec09c7f6b00",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SPATIAL/R2_T20_1",
+      "split": "test",
+      "scenario": "SPATIAL",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 1,
+      "generation_seed": 1555008730980795946,
+      "pair_id": "test/R2_T20_1",
+      "path": "test/SPATIAL/R2_T20_1.txt",
+      "sha256": "988dff60a7a34baeb6fbf5c28c7ecd84dc8fe924a1367419f173a707fb90869c",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BOTTLENECK/R2_T20_1",
+      "split": "test",
+      "scenario": "BOTTLENECK",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 1,
+      "generation_seed": 1555008730980795946,
+      "pair_id": "test/R2_T20_1",
+      "path": "test/BOTTLENECK/R2_T20_1.txt",
+      "sha256": "1bd5b3f025bcc7a30aff7a51a045e012097647fcd3fc0e1c2003084ed22a5fbb",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/TURN-HIGH/R2_T20_1",
+      "split": "test",
+      "scenario": "TURN-HIGH",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 1,
+      "generation_seed": 1555008730980795946,
+      "pair_id": "test/R2_T20_1",
+      "path": "test/TURN-HIGH/R2_T20_1.txt",
+      "sha256": "a87648bbcabf72a5333a69a5bdff87add448fd85175a702cd7edaf7ada3878b4",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "test/TRAVEL-HIGH/R2_T20_1",
+      "split": "test",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 1,
+      "generation_seed": 1555008730980795946,
+      "pair_id": "test/R2_T20_1",
+      "path": "test/TRAVEL-HIGH/R2_T20_1.txt",
+      "sha256": "f1980d68c0b43ff88b431b79a71c24aa9f5d0b98593cab40e3df9a71615054cf",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SWEEP-NARROW/R2_T20_1",
+      "split": "test",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 1,
+      "generation_seed": 1555008730980795946,
+      "pair_id": "test/R2_T20_1",
+      "path": "test/SWEEP-NARROW/R2_T20_1.txt",
+      "sha256": "b4a19b652a099b69ae4a955bfba73226b1de6399a9027bc7025bfde59d7ee684",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BASE/R2_T20_2",
+      "split": "test",
+      "scenario": "BASE",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 2,
+      "generation_seed": 9470834217684178581,
+      "pair_id": "test/R2_T20_2",
+      "path": "test/BASE/R2_T20_2.txt",
+      "sha256": "c136c5685102ceff61f029673b707316714fba1b73e73bc0b5cfe59976dfd4d7",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/HV-GEOM/R2_T20_2",
+      "split": "test",
+      "scenario": "HV-GEOM",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 2,
+      "generation_seed": 9470834217684178581,
+      "pair_id": "test/R2_T20_2",
+      "path": "test/HV-GEOM/R2_T20_2.txt",
+      "sha256": "464eee70a2e895c89b44518c4c44bf169325c5a9478e7406a860d341530d6756",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SPATIAL/R2_T20_2",
+      "split": "test",
+      "scenario": "SPATIAL",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 2,
+      "generation_seed": 9470834217684178581,
+      "pair_id": "test/R2_T20_2",
+      "path": "test/SPATIAL/R2_T20_2.txt",
+      "sha256": "e1bffc7939c822f3381f490feda88e9bc4fe656436aeea1686e9e59edf04f691",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BOTTLENECK/R2_T20_2",
+      "split": "test",
+      "scenario": "BOTTLENECK",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 2,
+      "generation_seed": 9470834217684178581,
+      "pair_id": "test/R2_T20_2",
+      "path": "test/BOTTLENECK/R2_T20_2.txt",
+      "sha256": "8cfcc78552befee923dcb61c98b9d8152642e7f56efcca9be26421ec4b4fa2a2",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/TURN-HIGH/R2_T20_2",
+      "split": "test",
+      "scenario": "TURN-HIGH",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 2,
+      "generation_seed": 9470834217684178581,
+      "pair_id": "test/R2_T20_2",
+      "path": "test/TURN-HIGH/R2_T20_2.txt",
+      "sha256": "34d9e4dc79cf1c12586078eb9774c84d4e0ba34f67a41b4f09c3e66f428c9d25",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "test/TRAVEL-HIGH/R2_T20_2",
+      "split": "test",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 2,
+      "generation_seed": 9470834217684178581,
+      "pair_id": "test/R2_T20_2",
+      "path": "test/TRAVEL-HIGH/R2_T20_2.txt",
+      "sha256": "c357a322d2b3f7365103f67eacf14238fc2866d945eef84f4173a5f69230b2c7",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SWEEP-NARROW/R2_T20_2",
+      "split": "test",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 2,
+      "generation_seed": 9470834217684178581,
+      "pair_id": "test/R2_T20_2",
+      "path": "test/SWEEP-NARROW/R2_T20_2.txt",
+      "sha256": "daa0ac5309aa38fbeb21a92e1d74d2e81174c4c70e2f52fbc4bac9f8bf48dc69",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BASE/R2_T20_3",
+      "split": "test",
+      "scenario": "BASE",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 3,
+      "generation_seed": 12874180929192286563,
+      "pair_id": "test/R2_T20_3",
+      "path": "test/BASE/R2_T20_3.txt",
+      "sha256": "0d92481b4e50e240d15720f54264569c773c5f4b0ea7fe1aa79d05d01eca8999",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/HV-GEOM/R2_T20_3",
+      "split": "test",
+      "scenario": "HV-GEOM",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 3,
+      "generation_seed": 12874180929192286563,
+      "pair_id": "test/R2_T20_3",
+      "path": "test/HV-GEOM/R2_T20_3.txt",
+      "sha256": "07e3f6fe3fa470e65e830af3e1c69afc554f296f2f42dfe88684db85221e4da7",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SPATIAL/R2_T20_3",
+      "split": "test",
+      "scenario": "SPATIAL",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 3,
+      "generation_seed": 12874180929192286563,
+      "pair_id": "test/R2_T20_3",
+      "path": "test/SPATIAL/R2_T20_3.txt",
+      "sha256": "5f89264e1af4c1c59fe4ddf9dc2893f4807a6260cb94effcb385be4773286f77",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BOTTLENECK/R2_T20_3",
+      "split": "test",
+      "scenario": "BOTTLENECK",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 3,
+      "generation_seed": 12874180929192286563,
+      "pair_id": "test/R2_T20_3",
+      "path": "test/BOTTLENECK/R2_T20_3.txt",
+      "sha256": "5f5525b9ea0db56602932af7055d313ca585cba8f3d5af0e37f547b314c5add5",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/TURN-HIGH/R2_T20_3",
+      "split": "test",
+      "scenario": "TURN-HIGH",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 3,
+      "generation_seed": 12874180929192286563,
+      "pair_id": "test/R2_T20_3",
+      "path": "test/TURN-HIGH/R2_T20_3.txt",
+      "sha256": "4f96e1433154c7718be32ee9a0152e35562550c08bd480cef4cbaf1b5bb05c59",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "test/TRAVEL-HIGH/R2_T20_3",
+      "split": "test",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 3,
+      "generation_seed": 12874180929192286563,
+      "pair_id": "test/R2_T20_3",
+      "path": "test/TRAVEL-HIGH/R2_T20_3.txt",
+      "sha256": "f4ceb118a4dddff6ba50a926601c1443268e9b0ef9e6d596bb3486cdf1cf5406",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SWEEP-NARROW/R2_T20_3",
+      "split": "test",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 2,
+      "n_tasks": 20,
+      "replicate": 3,
+      "generation_seed": 12874180929192286563,
+      "pair_id": "test/R2_T20_3",
+      "path": "test/SWEEP-NARROW/R2_T20_3.txt",
+      "sha256": "ced9920f39c6ccaf9412cd49763cacbfb992a7508a46b4ece308f4b90e97e061",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BASE/R4_T40_0",
+      "split": "test",
+      "scenario": "BASE",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 0,
+      "generation_seed": 1664082951017892097,
+      "pair_id": "test/R4_T40_0",
+      "path": "test/BASE/R4_T40_0.txt",
+      "sha256": "9c4608794ede5ed6b206b682471c39156bd901846cae8e1369280c263211b2e6",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/HV-GEOM/R4_T40_0",
+      "split": "test",
+      "scenario": "HV-GEOM",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 0,
+      "generation_seed": 1664082951017892097,
+      "pair_id": "test/R4_T40_0",
+      "path": "test/HV-GEOM/R4_T40_0.txt",
+      "sha256": "0e99c0695c50a369b8fefe8b90e45106e2df56ee2202aff888ed2a9eb34c4f7c",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SPATIAL/R4_T40_0",
+      "split": "test",
+      "scenario": "SPATIAL",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 0,
+      "generation_seed": 1664082951017892097,
+      "pair_id": "test/R4_T40_0",
+      "path": "test/SPATIAL/R4_T40_0.txt",
+      "sha256": "d3d5b757f8c8f548f54a7914bad83aac54a4463dccda1d80fe0f6554e3d0cc9c",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BOTTLENECK/R4_T40_0",
+      "split": "test",
+      "scenario": "BOTTLENECK",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 0,
+      "generation_seed": 1664082951017892097,
+      "pair_id": "test/R4_T40_0",
+      "path": "test/BOTTLENECK/R4_T40_0.txt",
+      "sha256": "8c0ba0e34ea7d59fbcbf89ce5437a3e393c665bdda0fd3620c39959d013ffdfd",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/TURN-HIGH/R4_T40_0",
+      "split": "test",
+      "scenario": "TURN-HIGH",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 0,
+      "generation_seed": 1664082951017892097,
+      "pair_id": "test/R4_T40_0",
+      "path": "test/TURN-HIGH/R4_T40_0.txt",
+      "sha256": "bb13120f4d3ff0ef83bf3932f88fab0a2735a1777861fed20d8537caa046af97",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "test/TRAVEL-HIGH/R4_T40_0",
+      "split": "test",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 0,
+      "generation_seed": 1664082951017892097,
+      "pair_id": "test/R4_T40_0",
+      "path": "test/TRAVEL-HIGH/R4_T40_0.txt",
+      "sha256": "c5f7e88fb7fc1d04d8d0cf90eea79d8df0514a13366ae6b891267779b5b9f41a",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SWEEP-NARROW/R4_T40_0",
+      "split": "test",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 0,
+      "generation_seed": 1664082951017892097,
+      "pair_id": "test/R4_T40_0",
+      "path": "test/SWEEP-NARROW/R4_T40_0.txt",
+      "sha256": "483d53e1b5e09ecc797b96ed469fe14732e3c665f5f42e225b743f66b2596373",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BASE/R4_T40_1",
+      "split": "test",
+      "scenario": "BASE",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 1,
+      "generation_seed": 1103362304620599574,
+      "pair_id": "test/R4_T40_1",
+      "path": "test/BASE/R4_T40_1.txt",
+      "sha256": "a8a25c939f0b95a870e0e31e4af3911562c515a4b58a74e90ec81f7475ab92ba",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/HV-GEOM/R4_T40_1",
+      "split": "test",
+      "scenario": "HV-GEOM",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 1,
+      "generation_seed": 1103362304620599574,
+      "pair_id": "test/R4_T40_1",
+      "path": "test/HV-GEOM/R4_T40_1.txt",
+      "sha256": "b37c67902f5c111e01f0a245152a58ddf4fa1634355322d4824176f5aa65bd51",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SPATIAL/R4_T40_1",
+      "split": "test",
+      "scenario": "SPATIAL",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 1,
+      "generation_seed": 1103362304620599574,
+      "pair_id": "test/R4_T40_1",
+      "path": "test/SPATIAL/R4_T40_1.txt",
+      "sha256": "69a10ec42818b9aa6a59c849d6bb5366be1c6a796003cef7a4c855f8dc7e28d5",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BOTTLENECK/R4_T40_1",
+      "split": "test",
+      "scenario": "BOTTLENECK",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 1,
+      "generation_seed": 1103362304620599574,
+      "pair_id": "test/R4_T40_1",
+      "path": "test/BOTTLENECK/R4_T40_1.txt",
+      "sha256": "c094f09ea66084e9c8767c802e012cb5da3333a78126267df05b99280317d52d",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/TURN-HIGH/R4_T40_1",
+      "split": "test",
+      "scenario": "TURN-HIGH",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 1,
+      "generation_seed": 1103362304620599574,
+      "pair_id": "test/R4_T40_1",
+      "path": "test/TURN-HIGH/R4_T40_1.txt",
+      "sha256": "ad245adf78abda475b8300eedfa7d6fcd402766f3f5a61f5f558b410301d50e1",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "test/TRAVEL-HIGH/R4_T40_1",
+      "split": "test",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 1,
+      "generation_seed": 1103362304620599574,
+      "pair_id": "test/R4_T40_1",
+      "path": "test/TRAVEL-HIGH/R4_T40_1.txt",
+      "sha256": "65ceb0474d22296b88b89980dd819d9e110ec2db936c3218abbc9282d81caf9c",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SWEEP-NARROW/R4_T40_1",
+      "split": "test",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 1,
+      "generation_seed": 1103362304620599574,
+      "pair_id": "test/R4_T40_1",
+      "path": "test/SWEEP-NARROW/R4_T40_1.txt",
+      "sha256": "67be6d678fca6d8dada63c56d348a5228712e3a679c350a1b2e5bb4363380404",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BASE/R4_T40_2",
+      "split": "test",
+      "scenario": "BASE",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 2,
+      "generation_seed": 3167343004377115622,
+      "pair_id": "test/R4_T40_2",
+      "path": "test/BASE/R4_T40_2.txt",
+      "sha256": "be836ef0ee39a3b7584f7342ff55a66137f93d96dd5f29f9bf38834977ae642b",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/HV-GEOM/R4_T40_2",
+      "split": "test",
+      "scenario": "HV-GEOM",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 2,
+      "generation_seed": 3167343004377115622,
+      "pair_id": "test/R4_T40_2",
+      "path": "test/HV-GEOM/R4_T40_2.txt",
+      "sha256": "7930bdb9fb809b48a05c9e04906c537a9a1060bf1c253a379d6cd4582a306b62",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SPATIAL/R4_T40_2",
+      "split": "test",
+      "scenario": "SPATIAL",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 2,
+      "generation_seed": 3167343004377115622,
+      "pair_id": "test/R4_T40_2",
+      "path": "test/SPATIAL/R4_T40_2.txt",
+      "sha256": "405b458f7db65ee36a3990db1099b22bab0ecc58a5529c602fd534f0c8c6b45d",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BOTTLENECK/R4_T40_2",
+      "split": "test",
+      "scenario": "BOTTLENECK",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 2,
+      "generation_seed": 3167343004377115622,
+      "pair_id": "test/R4_T40_2",
+      "path": "test/BOTTLENECK/R4_T40_2.txt",
+      "sha256": "948557adf18317112496292a58e917c282dec0c8c2fcb5e75872a4a8dea7212f",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/TURN-HIGH/R4_T40_2",
+      "split": "test",
+      "scenario": "TURN-HIGH",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 2,
+      "generation_seed": 3167343004377115622,
+      "pair_id": "test/R4_T40_2",
+      "path": "test/TURN-HIGH/R4_T40_2.txt",
+      "sha256": "fd533f95b16f341a35105f0cef00588ea3c62b11912d4bd5d0f69e1b16581f3b",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "test/TRAVEL-HIGH/R4_T40_2",
+      "split": "test",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 2,
+      "generation_seed": 3167343004377115622,
+      "pair_id": "test/R4_T40_2",
+      "path": "test/TRAVEL-HIGH/R4_T40_2.txt",
+      "sha256": "999136744384da764a788a10d0d9f9f3c2bc013c9d97258b9402b761fe28f236",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SWEEP-NARROW/R4_T40_2",
+      "split": "test",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 2,
+      "generation_seed": 3167343004377115622,
+      "pair_id": "test/R4_T40_2",
+      "path": "test/SWEEP-NARROW/R4_T40_2.txt",
+      "sha256": "641fef240c024b875a02c18d4d7f173bee0f2ed34d86747243d106558ec9b635",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BASE/R4_T40_3",
+      "split": "test",
+      "scenario": "BASE",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 3,
+      "generation_seed": 7644297772382866910,
+      "pair_id": "test/R4_T40_3",
+      "path": "test/BASE/R4_T40_3.txt",
+      "sha256": "3d6499abca0e06ad5086f57700fb505333f5769f6135f8ddd5ca8fef59bee3cb",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/HV-GEOM/R4_T40_3",
+      "split": "test",
+      "scenario": "HV-GEOM",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 3,
+      "generation_seed": 7644297772382866910,
+      "pair_id": "test/R4_T40_3",
+      "path": "test/HV-GEOM/R4_T40_3.txt",
+      "sha256": "b5f18ebb0ca857ad8538699ec5d3db7bdd399e6e284677919f874c6c919d290b",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SPATIAL/R4_T40_3",
+      "split": "test",
+      "scenario": "SPATIAL",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 3,
+      "generation_seed": 7644297772382866910,
+      "pair_id": "test/R4_T40_3",
+      "path": "test/SPATIAL/R4_T40_3.txt",
+      "sha256": "f2638be868447822ad09417f1ad09fc208fed5a680da17dfca40d9444bc3cff6",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BOTTLENECK/R4_T40_3",
+      "split": "test",
+      "scenario": "BOTTLENECK",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 3,
+      "generation_seed": 7644297772382866910,
+      "pair_id": "test/R4_T40_3",
+      "path": "test/BOTTLENECK/R4_T40_3.txt",
+      "sha256": "bf943f724d0606695a67fc507438afadc9f2f85c127aaa6f240c9fa87b1e1faf",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/TURN-HIGH/R4_T40_3",
+      "split": "test",
+      "scenario": "TURN-HIGH",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 3,
+      "generation_seed": 7644297772382866910,
+      "pair_id": "test/R4_T40_3",
+      "path": "test/TURN-HIGH/R4_T40_3.txt",
+      "sha256": "0426e1ebcad71bcfdb7905cc078690f40bf7439c007aeaf1aec6f623c4001be3",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "test/TRAVEL-HIGH/R4_T40_3",
+      "split": "test",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 3,
+      "generation_seed": 7644297772382866910,
+      "pair_id": "test/R4_T40_3",
+      "path": "test/TRAVEL-HIGH/R4_T40_3.txt",
+      "sha256": "bc60dadd584b84b8301bb62a30d5b1b3b034a60947da938649cd39d0e70a6cab",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SWEEP-NARROW/R4_T40_3",
+      "split": "test",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 4,
+      "n_tasks": 40,
+      "replicate": 3,
+      "generation_seed": 7644297772382866910,
+      "pair_id": "test/R4_T40_3",
+      "path": "test/SWEEP-NARROW/R4_T40_3.txt",
+      "sha256": "29929b400a8d664ad0f0097e1a6a66a77a2a77a73f63fa3bcdec7ba4bb1faeb7",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BASE/R4_T60_0",
+      "split": "test",
+      "scenario": "BASE",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 0,
+      "generation_seed": 5875574428969544871,
+      "pair_id": "test/R4_T60_0",
+      "path": "test/BASE/R4_T60_0.txt",
+      "sha256": "49a388036c5d9219c4f0c9a3c63d7718e86011f220d24e0f04a9142c90574b60",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/HV-GEOM/R4_T60_0",
+      "split": "test",
+      "scenario": "HV-GEOM",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 0,
+      "generation_seed": 5875574428969544871,
+      "pair_id": "test/R4_T60_0",
+      "path": "test/HV-GEOM/R4_T60_0.txt",
+      "sha256": "8b857019fa1474b660919edc2ea6491df21bcac644f616b2b0921173f070c272",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SPATIAL/R4_T60_0",
+      "split": "test",
+      "scenario": "SPATIAL",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 0,
+      "generation_seed": 5875574428969544871,
+      "pair_id": "test/R4_T60_0",
+      "path": "test/SPATIAL/R4_T60_0.txt",
+      "sha256": "5fb981764082f4a183cf78d8a9eb92615350e520b2a2da5477fd79978083c502",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BOTTLENECK/R4_T60_0",
+      "split": "test",
+      "scenario": "BOTTLENECK",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 0,
+      "generation_seed": 5875574428969544871,
+      "pair_id": "test/R4_T60_0",
+      "path": "test/BOTTLENECK/R4_T60_0.txt",
+      "sha256": "10a4c22830104a1af4b9c6cb99af7cc4c28e423508cc55b7d50c2983af71ea5e",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/TURN-HIGH/R4_T60_0",
+      "split": "test",
+      "scenario": "TURN-HIGH",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 0,
+      "generation_seed": 5875574428969544871,
+      "pair_id": "test/R4_T60_0",
+      "path": "test/TURN-HIGH/R4_T60_0.txt",
+      "sha256": "04751e91af28f761c6cf9d18c016a1543fcbc81a4d02d5f8710ce6bee48dd0ff",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "test/TRAVEL-HIGH/R4_T60_0",
+      "split": "test",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 0,
+      "generation_seed": 5875574428969544871,
+      "pair_id": "test/R4_T60_0",
+      "path": "test/TRAVEL-HIGH/R4_T60_0.txt",
+      "sha256": "b2fde48d7846eb4cf71e4dbe6c9b1f8f13c43d0ee23973e0ab3543e807372017",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SWEEP-NARROW/R4_T60_0",
+      "split": "test",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 0,
+      "generation_seed": 5875574428969544871,
+      "pair_id": "test/R4_T60_0",
+      "path": "test/SWEEP-NARROW/R4_T60_0.txt",
+      "sha256": "e9d43d69f1932c7fbf15faa83355078ea5f122ae30fda53871d7d87e78ada0cb",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BASE/R4_T60_1",
+      "split": "test",
+      "scenario": "BASE",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 1,
+      "generation_seed": 2589567543558363706,
+      "pair_id": "test/R4_T60_1",
+      "path": "test/BASE/R4_T60_1.txt",
+      "sha256": "e626d3cce064ffac2c01ea7387d0f054d99bbce25849b4db94f259452c8dff8f",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/HV-GEOM/R4_T60_1",
+      "split": "test",
+      "scenario": "HV-GEOM",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 1,
+      "generation_seed": 2589567543558363706,
+      "pair_id": "test/R4_T60_1",
+      "path": "test/HV-GEOM/R4_T60_1.txt",
+      "sha256": "7a72155b5725bd113194ec0715c5b02f8126e7df4913014a5b08952f68ed9e06",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SPATIAL/R4_T60_1",
+      "split": "test",
+      "scenario": "SPATIAL",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 1,
+      "generation_seed": 2589567543558363706,
+      "pair_id": "test/R4_T60_1",
+      "path": "test/SPATIAL/R4_T60_1.txt",
+      "sha256": "5e48930378043f14a8574df47442eae7ad432610c967b1e1cdb94c2cc127d16f",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BOTTLENECK/R4_T60_1",
+      "split": "test",
+      "scenario": "BOTTLENECK",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 1,
+      "generation_seed": 2589567543558363706,
+      "pair_id": "test/R4_T60_1",
+      "path": "test/BOTTLENECK/R4_T60_1.txt",
+      "sha256": "a387eaa4124eb3d680750905dcb454348d3e341881b94f29b4e0e9e6fc4762af",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/TURN-HIGH/R4_T60_1",
+      "split": "test",
+      "scenario": "TURN-HIGH",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 1,
+      "generation_seed": 2589567543558363706,
+      "pair_id": "test/R4_T60_1",
+      "path": "test/TURN-HIGH/R4_T60_1.txt",
+      "sha256": "e981782a2733ce13208ebd26056623d2d39c5459e8e118083ad6c5f303bb820e",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "test/TRAVEL-HIGH/R4_T60_1",
+      "split": "test",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 1,
+      "generation_seed": 2589567543558363706,
+      "pair_id": "test/R4_T60_1",
+      "path": "test/TRAVEL-HIGH/R4_T60_1.txt",
+      "sha256": "9e3c628874bf4ab4f2e46c58c48b463b70887f83d7c0bbe3f7c1f543baafdabf",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SWEEP-NARROW/R4_T60_1",
+      "split": "test",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 1,
+      "generation_seed": 2589567543558363706,
+      "pair_id": "test/R4_T60_1",
+      "path": "test/SWEEP-NARROW/R4_T60_1.txt",
+      "sha256": "cbe54de40b3c582d7c7e19ec34eaf587324653278540d39a39b689370e2f52b0",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BASE/R4_T60_2",
+      "split": "test",
+      "scenario": "BASE",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 2,
+      "generation_seed": 17424962222665404801,
+      "pair_id": "test/R4_T60_2",
+      "path": "test/BASE/R4_T60_2.txt",
+      "sha256": "e4cf74fea5b9497ea169ad58ddf39e8743824dbd799b5cd2cc3a84217c2b4b7a",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/HV-GEOM/R4_T60_2",
+      "split": "test",
+      "scenario": "HV-GEOM",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 2,
+      "generation_seed": 17424962222665404801,
+      "pair_id": "test/R4_T60_2",
+      "path": "test/HV-GEOM/R4_T60_2.txt",
+      "sha256": "4c29b4f3f197f643c0c721949c0d07648b9bd0feb30ca0b106a69f8e95fa392a",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SPATIAL/R4_T60_2",
+      "split": "test",
+      "scenario": "SPATIAL",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 2,
+      "generation_seed": 17424962222665404801,
+      "pair_id": "test/R4_T60_2",
+      "path": "test/SPATIAL/R4_T60_2.txt",
+      "sha256": "c90029ff45ddbcef795589b09af26b718fdae8863b6f40c6c97261f226f588f8",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BOTTLENECK/R4_T60_2",
+      "split": "test",
+      "scenario": "BOTTLENECK",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 2,
+      "generation_seed": 17424962222665404801,
+      "pair_id": "test/R4_T60_2",
+      "path": "test/BOTTLENECK/R4_T60_2.txt",
+      "sha256": "894251fdf45dd98ab0b5656ca69853aea06fd094c4cf3fb27e774504113852f9",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/TURN-HIGH/R4_T60_2",
+      "split": "test",
+      "scenario": "TURN-HIGH",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 2,
+      "generation_seed": 17424962222665404801,
+      "pair_id": "test/R4_T60_2",
+      "path": "test/TURN-HIGH/R4_T60_2.txt",
+      "sha256": "a7ef20945b1e5ab8d8b2dd94d70061de9e27694b1fe8ec55fc126273744a3d21",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "test/TRAVEL-HIGH/R4_T60_2",
+      "split": "test",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 2,
+      "generation_seed": 17424962222665404801,
+      "pair_id": "test/R4_T60_2",
+      "path": "test/TRAVEL-HIGH/R4_T60_2.txt",
+      "sha256": "2e77602242bba90dc56fed7c7886409cc4a6eda852631b1e6b1b68213d552926",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SWEEP-NARROW/R4_T60_2",
+      "split": "test",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 2,
+      "generation_seed": 17424962222665404801,
+      "pair_id": "test/R4_T60_2",
+      "path": "test/SWEEP-NARROW/R4_T60_2.txt",
+      "sha256": "00bc58ee6ea2002f3b6be98303d79f1099268ae858f52f28c86c8067434f970d",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BASE/R4_T60_3",
+      "split": "test",
+      "scenario": "BASE",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 3,
+      "generation_seed": 14427025551554330687,
+      "pair_id": "test/R4_T60_3",
+      "path": "test/BASE/R4_T60_3.txt",
+      "sha256": "f4c4cef84eb4f37c0b5d5519f55c53528cfa285d895dcd5410ee7345a3e6c058",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/HV-GEOM/R4_T60_3",
+      "split": "test",
+      "scenario": "HV-GEOM",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 3,
+      "generation_seed": 14427025551554330687,
+      "pair_id": "test/R4_T60_3",
+      "path": "test/HV-GEOM/R4_T60_3.txt",
+      "sha256": "3bb5c3459b12472ea3b46be4c8eea1d5ae194748b5cbf51469836d06da3e6c03",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SPATIAL/R4_T60_3",
+      "split": "test",
+      "scenario": "SPATIAL",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 3,
+      "generation_seed": 14427025551554330687,
+      "pair_id": "test/R4_T60_3",
+      "path": "test/SPATIAL/R4_T60_3.txt",
+      "sha256": "40e4d6cc4ed406ed95cc1c7ed6082524c99c3e7b26d8c4df1dbc115ba6e63b0a",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BOTTLENECK/R4_T60_3",
+      "split": "test",
+      "scenario": "BOTTLENECK",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 3,
+      "generation_seed": 14427025551554330687,
+      "pair_id": "test/R4_T60_3",
+      "path": "test/BOTTLENECK/R4_T60_3.txt",
+      "sha256": "38bd45fa815f1835d84746dc335093b095252ed63e154f139d3b31b86c95543d",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/TURN-HIGH/R4_T60_3",
+      "split": "test",
+      "scenario": "TURN-HIGH",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 3,
+      "generation_seed": 14427025551554330687,
+      "pair_id": "test/R4_T60_3",
+      "path": "test/TURN-HIGH/R4_T60_3.txt",
+      "sha256": "081be05fbc915d527b292fb1f6abf55ccb0c2573994545714710ff9dfcc085eb",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "test/TRAVEL-HIGH/R4_T60_3",
+      "split": "test",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 3,
+      "generation_seed": 14427025551554330687,
+      "pair_id": "test/R4_T60_3",
+      "path": "test/TRAVEL-HIGH/R4_T60_3.txt",
+      "sha256": "c849c37974f045f8b974d7fee98367e6efb866bd39caa57ac2dcc7622abd585c",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SWEEP-NARROW/R4_T60_3",
+      "split": "test",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 4,
+      "n_tasks": 60,
+      "replicate": 3,
+      "generation_seed": 14427025551554330687,
+      "pair_id": "test/R4_T60_3",
+      "path": "test/SWEEP-NARROW/R4_T60_3.txt",
+      "sha256": "d249ce87237ac43ce532df75213cc7151c304e8e9e3b853d69a71c02e0542d9b",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BASE/R8_T80_0",
+      "split": "test",
+      "scenario": "BASE",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 0,
+      "generation_seed": 8550711996763387059,
+      "pair_id": "test/R8_T80_0",
+      "path": "test/BASE/R8_T80_0.txt",
+      "sha256": "54a18ec9d1043f6f55a2297f83eb3284ffa28714b99130a8a694220b5eeee9ad",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/HV-GEOM/R8_T80_0",
+      "split": "test",
+      "scenario": "HV-GEOM",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 0,
+      "generation_seed": 8550711996763387059,
+      "pair_id": "test/R8_T80_0",
+      "path": "test/HV-GEOM/R8_T80_0.txt",
+      "sha256": "71ea2bfbd1275e6d9b39cd4dd4b5a3844fd1e62217195df28da49d84da88d29b",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SPATIAL/R8_T80_0",
+      "split": "test",
+      "scenario": "SPATIAL",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 0,
+      "generation_seed": 8550711996763387059,
+      "pair_id": "test/R8_T80_0",
+      "path": "test/SPATIAL/R8_T80_0.txt",
+      "sha256": "d0d5689e1d883bd38c1db38e22587e89db7bb6ba425e4913088d3c364d79a533",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BOTTLENECK/R8_T80_0",
+      "split": "test",
+      "scenario": "BOTTLENECK",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 0,
+      "generation_seed": 8550711996763387059,
+      "pair_id": "test/R8_T80_0",
+      "path": "test/BOTTLENECK/R8_T80_0.txt",
+      "sha256": "14d4d10b5b9ce41bc83436ac3876b71ca18125b30de591856a673cd33dcb145a",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/TURN-HIGH/R8_T80_0",
+      "split": "test",
+      "scenario": "TURN-HIGH",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 0,
+      "generation_seed": 8550711996763387059,
+      "pair_id": "test/R8_T80_0",
+      "path": "test/TURN-HIGH/R8_T80_0.txt",
+      "sha256": "42d74dd06a1180f09f4ccc4b9b325cdf29699ccfaef469ea3217c130ea515d37",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "test/TRAVEL-HIGH/R8_T80_0",
+      "split": "test",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 0,
+      "generation_seed": 8550711996763387059,
+      "pair_id": "test/R8_T80_0",
+      "path": "test/TRAVEL-HIGH/R8_T80_0.txt",
+      "sha256": "ec9919bcd0ede574621521489a3ae19c652890797248fd6747f706f55574e0b7",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SWEEP-NARROW/R8_T80_0",
+      "split": "test",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 0,
+      "generation_seed": 8550711996763387059,
+      "pair_id": "test/R8_T80_0",
+      "path": "test/SWEEP-NARROW/R8_T80_0.txt",
+      "sha256": "5cc1980daccca93f78655359404d90360871d14a9cbd663a8270aca708eeb8a1",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BASE/R8_T80_1",
+      "split": "test",
+      "scenario": "BASE",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 1,
+      "generation_seed": 6813835720676498667,
+      "pair_id": "test/R8_T80_1",
+      "path": "test/BASE/R8_T80_1.txt",
+      "sha256": "ea14ac537bad902fffe401be17fd0481cea11c04efe9a3e1f3b1a85c80cc7c7d",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/HV-GEOM/R8_T80_1",
+      "split": "test",
+      "scenario": "HV-GEOM",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 1,
+      "generation_seed": 6813835720676498667,
+      "pair_id": "test/R8_T80_1",
+      "path": "test/HV-GEOM/R8_T80_1.txt",
+      "sha256": "c936aa4d8a61fd6c788f5426df588b552025b12b4ce1858a87ba8ed8f70dfce6",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SPATIAL/R8_T80_1",
+      "split": "test",
+      "scenario": "SPATIAL",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 1,
+      "generation_seed": 6813835720676498667,
+      "pair_id": "test/R8_T80_1",
+      "path": "test/SPATIAL/R8_T80_1.txt",
+      "sha256": "78fd7756fdc44274920ef61e2d2ddec83db557a765af4e0c1d36e80b95f20c6d",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BOTTLENECK/R8_T80_1",
+      "split": "test",
+      "scenario": "BOTTLENECK",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 1,
+      "generation_seed": 6813835720676498667,
+      "pair_id": "test/R8_T80_1",
+      "path": "test/BOTTLENECK/R8_T80_1.txt",
+      "sha256": "79a1a8269f711817e6d52796d74126be9107fc148e9eac0bc6ac8706e1ce4058",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/TURN-HIGH/R8_T80_1",
+      "split": "test",
+      "scenario": "TURN-HIGH",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 1,
+      "generation_seed": 6813835720676498667,
+      "pair_id": "test/R8_T80_1",
+      "path": "test/TURN-HIGH/R8_T80_1.txt",
+      "sha256": "aa96c00a9c24708c7f69f76cabf126c2c2d72512dcb669421b5c4f6191a56d7a",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "test/TRAVEL-HIGH/R8_T80_1",
+      "split": "test",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 1,
+      "generation_seed": 6813835720676498667,
+      "pair_id": "test/R8_T80_1",
+      "path": "test/TRAVEL-HIGH/R8_T80_1.txt",
+      "sha256": "9c0158df457b40a6128b3e941b7534b2f76547bfb985ab5556ca5014653f4772",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SWEEP-NARROW/R8_T80_1",
+      "split": "test",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 1,
+      "generation_seed": 6813835720676498667,
+      "pair_id": "test/R8_T80_1",
+      "path": "test/SWEEP-NARROW/R8_T80_1.txt",
+      "sha256": "c5d711e83b0684ccbc65a366b436e72964c94a93c75d7a5aeff0f00f0b0bc9ab",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BASE/R8_T80_2",
+      "split": "test",
+      "scenario": "BASE",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 2,
+      "generation_seed": 3110408013389467432,
+      "pair_id": "test/R8_T80_2",
+      "path": "test/BASE/R8_T80_2.txt",
+      "sha256": "38307acf0dcf6c4ac70b59cce7e3a7ee9713632020a064c1276c80364a1b14ab",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/HV-GEOM/R8_T80_2",
+      "split": "test",
+      "scenario": "HV-GEOM",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 2,
+      "generation_seed": 3110408013389467432,
+      "pair_id": "test/R8_T80_2",
+      "path": "test/HV-GEOM/R8_T80_2.txt",
+      "sha256": "8e7c67d175a5ca27f1f09835479f2963e708d593a3b6d29a4b118f5b48d0b535",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SPATIAL/R8_T80_2",
+      "split": "test",
+      "scenario": "SPATIAL",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 2,
+      "generation_seed": 3110408013389467432,
+      "pair_id": "test/R8_T80_2",
+      "path": "test/SPATIAL/R8_T80_2.txt",
+      "sha256": "e56fcb7754b7eda4559dd9a7c2da00ac312dbdb86dc7277c007e081c746b8490",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BOTTLENECK/R8_T80_2",
+      "split": "test",
+      "scenario": "BOTTLENECK",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 2,
+      "generation_seed": 3110408013389467432,
+      "pair_id": "test/R8_T80_2",
+      "path": "test/BOTTLENECK/R8_T80_2.txt",
+      "sha256": "023aa84b63b75b1c539b28c5c6666b0418b567aaa4f644a32958ca56935f5152",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/TURN-HIGH/R8_T80_2",
+      "split": "test",
+      "scenario": "TURN-HIGH",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 2,
+      "generation_seed": 3110408013389467432,
+      "pair_id": "test/R8_T80_2",
+      "path": "test/TURN-HIGH/R8_T80_2.txt",
+      "sha256": "81b86504d27b6fced1582556211b6f1aa208ae4b8136d31e6003345a9c7a10cd",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "test/TRAVEL-HIGH/R8_T80_2",
+      "split": "test",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 2,
+      "generation_seed": 3110408013389467432,
+      "pair_id": "test/R8_T80_2",
+      "path": "test/TRAVEL-HIGH/R8_T80_2.txt",
+      "sha256": "a92f632f11271b49f6b2e8386d1b5aca913e67d3a074717c7978068019f8bae7",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SWEEP-NARROW/R8_T80_2",
+      "split": "test",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 2,
+      "generation_seed": 3110408013389467432,
+      "pair_id": "test/R8_T80_2",
+      "path": "test/SWEEP-NARROW/R8_T80_2.txt",
+      "sha256": "48a410f4ed190dfc59a80409e8363056c5d00bed695ca9d8b7114556ec4a2332",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BASE/R8_T80_3",
+      "split": "test",
+      "scenario": "BASE",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 3,
+      "generation_seed": 4389767713115031403,
+      "pair_id": "test/R8_T80_3",
+      "path": "test/BASE/R8_T80_3.txt",
+      "sha256": "95d6b3128c94bf0876cafdbee563bb568accf9f77ebcddfcfa814f5e0796534c",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/HV-GEOM/R8_T80_3",
+      "split": "test",
+      "scenario": "HV-GEOM",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 3,
+      "generation_seed": 4389767713115031403,
+      "pair_id": "test/R8_T80_3",
+      "path": "test/HV-GEOM/R8_T80_3.txt",
+      "sha256": "e82656db9e9ad7daa4595fd2f6b745e0980215b3b3e2166ffaf03b2d50c48e9a",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SPATIAL/R8_T80_3",
+      "split": "test",
+      "scenario": "SPATIAL",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 3,
+      "generation_seed": 4389767713115031403,
+      "pair_id": "test/R8_T80_3",
+      "path": "test/SPATIAL/R8_T80_3.txt",
+      "sha256": "92fc331aa090c3f9b21d8c04cdcd80548b47fd6774f8f70895eb77b5d43c794a",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BOTTLENECK/R8_T80_3",
+      "split": "test",
+      "scenario": "BOTTLENECK",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 3,
+      "generation_seed": 4389767713115031403,
+      "pair_id": "test/R8_T80_3",
+      "path": "test/BOTTLENECK/R8_T80_3.txt",
+      "sha256": "b142e16108b49dd2c79cff893cb8b859cef0b3337d31fdb865c7652fa633684e",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/TURN-HIGH/R8_T80_3",
+      "split": "test",
+      "scenario": "TURN-HIGH",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 3,
+      "generation_seed": 4389767713115031403,
+      "pair_id": "test/R8_T80_3",
+      "path": "test/TURN-HIGH/R8_T80_3.txt",
+      "sha256": "53647a6c328f0fb60743a0aa2d84e102c5231bd1072d55a9e83d75a3289007c0",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "test/TRAVEL-HIGH/R8_T80_3",
+      "split": "test",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 3,
+      "generation_seed": 4389767713115031403,
+      "pair_id": "test/R8_T80_3",
+      "path": "test/TRAVEL-HIGH/R8_T80_3.txt",
+      "sha256": "56446ab750d28e4da8f0b23e8480e6dc179df3ddaa8fee300553b3401f2851e8",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SWEEP-NARROW/R8_T80_3",
+      "split": "test",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 8,
+      "n_tasks": 80,
+      "replicate": 3,
+      "generation_seed": 4389767713115031403,
+      "pair_id": "test/R8_T80_3",
+      "path": "test/SWEEP-NARROW/R8_T80_3.txt",
+      "sha256": "b105a2c42f8370df8e99881e2b9f0398142f112f112115a686fb358d9ebb6450",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BASE/R8_T100_0",
+      "split": "test",
+      "scenario": "BASE",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 0,
+      "generation_seed": 16993807609408014867,
+      "pair_id": "test/R8_T100_0",
+      "path": "test/BASE/R8_T100_0.txt",
+      "sha256": "e34b2a6da6b59e477ead0fc067c412a472198909f4bf26235112158a518fa131",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/HV-GEOM/R8_T100_0",
+      "split": "test",
+      "scenario": "HV-GEOM",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 0,
+      "generation_seed": 16993807609408014867,
+      "pair_id": "test/R8_T100_0",
+      "path": "test/HV-GEOM/R8_T100_0.txt",
+      "sha256": "e276c8288177faf6f1019ad322127ddfd60c681b16765f9f271e6f64406c3dad",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SPATIAL/R8_T100_0",
+      "split": "test",
+      "scenario": "SPATIAL",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 0,
+      "generation_seed": 16993807609408014867,
+      "pair_id": "test/R8_T100_0",
+      "path": "test/SPATIAL/R8_T100_0.txt",
+      "sha256": "cbcfe8a3b542af9f102f5dae2079a8f0b047c1a5cd44d9d303b2dfc9d5434b40",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BOTTLENECK/R8_T100_0",
+      "split": "test",
+      "scenario": "BOTTLENECK",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 0,
+      "generation_seed": 16993807609408014867,
+      "pair_id": "test/R8_T100_0",
+      "path": "test/BOTTLENECK/R8_T100_0.txt",
+      "sha256": "c3703bad6ec2fe129a7c1a34f037eb1101e7e4b70430170a87a6334ff963c730",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/TURN-HIGH/R8_T100_0",
+      "split": "test",
+      "scenario": "TURN-HIGH",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 0,
+      "generation_seed": 16993807609408014867,
+      "pair_id": "test/R8_T100_0",
+      "path": "test/TURN-HIGH/R8_T100_0.txt",
+      "sha256": "aadc24327f6d9675f7915de792cb0cc98974d89701d88e616050e72fd94a3b72",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "test/TRAVEL-HIGH/R8_T100_0",
+      "split": "test",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 0,
+      "generation_seed": 16993807609408014867,
+      "pair_id": "test/R8_T100_0",
+      "path": "test/TRAVEL-HIGH/R8_T100_0.txt",
+      "sha256": "6d4c11143d71c4fc5bc1b4918a0e957ab430dbe79d022ec593bcaeb656648a32",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SWEEP-NARROW/R8_T100_0",
+      "split": "test",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 0,
+      "generation_seed": 16993807609408014867,
+      "pair_id": "test/R8_T100_0",
+      "path": "test/SWEEP-NARROW/R8_T100_0.txt",
+      "sha256": "dfcfce79b9bc2d4869eab4d306a0cad4781a94e15e71e3eae6aaedfca68e9485",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BASE/R8_T100_1",
+      "split": "test",
+      "scenario": "BASE",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 1,
+      "generation_seed": 2469608533724624658,
+      "pair_id": "test/R8_T100_1",
+      "path": "test/BASE/R8_T100_1.txt",
+      "sha256": "a01e08bd889d6e6819f78c4ed31edf491b6bf46eb63ac169f3a2d5053278e99c",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/HV-GEOM/R8_T100_1",
+      "split": "test",
+      "scenario": "HV-GEOM",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 1,
+      "generation_seed": 2469608533724624658,
+      "pair_id": "test/R8_T100_1",
+      "path": "test/HV-GEOM/R8_T100_1.txt",
+      "sha256": "d3412f44e0feb0cb953c4538d4cb3949720abb97306f4bd0de4312ba901a19eb",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SPATIAL/R8_T100_1",
+      "split": "test",
+      "scenario": "SPATIAL",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 1,
+      "generation_seed": 2469608533724624658,
+      "pair_id": "test/R8_T100_1",
+      "path": "test/SPATIAL/R8_T100_1.txt",
+      "sha256": "a0d6096f750019cd076c36a279c6e7a140b2041dac4059c0a2baa63037614e32",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BOTTLENECK/R8_T100_1",
+      "split": "test",
+      "scenario": "BOTTLENECK",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 1,
+      "generation_seed": 2469608533724624658,
+      "pair_id": "test/R8_T100_1",
+      "path": "test/BOTTLENECK/R8_T100_1.txt",
+      "sha256": "ce9588b9a8c294a3e8890285a88cb348942ff5522d86f9e9fd34bb29d619d3f2",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/TURN-HIGH/R8_T100_1",
+      "split": "test",
+      "scenario": "TURN-HIGH",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 1,
+      "generation_seed": 2469608533724624658,
+      "pair_id": "test/R8_T100_1",
+      "path": "test/TURN-HIGH/R8_T100_1.txt",
+      "sha256": "1691fa7cf4322ce6145645c31e3d8788d41e52011f943a6df7223ff76c9e0823",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "test/TRAVEL-HIGH/R8_T100_1",
+      "split": "test",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 1,
+      "generation_seed": 2469608533724624658,
+      "pair_id": "test/R8_T100_1",
+      "path": "test/TRAVEL-HIGH/R8_T100_1.txt",
+      "sha256": "fd556eb8520c3fc6914187ec864956cefd7ac654c20e1b6336ddd78d15ab5ee5",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SWEEP-NARROW/R8_T100_1",
+      "split": "test",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 1,
+      "generation_seed": 2469608533724624658,
+      "pair_id": "test/R8_T100_1",
+      "path": "test/SWEEP-NARROW/R8_T100_1.txt",
+      "sha256": "85b0c1ed052fec32f9c6572ecf8c8d7ec7be87e3099fed91a1d1b4ec81112272",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BASE/R8_T100_2",
+      "split": "test",
+      "scenario": "BASE",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 2,
+      "generation_seed": 17410427945009798200,
+      "pair_id": "test/R8_T100_2",
+      "path": "test/BASE/R8_T100_2.txt",
+      "sha256": "52dc5ae077f2d0e16c9fc4ebec576123af35df543111fa049373b1ea20e03e1d",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/HV-GEOM/R8_T100_2",
+      "split": "test",
+      "scenario": "HV-GEOM",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 2,
+      "generation_seed": 17410427945009798200,
+      "pair_id": "test/R8_T100_2",
+      "path": "test/HV-GEOM/R8_T100_2.txt",
+      "sha256": "f3d7c439c10e046ef260ba0255b40cfc6c57339e2e0fa33d41c295339f17c38d",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SPATIAL/R8_T100_2",
+      "split": "test",
+      "scenario": "SPATIAL",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 2,
+      "generation_seed": 17410427945009798200,
+      "pair_id": "test/R8_T100_2",
+      "path": "test/SPATIAL/R8_T100_2.txt",
+      "sha256": "9bf52d2632f7a1a852f8249dd52e8b8197db9f159429621489e854ec495f38f8",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BOTTLENECK/R8_T100_2",
+      "split": "test",
+      "scenario": "BOTTLENECK",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 2,
+      "generation_seed": 17410427945009798200,
+      "pair_id": "test/R8_T100_2",
+      "path": "test/BOTTLENECK/R8_T100_2.txt",
+      "sha256": "73056d20e3defcb24f095f9b2913336b6af2e81d819feb9e2a04ff5709aebf4c",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/TURN-HIGH/R8_T100_2",
+      "split": "test",
+      "scenario": "TURN-HIGH",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 2,
+      "generation_seed": 17410427945009798200,
+      "pair_id": "test/R8_T100_2",
+      "path": "test/TURN-HIGH/R8_T100_2.txt",
+      "sha256": "fc0a9c038ccd13bca27d6ff1fa7e802ae6ac2bc685c1483a52439c51f9849cdb",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "test/TRAVEL-HIGH/R8_T100_2",
+      "split": "test",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 2,
+      "generation_seed": 17410427945009798200,
+      "pair_id": "test/R8_T100_2",
+      "path": "test/TRAVEL-HIGH/R8_T100_2.txt",
+      "sha256": "5ea1a441064e33a0c3bd6bb5c60890ab529a9f5ade0f02dc949a634f4a727349",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SWEEP-NARROW/R8_T100_2",
+      "split": "test",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 2,
+      "generation_seed": 17410427945009798200,
+      "pair_id": "test/R8_T100_2",
+      "path": "test/SWEEP-NARROW/R8_T100_2.txt",
+      "sha256": "620b04bf3ebadb86d67b1e149b0b2f35fa67fc89c2b9c7b1c421c6a5c3888c44",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BASE/R8_T100_3",
+      "split": "test",
+      "scenario": "BASE",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 3,
+      "generation_seed": 11220154428906314566,
+      "pair_id": "test/R8_T100_3",
+      "path": "test/BASE/R8_T100_3.txt",
+      "sha256": "39be07048202334b5cd39c3e9cbf4991824feef703888d269df5a78eb518d811",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/HV-GEOM/R8_T100_3",
+      "split": "test",
+      "scenario": "HV-GEOM",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 3,
+      "generation_seed": 11220154428906314566,
+      "pair_id": "test/R8_T100_3",
+      "path": "test/HV-GEOM/R8_T100_3.txt",
+      "sha256": "a50e0626d87bf71cb3c4c66eeb020c773d12c9f3e215978952f3579a1138c25f",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SPATIAL/R8_T100_3",
+      "split": "test",
+      "scenario": "SPATIAL",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 3,
+      "generation_seed": 11220154428906314566,
+      "pair_id": "test/R8_T100_3",
+      "path": "test/SPATIAL/R8_T100_3.txt",
+      "sha256": "ec9cf11cfb7c98a58a75ec0ecbe81b5fa841c2f35492959993155cd28d9dc483",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/BOTTLENECK/R8_T100_3",
+      "split": "test",
+      "scenario": "BOTTLENECK",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 3,
+      "generation_seed": 11220154428906314566,
+      "pair_id": "test/R8_T100_3",
+      "path": "test/BOTTLENECK/R8_T100_3.txt",
+      "sha256": "a018df4deb9974790a7ba37abf85bc453930373c10c58ba64ebc407c79091077",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/TURN-HIGH/R8_T100_3",
+      "split": "test",
+      "scenario": "TURN-HIGH",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 3,
+      "generation_seed": 11220154428906314566,
+      "pair_id": "test/R8_T100_3",
+      "path": "test/TURN-HIGH/R8_T100_3.txt",
+      "sha256": "40ad1535f1ab4096f753c8be10193ca49a3693981671cc6ed42fbdf8f0cfb496",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 10.0
+      }
+    },
+    {
+      "instance_id": "test/TRAVEL-HIGH/R8_T100_3",
+      "split": "test",
+      "scenario": "TRAVEL-HIGH",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 3,
+      "generation_seed": 11220154428906314566,
+      "pair_id": "test/R8_T100_3",
+      "path": "test/TRAVEL-HIGH/R8_T100_3.txt",
+      "sha256": "ee4a46345d6b55adb6c9793d406b54f72a3e8339fad45365e49a122f9d405926",
+      "params": {
+        "sweep_width": 3.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 0.5,
+        "turning_time": 5.0
+      }
+    },
+    {
+      "instance_id": "test/SWEEP-NARROW/R8_T100_3",
+      "split": "test",
+      "scenario": "SWEEP-NARROW",
+      "n_robots": 8,
+      "n_tasks": 100,
+      "replicate": 3,
+      "generation_seed": 11220154428906314566,
+      "pair_id": "test/R8_T100_3",
+      "path": "test/SWEEP-NARROW/R8_T100_3.txt",
+      "sha256": "0346549787799fe5fec2ef39b1f74b7e193ab4c4425905538430aae6ddcf54c2",
+      "params": {
+        "sweep_width": 2.0,
+        "sweep_speed": 1.0,
+        "travel_speed": 1.0,
+        "turning_time": 5.0
+      }
+    }
+  ]
+}
