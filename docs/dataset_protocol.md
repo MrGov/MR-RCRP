@@ -56,3 +56,43 @@ There are two files in each split (six total). They validate generation, parsing
 After separate authorization, freeze a complete family matrix before generating files. A concrete planning envelope is 12 development families x 10 replicates (120), 6 held-out families x 10 replicates (60), and 6 final families x 20 replicates (120), for 300 planned instances; the actual count must be confirmed by runtime and precision/power planning, not by the sanity set. Any regenerated family, split rule, objective version, or generation rule receives a new dataset version and cannot overwrite an existing manifest.
 
 R2 stops before formal baseline-vs-ALNS comparison, significance testing, convergence studies, operator evolution, tuning, and final-test solver execution. The next permitted phase after review is R3 Optimization Diagnostics only.
+
+## E10 structural development extension
+
+The restrictions above describe historical R2. E10 adds a separate authorized
+development dataset, reusing `FamilySpec`, `generate_instance`, hash seeds,
+center/non-overlap helpers, TXT writing and `extract_intrinsic_features` in the
+same module. Optional `structural_scenario` dispatches the paired design; the
+legacy generator path and its configuration hashes stay stable.
+
+`data/e10_structural_development/` contains seven scenario directories, each with
+`R4_T40_0/1/2.txt`. Use scenario-qualified IDs or relative paths: basenames repeat.
+All 21 entries in `manifest.json` are development and record BASE pairing, seeds,
+physical parameters, homogeneous status and config/file/geometry hashes. Schema
+`mr-rcrp-structural-development-manifest-v1` and dataset
+`e10-structural-development-v1` are separate from the strict R2-only manifest loader.
+The generator version is `mr-rcrp-paired-structural-v1`.
+
+```powershell
+$env:PYTHONPATH='src'
+& 'G:\Anaconda\envs\mrta_env\python.exe' -m mrta_rect_coverage.experiments.dataset_protocol --structural-output data/e10_structural_development
+& 'G:\Anaconda\envs\mrta_env\python.exe' -m mrta_rect_coverage.experiments.dataset_protocol --validate-structural data/e10_structural_development --validation-output outputs/e10_structural_development --smoke
+```
+
+Generation refuses an existing nonempty directory. Reproduce into a fresh path
+and compare TXT hashes. Validation checks all 21 loader/hash/pair/non-overlap
+contracts, reproduces bytes, generates 6,720 states, and uses Exact-DP to evaluate
+one fixed complete round-robin solution per instance. `--smoke` adds only three
+two-second manual B1 runs (BASE/HV-GEOM/SWEEP-NARROW replicate 0, seed 0), purely
+for feasibility. Generation itself never invokes optimization.
+
+Intrinsic features now also report unoriented aspect, H/V sweeps and parity,
+H/V processing distributions, preferred turning share, workload CV/top-decile
+share, nearest-neighbor distance and centroid travel/processing proxies. No solver
+outcomes define labels or tune rules. Definitions and actual accompanying changes
+are in the generated `STRUCTURE_REPORT.md`; each feature has mean/min/max in
+`structure_summary.csv`, and per-replicate checks are in `structure_checks.json`.
+
+The 60 original regular instances, smoke input and `r2_sanity` stay unchanged.
+No held-out/final/lockbox data were inputs. Future confirmation requires freezing
+this design before creating a new dataset version and independent seed namespace.

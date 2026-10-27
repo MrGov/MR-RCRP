@@ -1,0 +1,218 @@
+[
+  {
+    "scenario": "HV-GEOM",
+    "replicate_id": 0,
+    "metric": "relative_hv_gap_mean",
+    "value": 0.33744351603060585,
+    "base_value": 0.0,
+    "rule": "BASE + 0.15",
+    "passed": true
+  },
+  {
+    "scenario": "TURN-HIGH",
+    "replicate_id": 0,
+    "metric": "preferred_turning_share_mean",
+    "value": 0.3495872317006054,
+    "base_value": 0.21215538847117793,
+    "rule": "BASE + 0.05",
+    "passed": true
+  },
+  {
+    "scenario": "TRAVEL-HIGH",
+    "replicate_id": 0,
+    "metric": "travel_processing_pressure_ratio",
+    "value": 7.9751656285952315,
+    "base_value": 3.9875828142976157,
+    "rule": "2 * BASE",
+    "passed": true
+  },
+  {
+    "scenario": "SWEEP-NARROW",
+    "replicate_id": 0,
+    "metric": "sweeps_h_mean",
+    "value": 7.675,
+    "base_value": 5,
+    "rule": "greater than BASE",
+    "passed": true
+  },
+  {
+    "scenario": "SWEEP-NARROW",
+    "replicate_id": 0,
+    "metric": "mean_p_min",
+    "value": 151.425,
+    "base_value": 96.95,
+    "rule": "greater than BASE",
+    "passed": true
+  },
+  {
+    "scenario": "BOTTLENECK",
+    "replicate_id": 0,
+    "metric": "workload_cv",
+    "value": 1.4815850900523058,
+    "base_value": 0.2914302113036711,
+    "rule": "BASE + 0.5",
+    "passed": true
+  },
+  {
+    "scenario": "BOTTLENECK",
+    "replicate_id": 0,
+    "metric": "sum_p_min",
+    "value": 3840.829289840565,
+    "base_value": 3878.0,
+    "rule": "within 2% of BASE",
+    "passed": true
+  },
+  {
+    "scenario": "SPATIAL",
+    "replicate_id": 0,
+    "metric": "pairwise_distance_mean",
+    "value": 590.7410256410257,
+    "base_value": 386.59615384615387,
+    "rule": "greater than 1.2 * BASE",
+    "passed": true
+  },
+  {
+    "scenario": "HV-GEOM",
+    "replicate_id": 1,
+    "metric": "relative_hv_gap_mean",
+    "value": 0.34959956009720883,
+    "base_value": 0.0,
+    "rule": "BASE + 0.15",
+    "passed": true
+  },
+  {
+    "scenario": "TURN-HIGH",
+    "replicate_id": 1,
+    "metric": "preferred_turning_share_mean",
+    "value": 0.34447525506964144,
+    "base_value": 0.20839598997493733,
+    "rule": "BASE + 0.05",
+    "passed": true
+  },
+  {
+    "scenario": "TRAVEL-HIGH",
+    "replicate_id": 1,
+    "metric": "travel_processing_pressure_ratio",
+    "value": 7.102212855637513,
+    "base_value": 3.5511064278187563,
+    "rule": "2 * BASE",
+    "passed": true
+  },
+  {
+    "scenario": "SWEEP-NARROW",
+    "replicate_id": 1,
+    "metric": "sweeps_h_mean",
+    "value": 7.9,
+    "base_value": 5.15,
+    "rule": "greater than BASE",
+    "passed": true
+  },
+  {
+    "scenario": "SWEEP-NARROW",
+    "replicate_id": 1,
+    "metric": "mean_p_min",
+    "value": 159.3,
+    "base_value": 102.2,
+    "rule": "greater than BASE",
+    "passed": true
+  },
+  {
+    "scenario": "BOTTLENECK",
+    "replicate_id": 1,
+    "metric": "workload_cv",
+    "value": 1.717051489381518,
+    "base_value": 0.2735809333432688,
+    "rule": "BASE + 0.5",
+    "passed": true
+  },
+  {
+    "scenario": "BOTTLENECK",
+    "replicate_id": 1,
+    "metric": "sum_p_min",
+    "value": 4082.8549721849613,
+    "base_value": 4088.0,
+    "rule": "within 2% of BASE",
+    "passed": true
+  },
+  {
+    "scenario": "SPATIAL",
+    "replicate_id": 1,
+    "metric": "pairwise_distance_mean",
+    "value": 527.7807692307692,
+    "base_value": 362.9230769230769,
+    "rule": "greater than 1.2 * BASE",
+    "passed": true
+  },
+  {
+    "scenario": "HV-GEOM",
+    "replicate_id": 2,
+    "metric": "relative_hv_gap_mean",
+    "value": 0.3183574418334371,
+    "base_value": 0.0,
+    "rule": "BASE + 0.15",
+    "passed": true
+  },
+  {
+    "scenario": "TURN-HIGH",
+    "replicate_id": 2,
+    "metric": "preferred_turning_share_mean",
+    "value": 0.3574584056559841,
+    "base_value": 0.21798245614035086,
+    "rule": "BASE + 0.05",
+    "passed": true
+  },
+  {
+    "scenario": "TRAVEL-HIGH",
+    "replicate_id": 2,
+    "metric": "travel_processing_pressure_ratio",
+    "value": 8.762770264449996,
+    "base_value": 4.381385132224998,
+    "rule": "2 * BASE",
+    "passed": true
+  },
+  {
+    "scenario": "SWEEP-NARROW",
+    "replicate_id": 2,
+    "metric": "sweeps_h_mean",
+    "value": 7.3,
+    "base_value": 4.775,
+    "rule": "greater than BASE",
+    "passed": true
+  },
+  {
+    "scenario": "SWEEP-NARROW",
+    "replicate_id": 2,
+    "metric": "mean_p_min",
+    "value": 139.2,
+    "base_value": 89.3,
+    "rule": "greater than BASE",
+    "passed": true
+  },
+  {
+    "scenario": "BOTTLENECK",
+    "replicate_id": 2,
+    "metric": "workload_cv",
+    "value": 1.6894104527907103,
+    "base_value": 0.31967109207695177,
+    "rule": "BASE + 0.5",
+    "passed": true
+  },
+  {
+    "scenario": "BOTTLENECK",
+    "replicate_id": 2,
+    "metric": "sum_p_min",
+    "value": 3571.9999999999977,
+    "base_value": 3572.0,
+    "rule": "within 2% of BASE",
+    "passed": true
+  },
+  {
+    "scenario": "SPATIAL",
+    "replicate_id": 2,
+    "metric": "pairwise_distance_mean",
+    "value": 598.0923076923077,
+    "base_value": 391.2576923076923,
+    "rule": "greater than 1.2 * BASE",
+    "passed": true
+  }
+]
