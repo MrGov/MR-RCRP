@@ -38,12 +38,20 @@ each state by incoming Manhattan travel plus processing time, and includes the
 return to depot when choosing the final task's state. It never optimizes a DP
 state chain during search.
 
-Both modes independently re-evaluate only the search-selected incumbent using
-Exact Route-DP after search. `best_evaluation` is this final exact result;
-`search_makespan` and `history` use the configured search costs. No exact recheck
-is used to reselect a historical greedy candidate. `runtime_seconds` is setup
-plus search, `final_recheck_seconds` is independent verification, and
-`total_runtime_seconds` includes both. Search and final DP counters are separate.
+E13-Fix: Greedy never constructs or calls Route-DP, including initialization,
+finish and result analysis. `best_evaluation` retains the actual selected state
+chain and its costs, equal to `search_makespan`. Final validation checks task
+completeness, membership in the generated legal states, trace consistency,
+Manhattan travel (including depot return), coverage and turning costs, and
+makespan. It does not select states again. `selected_route_details` stores each
+robot's task sequence, H/V modes, state IDs, entry/exit corners and costs.
+`route_dp_calls`, `cache_misses`, `final_route_dp_calls` and
+`final_recheck_seconds` are zero; `final_validation_seconds` times the checks.
+
+Exact retains its original independent uncached Route-DP recheck after search.
+`runtime_seconds` includes setup plus search; `total_runtime_seconds` also
+includes the final validation or Exact recheck. Search and final DP counters
+remain separate. Search loops, parameters and Deadline rules are unchanged.
 
 The shared deadline exception unwinds nested search before another route
 evaluation can start, retaining the last complete feasible incumbent. One
@@ -51,4 +59,11 @@ mandatory complete spatial-sort bootstrap ensures a result even for a budget
 smaller than setup; that exceptional overrun is explicitly reported. A single
 route evaluation already in progress may finish. Each literature solver retains
 its independent population and search logic. E13 measurements and reproduction
-commands are under `outputs/e13_evaluation_efficiency/`; E12 results are retained.
+commands from historical E13 are under `outputs/e13_evaluation_efficiency/` and
+remain unchanged; those Greedy results include final Exact state optimization.
+New fully Greedy smoke results are separate under
+`outputs/e13_fix_fully_greedy/`. Use `python -m
+mrta_rect_coverage.experiments.e13_evaluation_efficiency --stage smoke`, followed
+by `--stage analyze`. Smoke covers two development instances, seeds 0/1, all
+four algorithms in both modes with a 1-second setup+search budget. Normal
+`--stage run` retains task_count seconds; it was not rerun for E13-Fix.

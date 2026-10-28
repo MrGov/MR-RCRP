@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from collections import Counter
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Literal
 import math
 import random
@@ -76,6 +76,8 @@ class SearchResult:
     final_route_dp_calls: int
     deadline_reached: bool
     budget_overrun_seconds: float
+    final_validation_seconds: float = 0.0
+    selected_route_details: list[dict] = field(default_factory=list)
 
 
 class SearchDeadline(Exception):
@@ -119,6 +121,69 @@ class GreedyRouteEvaluator:
         return result
 
 
+def validate_selected_evaluation(instance, solution, evaluation, states=None, costs=None):
+    """Check the supplied state chain and sum its costs, without selecting states.
+
+    Returns serializable per-robot evidence; never mutates the supplied result
+    and never constructs/calls Route-DP or even reruns Greedy state selection.
+    """
+    MultiRobotSolutionEvaluator(None, instance=instance)._validate_solution(solution, allow_missing=False)
+    if len(evaluation.route_evaluations) != instance.robot_count or len(evaluation.per_robot_costs) != instance.robot_count:
+        raise ValueError('evaluation route count must equal robot count')
+    if states is None:states = generate_all_states(instance)
+    if costs is None:costs = CostMatrix(instance.depot, states, travel_speed=instance.travel_speed)
+    tasks = {t.task_id:t for t in instance.tasks}
+    evidence = []
+
+    def equal(actual, expected):
+        if not math.isclose(actual, expected, rel_tol=1e-10, abs_tol=1e-8):
+            raise ValueError(f'selected state chain cost mismatch: {actual} != {expected}')
+
+    for robot, (route, result) in enumerate(zip(solution.routes, evaluation.route_evaluations)):
+        if result.route_task_ids != route or len(result.chosen_states) != len(route):
+            raise ValueError('selected state chain does not match task sequence')
+        ids = [s.state_id for s in result.chosen_states]
+        if (result.chosen_state_ids != ids or
+            result.entry_points != [s.entry_point for s in result.chosen_states] or
+            result.exit_points != [s.exit_point for s in result.chosen_states] or
+            result.predecessor_state_ids != ([None]+ids[:-1] if route else [])):
+            raise ValueError('selected state chain metadata mismatch')
+        transitions, cumulative, saved_states = [], [], []
+        total = coverage = turning = 0.0
+        previous = None
+        for task_id, state in zip(route, result.chosen_states):
+            if state not in states[task_id]:
+                raise ValueError('state is not a legal generated state for this task')
+            task = tasks[task_id]
+            sweep_length = task.width if state.sweep_mode.value == 'H' else task.height
+            cover = state.n_sweeps*sweep_length/instance.sweep_speed
+            turn = (state.n_sweeps-1)*instance.turning_time
+            equal(state.processing_time, cover+turn)
+            incoming = (costs.depot_to_state(state.state_id) if previous is None
+                        else costs.transition(previous, state.state_id))
+            total += incoming+state.processing_time
+            transitions.append(incoming); cumulative.append(total)
+            coverage += cover; turning += turn; previous = state.state_id
+            saved_states.append(dict(task_id=task_id,state_id=state.state_id,
+                sweep_mode=state.sweep_mode.value,entry_corner=state.entry_corner.value,
+                exit_corner=state.exit_corner.value,entry_point=list(state.entry_point),
+                exit_point=list(state.exit_point),n_sweeps=state.n_sweeps,
+                coverage_cost=cover,turning_cost=turn,processing_time=state.processing_time))
+        depot_return = costs.state_to_depot(previous) if route else 0.0
+        if route:transitions.append(depot_return)
+        total += depot_return
+        if len(result.transition_costs) != len(transitions) or len(result.cumulative_costs) != len(cumulative):
+            raise ValueError('selected state trace length mismatch')
+        for a,b in zip(result.transition_costs,transitions):equal(a,b)
+        for a,b in zip(result.cumulative_costs,cumulative):equal(a,b)
+        equal(result.total_cost,total); equal(evaluation.per_robot_costs[robot],total)
+        evidence.append(dict(robot_id=robot,task_sequence=list(route),states=saved_states,
+            route_cost=total,travel_cost=sum(transitions),coverage_cost=coverage,
+            turning_cost=turning,depot_return_cost=depot_return))
+    equal(evaluation.makespan,max((r['route_cost'] for r in evidence),default=0.0))
+    return evidence
+
+
 def clone(solution):
     return MultiRobotSolution([r[:] for r in solution.routes])
 
@@ -141,7 +206,7 @@ class SearchEnvironment:
         states = generate_all_states(instance)
         costs = CostMatrix(instance.depot, states, travel_speed=instance.travel_speed)
         self.states, self.costs = states, costs
-        self.dp = RouteDPEvaluator(costs, states)
+        self.dp = RouteDPEvaluator(costs, states) if config.evaluation_mode == 'exact' else None
         self.greedy = GreedyRouteEvaluator(costs, states)
         self.evaluator = MultiRobotSolutionEvaluator(self, instance=instance)
         self.work = {t:min(s.processing_time for s in ss) for t,ss in states.items()}
@@ -198,21 +263,32 @@ class SearchEnvironment:
     def finish(self, generation):
         self.record('finished',generation)
         search_seconds = self.elapsed()
-        stats = self.dp.statistics()
-        # Freeze the search-selected allocation/order. Independent Exact-DP only
-        # reoptimizes its legal state chain; it never reselects a search candidate.
-        final_started = perf_counter()
-        final_dp = RouteDPEvaluator(self.costs, self.states)
-        final_dp._e13_final_recheck = True
-        final = MultiRobotSolutionEvaluator(final_dp, instance=self.instance).evaluate(self.best.solution)
-        recheck_seconds = perf_counter()-final_started
+        stats = self.dp.statistics() if self.dp is not None else dict(calls=0,cache_misses=0)
+        recheck_seconds = validation_seconds = 0.0
+        final_calls = 0
+        details = []
+        if self.config.evaluation_mode == 'greedy':
+            # Preserve the actual selected states and their physical costs.
+            # Validation sums only that chain; there is no state optimization.
+            final = self.best.evaluation
+            validation_started = perf_counter()
+            details = validate_selected_evaluation(self.instance,self.best.solution,final,self.states,self.costs)
+            validation_seconds = perf_counter()-validation_started
+        else:
+            # Exact mode retains the E13 independent uncached DP recheck.
+            final_started = perf_counter()
+            final_dp = RouteDPEvaluator(self.costs, self.states)
+            final_dp._e13_final_recheck = True
+            final = MultiRobotSolutionEvaluator(final_dp, instance=self.instance).evaluate(self.best.solution)
+            recheck_seconds = perf_counter()-final_started
+            final_calls = final_dp.statistics()['calls']
         return SearchResult(clone(self.best.solution),final,self.initial_makespan,
             search_seconds,self.initialization_seconds,generation,self.evaluations,
             stats['calls'],stats['cache_misses'],self.history,dict(self.phases),
             self.best.score,[r[:] for r in self.best.solution.routes],recheck_seconds,
             self.elapsed(),self.greedy.calls,self.greedy.cache_misses,
-            final_dp.statistics()['calls'],search_seconds >= self.config.max_time,
-            max(0.0,search_seconds-self.config.max_time))
+            final_calls,search_seconds >= self.config.max_time,
+            max(0.0,search_seconds-self.config.max_time),validation_seconds,details)
 
     def random_solution(self):
         self.check_deadline()
