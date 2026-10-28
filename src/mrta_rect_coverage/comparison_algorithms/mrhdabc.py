@@ -5,7 +5,7 @@ ordinary employed search, binary-tournament critical onlookers, multi-operator
 scouts and random/guided restarts. Spatial groups stand in for original regions;
 no capacity, heterogeneity, permissions or multiple depot trips are introduced.
 """
-from .common import SearchConfig, SearchEnvironment, KINDS, clone, rank
+from .common import SearchConfig, SearchEnvironment, run_search, KINDS, clone, rank
 
 
 def grouped_order(env,priority,random_within=False):
@@ -25,8 +25,12 @@ def grouped_order(env,priority,random_within=False):
     return out
 
 
-def solve(instance,config=None):
-    env=SearchEnvironment(instance,config or SearchConfig(max_time=instance.task_count,scout_limit=150,local_depth=5))
+def solve(instance, config=None):
+    return run_search(instance, config or SearchConfig(max_time=instance.task_count,scout_limit=150,local_depth=5), _search)
+
+
+def _search(env):
+    instance=env.instance
     cfg=env.config;rng=env.rng
     # MR priority is underspecified in the supplied algorithm. Normalize true
     # minimum service workload and depot travel equally, with 10% perturbation.
@@ -102,4 +106,4 @@ def solve(instance,config=None):
             worst=max(range(len(pop)),key=lambda j:rank(pop[j]))
             if rank(best)<rank(pop[worst]):pop[worst]=best;trials[worst]=0
         generation+=1;env.record('colony_update',generation)
-    return env.finish(generation)
+    return generation

@@ -3,11 +3,11 @@
 Permutation/count chromosomes, half crossover with duplicate repair, roulette,
 5% swap/reverse/count/TaskShift mutation and elite preservation. JPS encounters
 are approximated by proximity to a shortest Manhattan corridor between actual
-DP exit/entry points. Transfers additionally pass a real DP nonworsening guard
+configured-evaluator exit/entry points. Transfers additionally pass a configured-evaluator nonworsening guard
 because MR-RCRP tasks have nonzero and strongly variable service time.
 """
 import math
-from .common import SearchConfig, SearchEnvironment, clone, rank
+from .common import SearchConfig, SearchEnvironment, run_search, clone, rank
 from ..core.models import MultiRobotSolution
 
 
@@ -43,6 +43,7 @@ def taskshift(env,ind):
         encounters=[]
         for pos,(start,end) in enumerate(zip(starts,ends)):
             for task in env.ids:
+                env.check_deadline()
                 if task in anchors:continue
                 point=env.centers[task]
                 excess=env.distance(start,point)+env.distance(point,end)-env.distance(start,end)
@@ -50,7 +51,8 @@ def taskshift(env,ind):
                     encounters.append((pos,excess,task))
         seen=set()
         for pos,excess,task in sorted(encounters):
-            if task in seen or not env.active():continue
+            env.check_deadline()
+            if task in seen:continue
             seen.add(task);donor=next(k for k,r in enumerate(current.solution.routes) if task in r)
             costs=current.evaluation.per_robot_costs
             if donor==receiver or costs[donor]<max(costs)-1e-9 or costs[receiver]>=costs[donor]:continue
@@ -80,8 +82,12 @@ def mutate(env,solution):
     return split(flat,counts)
 
 
-def solve(instance,config=None):
-    env=SearchEnvironment(instance,config or SearchConfig(max_time=instance.task_count))
+def solve(instance, config=None):
+    return run_search(instance, config or SearchConfig(max_time=instance.task_count), _search)
+
+
+def _search(env):
+    instance=env.instance
     cfg=env.config;rng=env.rng
     order=sorted(env.ids,key=lambda t:env.work[t],reverse=True)
     population=[env.evaluate(env.construct(order),'greedy_seed')]
@@ -108,4 +114,4 @@ def solve(instance,config=None):
                 if rank(elite)<rank(children[worst]):children[worst]=elite
             population=children
         generation+=1;env.record('generation',generation)
-    return env.finish(generation)
+    return generation

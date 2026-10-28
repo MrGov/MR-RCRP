@@ -5,7 +5,7 @@ discrete genetic sequencing, RBM endpoint load balance, proximity-based N1/N2/N3
 search and genetic route allocation with a diverse elite archive. Supplementary
 Algorithms 2--7 were not supplied; their implementations follow the main text.
 """
-from .common import (SearchConfig, SearchEnvironment, clone, rank,
+from .common import (SearchConfig, SearchEnvironment, run_search, clone, rank,
                      ordered_crossover, environmental_select)
 from ..core.models import MultiRobotSolution
 
@@ -17,6 +17,7 @@ def clustered_seed(env):
     for _ in range(5):
         groups=[[] for _ in centers]
         for t in ids:
+            env.check_deadline()
             k=min(range(len(centers)),key=lambda k:env.distance(env.centers[t],centers[k]))
             groups[k].append(t)
         for k,g in enumerate(groups):
@@ -25,6 +26,7 @@ def clustered_seed(env):
     for g in groups:
         route=[];point=env.instance.depot;remaining=set(g)
         while remaining:
+            env.check_deadline()
             task=min(remaining,key=lambda t:(env.distance(point,env.centers[t]),t))
             remaining.remove(task);route.append(task);point=env.centers[task]
         routes.append(route)
@@ -65,17 +67,17 @@ def isa(env, ind, success):
         local=[original,mutant]
         for _ in range(env.config.local_depth):
             if not env.active():break
-            best=min(local,key=lambda r:env.dp.evaluate_route(r).total_cost)
+            best=min(local,key=lambda r:env.route(r).total_cost)
             partner=env.rng.choice(local)
             mode=env.rng.choices(range(3),weights=success)[0]
             child=sequence_cross(best,partner,env.rng,mode)
             if env.rng.random()<.2:
                 a,b=sorted(env.rng.sample(range(len(child)),2));child[a:b+1]=reversed(child[a:b+1])
-            old_cost=env.dp.evaluate_route(best).total_cost
-            new_cost=env.dp.evaluate_route(child).total_cost
+            old_cost=env.route(best).total_cost
+            new_cost=env.route(child).total_cost
             if new_cost<old_cost:success[mode]+=1
-            local=sorted(local+[child],key=lambda r:env.dp.evaluate_route(r).total_cost)[:4]
-        best=min(local,key=lambda r:env.dp.evaluate_route(r).total_cost)
+            local=sorted(local+[child],key=lambda r:env.route(r).total_cost)[:4]
+        best=min(local,key=lambda r:env.route(r).total_cost)
         if best!=current.solution.routes[k]:
             out=clone(current.solution);out.routes[k]=best[:]
             current=env.evaluate(out,'ISA')
@@ -147,21 +149,25 @@ def route_allocation(env,a,b):
     return env.evaluate(out,'PRAM_genetic_allocation')
 
 
-def solve(instance,config=None):
-    env=SearchEnvironment(instance,config or SearchConfig(max_time=instance.task_count))
+def solve(instance, config=None):
+    return run_search(instance, config or SearchConfig(max_time=instance.task_count), _search)
+
+
+def _search(env):
+    instance=env.instance
     cfg=env.config;success=[1.,1.,1.];archive=[]
     while len(archive)<cfg.population_size and env.active():
         seed=env.evaluate(clustered_seed(env),'clustered_initialization')
         archive.append(isa(env,seed,success))
     if not archive:archive=[env.initial]
-    archive=environmental_select(archive,cfg.population_size)
+    archive=environmental_select(archive,cfg.population_size,env.check_deadline)
     env.initialization_seconds=env.elapsed();generation=0
     while env.active(generation):
         balanced=[]
         for ind in archive:
             if not env.active():break
             balanced.append(isa(env,balance(env,ind),success))
-        first=environmental_select(archive+balanced,cfg.population_size)
+        first=environmental_select(archive+balanced,cfg.population_size,env.check_deadline)
         offspring=[]
         for ind in first:
             if not env.active():break
@@ -172,7 +178,7 @@ def solve(instance,config=None):
             if env.active():
                 other=env.tournament(first) if len(first)>1 else first[0]
                 offspring.append(isa(env,route_allocation(env,candidate,other),success))
-        archive=environmental_select(first+offspring,cfg.population_size)
+        archive=environmental_select(first+offspring,cfg.population_size,env.check_deadline)
         generation+=1;env.record('archive_update',generation)
     env.phases.update({f'ISA_success_crossover_{i}':int(v-1) for i,v in enumerate(success)})
-    return env.finish(generation)
+    return generation

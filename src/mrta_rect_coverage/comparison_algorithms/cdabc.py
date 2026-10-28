@@ -3,11 +3,15 @@
 Two heuristic seeds, dynamic strategy lists, critical onlookers, two retained
 collaborative following bees per source, and follower-guided scout escape.
 """
-from .common import SearchConfig, SearchEnvironment, rank, clone
+from .common import SearchConfig, SearchEnvironment, run_search, rank, clone
 
 
 def solve(instance, config=None):
-    env=SearchEnvironment(instance,config or SearchConfig(max_time=instance.task_count,scout_limit=50))
+    return run_search(instance, config or SearchConfig(max_time=instance.task_count,scout_limit=50), _search)
+
+
+def _search(env):
+    instance=env.instance
     rng=env.rng;cfg=env.config
     # Section 4.2: normalized dominant work/depot groups plus descending work.
     work=env.work;dist={t:env.distance(env.centers[t],instance.depot)/instance.travel_speed for t in env.ids}
@@ -66,4 +70,4 @@ def solve(instance, config=None):
             pop[i]=current;trials[i]=0;followers[i]=[]
         # Global best is independently retained even if scouts replace its source.
         generation+=1;env.record('cycle',generation)
-    return env.finish(generation)
+    return generation

@@ -27,3 +27,28 @@ of evaluations as machine load varies.
 The exact supplied PDFs and implementation files are hashed in the E12 output
 configuration. No author-code reproduction, original-domain result reproduction,
 or formal performance claim is implied by this adapted implementation.
+
+## E13 evaluation and time control
+
+The E12 descriptions above describe the default `evaluation_mode='exact'`.
+Every solver also accepts `SearchConfig(evaluation_mode='greedy')`. All route
+ranking, insertion and ISA calls use the configured evaluator. TaskShift uses
+the corresponding evaluator's actual legal entry/exit states. Greedy selects
+each state by incoming Manhattan travel plus processing time, and includes the
+return to depot when choosing the final task's state. It never optimizes a DP
+state chain during search.
+
+Both modes independently re-evaluate only the search-selected incumbent using
+Exact Route-DP after search. `best_evaluation` is this final exact result;
+`search_makespan` and `history` use the configured search costs. No exact recheck
+is used to reselect a historical greedy candidate. `runtime_seconds` is setup
+plus search, `final_recheck_seconds` is independent verification, and
+`total_runtime_seconds` includes both. Search and final DP counters are separate.
+
+The shared deadline exception unwinds nested search before another route
+evaluation can start, retaining the last complete feasible incumbent. One
+mandatory complete spatial-sort bootstrap ensures a result even for a budget
+smaller than setup; that exceptional overrun is explicitly reported. A single
+route evaluation already in progress may finish. Each literature solver retains
+its independent population and search logic. E13 measurements and reproduction
+commands are under `outputs/e13_evaluation_efficiency/`; E12 results are retained.
