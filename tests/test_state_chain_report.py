@@ -222,3 +222,94 @@ def test_state_generation_matches_sweep_and_corner_rules():
             assert state.exit_corner == _determine_exit_corner(
                 state.sweep_mode, state.entry_corner, state.n_sweeps
             )
+
+
+def test_t12_mode_gap_matches_recomputed_mode_minima():
+    _, states, cm, dp = _build()
+    report = route_regret_report(
+        dp.evaluate_route([1, 2, 3]), states_by_task=states, cost_matrix=cm
+    )
+    for position in report.positions:
+        horizontal = [o.q_cost for o in position.options if o.sweep_mode == "H"]
+        vertical = [o.q_cost for o in position.options if o.sweep_mode == "V"]
+        assert horizontal and vertical
+        assert position.best_h_q == pytest.approx(min(horizontal), abs=1e-9)
+        assert position.best_v_q == pytest.approx(min(vertical), abs=1e-9)
+        assert position.mode_gap == pytest.approx(
+            min(horizontal) - min(vertical), abs=1e-9
+        )
+        expected = (
+            "H"
+            if position.mode_gap < -1e-9
+            else "V"
+            if position.mode_gap > 1e-9
+            else "equivalent"
+        )
+        assert position.mode_preference == expected
+
+
+def test_t13_informative_flag_is_tolerance_consistent():
+    _, states, cm, dp = _build()
+    route = dp.evaluate_route([1, 2])
+    defaults = route_regret_report(route, states_by_task=states, cost_matrix=cm)
+    for position in defaults.positions:
+        assert position.informative == (position.min_alternative_regret > 1e-9)
+        assert position.tied_state_count == 1 + sum(
+            o.regret <= 1e-9 for o in position.options if o.state_id != position.chosen_state_id
+        )
+        assert position.informative == (position.tied_state_count == 1)
+
+    broad = route_regret_report(
+        route, states_by_task=states, cost_matrix=cm, near_tie_tol=1e9
+    )
+    for position in broad.positions:
+        assert position.tied_state_count == len(position.options)
+        assert position.informative is False
+
+
+def test_t14_degeneracy_summary_is_consistent():
+    instance, states, cm, dp = _build()
+    _, _, report = _report_bundle(instance, states, cm, dp)
+    assert_report_consistent(report)
+    summary = report["state_degeneracy"]
+    positions = [p for route in report["routes"] for p in route["regret_table"]]
+    assert summary["position_count"] == len(positions) == instance.task_count
+    assert summary["tied_position_count"] == sum(
+        1 for p in positions if p["tied_state_count"] > 1
+    )
+    assert summary["all_equal_position_count"] == sum(
+        1 for p in positions if p["tied_state_count"] == len(p["options"])
+    )
+    assert summary["informative_position_count"] == sum(
+        1 for p in positions if p["informative"]
+    )
+    assert sum(summary["mode_preference_counts"].values()) == len(positions)
+    for route in report["routes"]:
+        assert route["regret_table"] and all(
+            "mode_gap" in position for position in route["regret_table"]
+        )
+
+    summary["informative_position_count"] += 1
+    with pytest.raises(ValueError, match="state_degeneracy"):
+        assert_report_consistent(report)
+
+
+def test_t15_mode_gap_and_tie_fields_are_tamper_detected():
+    instance, states, cm, dp = _build()
+    _, _, report = _report_bundle(instance, states, cm, dp)
+    position = report["routes"][0]["regret_table"][0]
+
+    position["tied_state_count"] += 1
+    with pytest.raises(ValueError, match="tied_state_count|state_degeneracy"):
+        assert_report_consistent(report)
+
+    _, _, report = _report_bundle(instance, states, cm, dp)
+    report["routes"][0]["regret_table"][0]["mode_gap"] = 1e6
+    with pytest.raises(ValueError, match="mode_gap"):
+        assert_report_consistent(report)
+
+    _, _, report = _report_bundle(instance, states, cm, dp)
+    report["routes"][0]["regret_table"][0]["informative"] = True
+    with pytest.raises(ValueError, match="informative"):
+        assert_report_consistent(report)
+

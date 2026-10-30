@@ -5,6 +5,7 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+import statistics
 import subprocess
 import sys
 
@@ -52,13 +53,15 @@ def _solution_hash(solution: MultiRobotSolution) -> str:
 
 
 def _git_head() -> str:
-    try:
-        return subprocess.run(
-            ["git", "rev-parse", "HEAD"], cwd=ROOT, check=True,
-            capture_output=True, text=True
-        ).stdout.strip()
-    except (OSError, subprocess.CalledProcessError):
-        return "unavailable"
+    for executable in ("git", r"C:\Program Files\Git\cmd\git.exe"):
+        try:
+            return subprocess.run(
+                [executable, "rev-parse", "HEAD"], cwd=ROOT, check=True,
+                capture_output=True, text=True
+            ).stdout.strip()
+        except (OSError, subprocess.CalledProcessError):
+            continue
+    return "unavailable"
 
 
 def stage_smoke(output: Path, *, near_tie_tol: float = 0.0) -> None:
@@ -157,6 +160,9 @@ def stage_verify(output: Path) -> dict:
     failures = []
     route_count = position_count = near_tie_positions = 0
     regret_values = []
+    tied_positions = all_equal_positions = informative_positions = 0
+    mode_gaps = []
+    mode_preference_counts = {"H": 0, "V": 0, "equivalent": 0, "unknown": 0}
     for path in report_paths:
         try:
             report = json.loads(path.read_text(encoding="utf-8"))
@@ -167,23 +173,39 @@ def stage_verify(output: Path) -> dict:
                 raise ValueError("DP calls changed across report generation")
             if before.get("cache_misses") != after.get("cache_misses"):
                 raise ValueError("DP cache misses changed across report generation")
+            degeneracy = report.get("state_degeneracy") or {}
+            tied_positions += degeneracy.get("tied_position_count", 0)
+            all_equal_positions += degeneracy.get("all_equal_position_count", 0)
+            informative_positions += degeneracy.get("informative_position_count", 0)
+            for key, value in degeneracy.get("mode_preference_counts", {}).items():
+                mode_preference_counts[key] = mode_preference_counts.get(key, 0) + value
             for route in report["routes"]:
                 route_count += 1
                 for position in route.get("regret_table", []):
                     position_count += 1
                     near_tie_positions += position["near_tie_count"] > 0
                     regret_values.extend(option["regret"] for option in position["options"])
+                    if position.get("mode_gap") is not None:
+                        mode_gaps.append(abs(position["mode_gap"]))
         except Exception as exc:
             failures.append({"file": str(path), "error": str(exc)})
+
+    def _share(count: int) -> float:
+        return count / position_count if position_count else 0.0
+
     summary = {
         "report_count": len(report_paths),
         "route_count": route_count,
         "position_count": position_count,
         "min_regret": min(regret_values, default=None),
         "max_regret": max(regret_values, default=None),
-        "near_tie_position_fraction": (
-            near_tie_positions / position_count if position_count else 0.0
-        ),
+        "near_tie_position_fraction": _share(near_tie_positions),
+        "tied_position_fraction": _share(tied_positions),
+        "all_equal_position_fraction": _share(all_equal_positions),
+        "informative_position_fraction": _share(informative_positions),
+        "mode_gap_abs_median": statistics.median(mode_gaps) if mode_gaps else None,
+        "mode_gap_abs_max": max(mode_gaps) if mode_gaps else None,
+        "mode_preference_counts": mode_preference_counts,
         "failures": failures,
     }
     _write_json(output / "verify_summary.json", summary)

@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from math import inf
-from statistics import mean
+from statistics import mean, median
 from typing import Dict, Iterable, List, Tuple
 
 from .cost_matrix import CostMatrix
@@ -61,6 +61,12 @@ class PositionRegret:
     chosen_rank: int
     min_alternative_regret: float
     near_tie_count: int
+    tied_state_count: int
+    informative: bool
+    best_h_q: float | None
+    best_v_q: float | None
+    mode_gap: float | None
+    mode_preference: str
     options: Tuple[StateOption, ...]
 
     def to_dict(self) -> dict:
@@ -71,6 +77,12 @@ class PositionRegret:
             "chosen_rank": self.chosen_rank,
             "min_alternative_regret": self.min_alternative_regret,
             "near_tie_count": self.near_tie_count,
+            "tied_state_count": self.tied_state_count,
+            "informative": self.informative,
+            "best_h_q": self.best_h_q,
+            "best_v_q": self.best_v_q,
+            "mode_gap": self.mode_gap,
+            "mode_preference": self.mode_preference,
             "options": [option.to_dict() for option in self.options],
         }
 
@@ -82,11 +94,22 @@ class RouteRegretReport:
     evaluator_total_cost: float
     positions: Tuple[PositionRegret, ...]
 
+    @property
+    def informative_position_count(self) -> int:
+        return sum(1 for position in self.positions if position.informative)
+
+    @property
+    def tied_position_count(self) -> int:
+        return sum(1 for position in self.positions if position.tied_state_count > 1)
+
     def to_dict(self) -> dict:
         return {
             "route_task_ids": list(self.route_task_ids),
             "route_optimal_cost": self.route_optimal_cost,
             "evaluator_total_cost": self.evaluator_total_cost,
+            "position_count": len(self.positions),
+            "informative_position_count": self.informative_position_count,
+            "tied_position_count": self.tied_position_count,
             "positions": [position.to_dict() for position in self.positions],
         }
 
@@ -102,9 +125,16 @@ def route_regret_report(
     cost_matrix: CostMatrix,
     near_tie_tol: float = DEFAULT_NEAR_TIE_TOL,
 ) -> RouteRegretReport:
-    """Compute exact per-position state regrets for one fixed task sequence."""
+    """Compute exact per-position state regrets for one fixed task sequence.
+
+    Alongside the regret table this records, per position, how many states tie for
+    the route optimum (``tied_state_count``), whether the position carries any
+    decision signal at all (``informative``), and the sweep-mode gap
+    ``min Q(H) - min Q(V)``.  A negative gap means the horizontal mode is cheaper.
+    """
     if near_tie_tol < 0:
         raise ValueError("near_tie_tol must be non-negative")
+    effective_tol = max(near_tie_tol, REGRET_TOL)
     route = list(route_evaluation.route_task_ids)
     if not route:
         if abs(route_evaluation.total_cost) > REPORT_TOL:
@@ -230,18 +260,41 @@ def route_regret_report(
             (option.q_cost, option.state_id) < chosen_key for option in options
         )
         alternatives = [option for option in options if option.state_id != chosen_state_id]
+        minimum_alternative_regret = min(
+            (option.regret for option in alternatives), default=inf
+        )
+        near_tie_count = sum(
+            option.regret <= effective_tol for option in alternatives
+        )
+        horizontal = [option.q_cost for option in options if option.sweep_mode == "H"]
+        vertical = [option.q_cost for option in options if option.sweep_mode == "V"]
+        best_h_q = min(horizontal) if horizontal else None
+        best_v_q = min(vertical) if vertical else None
+        if best_h_q is None or best_v_q is None:
+            mode_gap = None
+            mode_preference = "unknown"
+        else:
+            mode_gap = best_h_q - best_v_q
+            if mode_gap < -effective_tol:
+                mode_preference = "H"
+            elif mode_gap > effective_tol:
+                mode_preference = "V"
+            else:
+                mode_preference = "equivalent"
         positions.append(
             PositionRegret(
                 position=position,
                 task_id=route[position],
                 chosen_state_id=chosen_state_id,
                 chosen_rank=chosen_rank,
-                min_alternative_regret=min(
-                    (option.regret for option in alternatives), default=inf
-                ),
-                near_tie_count=sum(
-                    option.regret <= near_tie_tol for option in alternatives
-                ),
+                min_alternative_regret=minimum_alternative_regret,
+                near_tie_count=near_tie_count,
+                tied_state_count=1 + near_tie_count,
+                informative=minimum_alternative_regret > effective_tol,
+                best_h_q=best_h_q,
+                best_v_q=best_v_q,
+                mode_gap=mode_gap,
+                mode_preference=mode_preference,
                 options=options,
             )
         )
@@ -327,6 +380,40 @@ def state_chain_rows(route_evaluation: RouteEvaluation, *, route_id: int) -> Lis
     return rows
 
 
+def _degeneracy_summary(routes: List[dict]) -> dict:
+    """Aggregate position-level tie and sweep-mode information over all routes."""
+    positions = [
+        position for route in routes for position in route.get("regret_table", [])
+    ]
+    gaps = [
+        abs(position["mode_gap"])
+        for position in positions
+        if position.get("mode_gap") is not None
+    ]
+    return {
+        "position_count": len(positions),
+        "tied_position_count": sum(
+            1 for position in positions if position["tied_state_count"] > 1
+        ),
+        "all_equal_position_count": sum(
+            1
+            for position in positions
+            if position["tied_state_count"] == len(position["options"])
+        ),
+        "informative_position_count": sum(
+            1 for position in positions if position["informative"]
+        ),
+        "mode_gap_abs_median": median(gaps) if gaps else None,
+        "mode_gap_abs_max": max(gaps) if gaps else None,
+        "mode_preference_counts": {
+            key: sum(
+                1 for position in positions if position["mode_preference"] == key
+            )
+            for key in ("H", "V", "equivalent", "unknown")
+        },
+    }
+
+
 def solution_state_report(
     instance: Instance,
     solution: MultiRobotSolution,
@@ -338,7 +425,12 @@ def solution_state_report(
     near_tie_tol: float = DEFAULT_NEAR_TIE_TOL,
     include_regret: bool = True,
 ) -> dict:
-    """Build a JSON-serializable state report for a complete evaluated solution."""
+    """Build a JSON-serializable state report for a complete evaluated solution.
+
+    Besides the objective decomposition this carries ``state_degeneracy``: how
+    many positions tie for the route optimum, how many are informative at all,
+    and the distribution of the sweep-mode gap.
+    """
     if len(solution.routes) != instance.robot_count:
         raise ValueError("solution route count does not equal instance robot count")
     task_ids = [task_id for route in solution.routes for task_id in route]
@@ -393,6 +485,7 @@ def solution_state_report(
     load_excess = max(route_costs, default=0.0) - mean_cost
     if abs(mean_processing + mean_transfer + load_excess - makespan) > REPORT_TOL:
         raise ValueError("global objective decomposition disagrees with makespan")
+    degeneracy = _degeneracy_summary(routes) if include_regret else None
     return {
         "instance": {
             "name": instance.name,
@@ -420,6 +513,7 @@ def solution_state_report(
             "makespan": makespan,
         },
         "near_tie_tol": near_tie_tol,
+        "state_degeneracy": degeneracy,
         "routes": routes,
     }
 
@@ -464,3 +558,84 @@ def assert_report_consistent(report: dict, *, tol: float = REPORT_TOL) -> None:
                 raise ValueError(
                     f"negative alternative regret at route_id {route_id}, position {position_id}"
                 )
+            tie_tol = max(report.get("near_tie_tol") or 0.0, REGRET_TOL)
+            expected_tied = sum(option["regret"] <= tie_tol for option in options)
+            if position.get("tied_state_count") != expected_tied:
+                raise ValueError(
+                    f"tied_state_count mismatch at route_id {route_id}, "
+                    f"position {position_id}"
+                )
+            if bool(position.get("informative")) != (
+                position.get("min_alternative_regret", -inf) > tie_tol
+            ):
+                raise ValueError(
+                    f"informative flag mismatch at route_id {route_id}, "
+                    f"position {position_id}"
+                )
+            horizontal = [
+                option["q_cost"] for option in options if option.get("sweep_mode") == "H"
+            ]
+            vertical = [
+                option["q_cost"] for option in options if option.get("sweep_mode") == "V"
+            ]
+            if horizontal and vertical:
+                expected_gap = min(horizontal) - min(vertical)
+                if position.get("mode_gap") is None or abs(
+                    position["mode_gap"] - expected_gap
+                ) > tol:
+                    raise ValueError(
+                        f"mode_gap mismatch at route_id {route_id}, position {position_id}"
+                    )
+                expected_preference = (
+                    "H"
+                    if expected_gap < -tie_tol
+                    else "V"
+                    if expected_gap > tie_tol
+                    else "equivalent"
+                )
+                if position.get("mode_preference") != expected_preference:
+                    raise ValueError(
+                        f"mode_preference mismatch at route_id {route_id}, "
+                        f"position {position_id}"
+                    )
+            elif (
+                position.get("mode_gap") is not None
+                or position.get("mode_preference") != "unknown"
+            ):
+                raise ValueError(
+                    f"mode_gap should be unknown at route_id {route_id}, "
+                    f"position {position_id}"
+                )
+
+    degeneracy = report.get("state_degeneracy")
+    if degeneracy is None:
+        return
+    positions = [
+        position
+        for route in report.get("routes", [])
+        for position in route.get("regret_table", [])
+    ]
+    expected = {
+        "position_count": len(positions),
+        "tied_position_count": sum(
+            1 for position in positions if position.get("tied_state_count", 0) > 1
+        ),
+        "all_equal_position_count": sum(
+            1
+            for position in positions
+            if position.get("tied_state_count") == len(position.get("options", []))
+        ),
+        "informative_position_count": sum(
+            1 for position in positions if position.get("informative")
+        ),
+    }
+    for key, value in expected.items():
+        if degeneracy.get(key) != value:
+            raise ValueError(f"state_degeneracy {key} mismatch")
+    preference_counts = degeneracy.get("mode_preference_counts") or {}
+    for key in ("H", "V", "equivalent", "unknown"):
+        observed = sum(
+            1 for position in positions if position.get("mode_preference") == key
+        )
+        if preference_counts.get(key) != observed:
+            raise ValueError(f"state_degeneracy mode_preference_counts[{key}] mismatch")
