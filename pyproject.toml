@@ -27,3 +27,8 @@ package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.pytest.ini_options]
+# 默认只收集 tests/；legacy_specs/ 是被隔离的加固规格，需显式指定路径才运行
+testpaths = ["tests"]
+norecursedirs = ["legacy_specs", "outputs", "data", ".git"]

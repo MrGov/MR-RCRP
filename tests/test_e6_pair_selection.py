@@ -1,14 +1,35 @@
 from __future__ import annotations
 
 from pathlib import Path
+import shutil
 import subprocess
 import types
+
+import pytest
 
 from mrta_rect_coverage.core.instance_loader import load_instance
 from mrta_rect_coverage.heuristics.alns_solver import ALNSConfig, ALNSSolver
 
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def _resolve_git() -> str | None:
+    """git 不在 PATH 时（本机默认如此）回退到已知安装位置，全部失败则返回 None。"""
+    found = shutil.which("git")
+    if found:
+        return found
+    for candidate in (
+        r"C:\Program Files\Git\cmd\git.exe",
+        r"C:\Program Files (x86)\Git\cmd\git.exe",
+        r"C:\Program Files\Git\bin\git.exe",
+    ):
+        if Path(candidate).exists():
+            return candidate
+    return None
+
+
+GIT = _resolve_git()
 
 
 def _solver(*, iterations: int = 0) -> ALNSSolver:
@@ -130,9 +151,10 @@ def test_solver_reports_search_phase_and_generated_execution_timings() -> None:
     assert result.generated_operator_execution["repair"] == {}
 
 
+@pytest.mark.skipif(GIT is None, reason="git 可执行文件不可用，无法取出 E5 冻结点源文件")
 def test_v1_retains_e5_rng_selection_and_fixed_iteration_search_results() -> None:
     source = subprocess.check_output([
-        "git", "show", "297a9495aa2dc04ebad21dc0314172b8df78ef00:src/mrta_rect_coverage/heuristics/alns_solver.py"
+        GIT, "show", "297a9495aa2dc04ebad21dc0314172b8df78ef00:src/mrta_rect_coverage/heuristics/alns_solver.py"
     ], cwd=ROOT, text=True)
     # Use the original module name for dataclass annotation resolution, without
     # installing or overwriting any project module or frozen candidate source.

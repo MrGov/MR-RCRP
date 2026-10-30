@@ -67,6 +67,10 @@ class ALNSConfig:
     allow_real_provider_frozen_deployment: bool = False
     explicit_runtime_risk_ack: bool = False
     runtime_authorization_source: str = ""
+    # P1: make adaptive weights aware of per-iteration wall-clock cost. Only
+    # meaningful under a fixed wall-clock budget; requires a calibrated reference.
+    iteration_cost_penalty: bool = False
+    iteration_cost_reference_seconds: float | None = None
 
     @classmethod
     def enhanced(cls, **overrides) -> "ALNSConfig":
@@ -95,6 +99,18 @@ class ALNSConfig:
             raise ValueError("cooling factors must be in (0, 1]")
         if self.initial_temperature is not None and (not math.isfinite(self.initial_temperature) or self.initial_temperature <= 0):
             raise ValueError("initial_temperature must be finite and positive")
+        if self.iteration_cost_penalty:
+            if self.max_runtime_seconds is None:
+                raise ValueError(
+                    "iteration_cost_penalty requires max_runtime_seconds "
+                    "(a fixed iteration count makes the penalty meaningless)"
+                )
+            reference = self.iteration_cost_reference_seconds
+            if reference is None or not math.isfinite(reference) or reference <= 0:
+                raise ValueError(
+                    "iteration_cost_penalty requires a positive calibrated "
+                    "iteration_cost_reference_seconds"
+                )
 
 
 @dataclass
@@ -120,6 +136,7 @@ class ALNSResult:
     pair_action_stats: Dict[str, float | int] = field(default_factory=dict)
     timing_breakdown_seconds: Dict[str, float] = field(default_factory=dict)
     generated_operator_execution: Dict[str, Dict[str, dict]] = field(default_factory=dict)
+    iteration_cost_reference_seconds: float | None = None
 
 
 class ALNSSolver:
@@ -326,6 +343,10 @@ class ALNSSolver:
                 self._full_evaluation_scope = None
             local_search_seconds = perf_counter() - stage_started
             phase_seconds["local_search_seconds"] += local_search_seconds
+            measured_stage_seconds = (
+                destroy_seconds + partial_evaluation_seconds
+                + repair_seconds + local_search_seconds
+            )
 
             previous_eval = current_eval
             accepted, reason = self._accept(current_eval, refined_eval, temperature)
@@ -333,15 +354,27 @@ class ALNSSolver:
                 current_solution = refined_solution
                 current_eval = refined_eval
 
-            score = 0.0
+            # Raw score keeps the original 8/3/1 semantics and alone decides
+            # whether a new global best was found; only the reward that feeds
+            # operator weights is cost-weighted.
+            score_raw = 0.0
             if refined_eval.makespan + 1e-9 < best_eval.makespan:
                 best_solution = MultiRobotSolution(routes=[list(route) for route in refined_solution.routes])
                 best_eval = refined_eval
-                score = 8.0
+                score_raw = 8.0
             elif accepted and refined_eval.makespan + 1e-9 < previous_eval.makespan:
-                score = 3.0
+                score_raw = 3.0
             elif accepted:
-                score = 1.0
+                score_raw = 1.0
+
+            score = score_raw
+            cost_penalty_factor = 1.0
+            if self.config.iteration_cost_penalty:
+                reference = float(self.config.iteration_cost_reference_seconds)  # type: ignore[arg-type]
+                cost_penalty_factor = min(
+                    1.0, math.sqrt(reference / max(measured_stage_seconds, 1e-12))
+                )
+                score = score_raw * cost_penalty_factor
 
             iteration_fallbacks = self.fallback_events[fallback_event_start:]
             fallback_types = {
@@ -401,7 +434,7 @@ class ALNSSolver:
                 else:
                     self.pair_action_stats["successful_uses"] += 1
                     self.pair_action_stats["accepted"] += int(accepted)
-                    new_global_best = score >= 8.0
+                    new_global_best = score_raw >= 8.0
                     self.pair_action_stats["global_best"] += int(new_global_best)
                     self.pair_action_stats["reward"] += score
                     self.pair_selection_segment["coupled"].score += score
@@ -418,7 +451,6 @@ class ALNSSolver:
                 self._update_coupled_selection_preference()
 
             iteration_elapsed = perf_counter() - iteration_started
-            measured_stage_seconds = destroy_seconds + partial_evaluation_seconds + repair_seconds + local_search_seconds
             other_iteration_seconds = max(0.0, iteration_elapsed - measured_stage_seconds)
 
             history.append(
@@ -458,6 +490,10 @@ class ALNSSolver:
                     },
                     "coupled_selection_probability": selection_probability,
                     "coupled_selection_preference": self.coupled_selection_preference,
+                    "measured_stage_seconds": measured_stage_seconds,
+                    "cost_penalty_factor": cost_penalty_factor,
+                    "score_raw": score_raw,
+                    "score_effective": score,
                 }
             )
 
@@ -491,6 +527,7 @@ class ALNSSolver:
                 ),
             },
             generated_operator_execution=self.generated_operator_execution,
+            iteration_cost_reference_seconds=self.config.iteration_cost_reference_seconds,
         )
 
     def _initial_temperature(self, makespan: float) -> float:

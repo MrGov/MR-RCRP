@@ -7,7 +7,7 @@
 - **当前禁令：** Gate B 未通过；不得运行真实 LLM/provider、正式/final-test/大规模实验，不得用两个 R2 smoke 文件形成论文证据。
 - **Phase 6A：** 当前未获授权进入。Phase 5B-R 文档修订不授权 mock/file closed-loop planning 或 execution；须先通过新的 independent protocol review。
 - **实现事实边界：** 本文档定义 planned conditions；portfolio、完整 elite retention 和 failure-specific revision 未全部实现。
-- **Manifest 实现边界：** `manifest_spec.md` 只是 strict schema contract；parser、canonical hash、duplicate/path safety、manifest-only runner 与 tests 尚未实现，均为 Phase 6/formal execution 前的 EXEC-BLOCKING。
+- **Manifest 实现边界：** `archive/manifest_spec.md` 只是 strict schema contract；parser、canonical hash、duplicate/path safety、manifest-only runner 与 tests 尚未实现，均为 Phase 6/formal execution 前的 EXEC-BLOCKING。
 
 ## 2. Objective Version
 
