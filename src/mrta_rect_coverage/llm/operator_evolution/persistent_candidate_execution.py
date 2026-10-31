@@ -63,7 +63,7 @@ class PersistentCandidateProxy(CandidateProxy):
     @classmethod
     def from_validated(cls, proxy):
         return cls(proxy.path, proxy.operator_type, proxy.expected_code_hash,
-                   proxy.timeout_ms, proxy.max_output_chars)
+                   proxy.timeout_ms, proxy.max_output_chars, proxy.import_timeout_s)
 
     def close(self):
         if self._process is not None:
@@ -98,13 +98,13 @@ class PersistentCandidateProxy(CandidateProxy):
                 self._process = context.Process(target=_warm_worker, args=(child,str(self.path),
                     self.operator_type,self.max_output_chars,self.expected_code_hash),daemon=True)
                 self._process.start(); child.close(); self.process_starts += 1
-                if not self._connection.poll(1.):
+                if not self._connection.poll(self.import_timeout_s):
                     self.close()
                     return outcome('timeout', message='Candidate host import timed out')
                 if self._connection.recv()[0] != 'host_ready':
                     raise RuntimeError('Unexpected host handshake')
             self._connection.send('call')
-            if not self._connection.poll(1.):
+            if not self._connection.poll(self.import_timeout_s):
                 self.close()
                 return outcome('timeout', message='Candidate import timed out')
             ready = self._connection.recv()

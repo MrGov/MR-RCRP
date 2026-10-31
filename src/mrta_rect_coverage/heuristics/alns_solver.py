@@ -5,13 +5,15 @@ from collections import Counter
 import json
 import math
 import random
+import statistics
 from dataclasses import dataclass, field
 from pathlib import Path
 from time import perf_counter
-from typing import Callable, Dict, List, Sequence
+from typing import Callable, Dict, List, Sequence, Tuple
 
 from ..core.cost_matrix import CostMatrix
 from ..core.dp_evaluator import RouteDPEvaluator
+from ..core.incremental_route import RouteIncrementalEvaluator
 from ..core.models import Instance, MultiRobotSolution, SolutionEvaluation
 from ..core.solution_evaluator import MultiRobotSolutionEvaluator
 from ..core.state_generator import generate_all_states
@@ -34,6 +36,14 @@ from ..llm.operator_evolution.candidate_security import (
 from ..llm.operator_evolution.utils import is_solution_complete
 from .baseline_solver import resolve_constructor
 from .local_search import run_stronger_local_search
+from .priced_local_search import run_priced_local_search
+from .decision_audit import DecisionAuditRecorder, audit_destroy, audit_repair
+
+def _manhattan(first: Tuple[float, float], second: Tuple[float, float]) -> float:
+    """Manhattan distance between two points."""
+
+    return abs(first[0] - second[0]) + abs(first[1] - second[1])
+
 
 DestroyFn = Callable[[MultiRobotSolution, SolutionEvaluation, int], tuple[MultiRobotSolution, List[int]]]
 RepairFn = Callable[[MultiRobotSolution, List[int], SolutionEvaluation], MultiRobotSolution]
@@ -71,6 +81,93 @@ class ALNSConfig:
     # meaningful under a fixed wall-clock budget; requires a calibrated reference.
     iteration_cost_penalty: bool = False
     iteration_cost_reference_seconds: float | None = None
+    # M2: make operator selection spend-aware. Probability is multiplied by
+    # (median measured call seconds / this operator's measured call seconds) ** exponent,
+    # clipped so exploration cannot collapse. With homogeneous operator costs the
+    # factor is 1.0 for every operator and selection is bit-identical to the baseline.
+    cost_aware_selection: bool = False
+    # "probability" discounts expensive operators in the roulette draw;
+    # "throughput" keeps the draw uniform but credits the segment weight with
+    # reward per unit time (an operator that earns the same reward in half the
+    # time counts as two median-cost calls).
+    cost_aware_mode: str = "probability"
+    cost_aware_exponent: float = 1.0
+    cost_aware_clip: float = 4.0
+    transfer_gain_destroy: bool = False
+    """Opt-in ruin criterion that scores candidate removals by exact DP transfer gain.
+
+    For every task on the loaded routes it prices, with the same exact Route-DP the
+    evaluator uses, (a) the cost released by taking the task out of its current route
+    and (b) the cost added by inserting it, at an estimated best position, into another
+    route.  The gain is (a) - (b); the ruin removes the highest-gain tasks, so the
+    destruction itself is aimed at load rebalancing rather than at random or purely
+    geometric selection.  Off by default: the manual baseline (B1) must not change.
+    """
+
+    cost_aware_min_samples: int = 1
+
+    priced_local_search: bool = True
+    """Local search that prices candidate moves from exact route tables.
+
+    ``run_stronger_local_search`` evaluates every candidate move with a full Route-DP
+    pass per robot.  On 8 robots x 80 tasks one unsuccessful scan of the five
+    neighbourhoods costs about 9400 evaluations (~2 s), and most scans fail, so the
+    local search ends up absorbing 30-80% of the iteration budget on large instances.
+
+    The priced variant walks the same neighbours in the same order and accepts under
+    the same ``candidate + 1e-9 < current`` rule, but prices each move from the exact
+    forward/backward tables (removal ``O(64)``, insertion slot ``O(64)``, in-place
+    replacement ``O(192)``) and prunes moves that provably cannot beat the current
+    makespan.  Decisions are identical for the same state; only the arithmetic is
+    shared, so this is a budget change rather than a different heuristic.
+
+    Default on since E24 (``outputs/e24_priced_local_search_ablation``): at a fixed
+    per-task wall clock the priced arm ran 2.52x the iterations and improved the paired
+    makespan by a median +0.15% (95% CI [+0.16%, +1.80%], 9/4/3), local search dropping
+    from a median 33.4 ms to 4.6 ms per iteration.  Set False to reproduce historical
+    B1 traces bit for bit.
+    """
+
+    decision_audit: bool = False
+    """Record an exact decision-level audit of every destroy and repair call.
+
+    The 8/3/1 credit assignment only sees the outcome of an iteration, which is
+    filtered through simulated annealing acceptance, the destroy/repair coupling and
+    the seed.  This switch records instead *what the operator decided*, priced by the
+    same exact Route-DP tables the evaluator uses: which tasks were removed compared
+    with the truly most expensive ones, and which robot each removed task was handed
+    to compared with the route that would have minimised the summed cost or the
+    makespan.  See ``heuristics/decision_audit.py``.
+
+    The audit never changes a decision (only reads the pricer) and costs well under a
+    millisecond per call, so it is safe to leave on during development runs.  It is
+    off by default only to keep historical traces bit-for-bit comparable.
+    """
+
+    decision_driven_selection: bool = False
+    """Feed the exact decision audit back into operator weights (H-Q).
+
+    With this on, the reward credited to the selected destroy and repair is the
+    quality of the decision itself rather than the 8/3/1 outcome score:
+
+    * destroy quality = ``precision`` of the removal set, i.e. the fraction of
+      removed tasks that belong to the truly most expensive ``k`` tasks under exact
+      Route-DP marginal saving (1.0 = it removed exactly the right tasks, 1/N = it
+      behaved like a uniform random removal);
+    * repair quality = ``makespan_hit_rate``, i.e. the fraction of removed tasks that
+      the operator handed to a route that minimises the exact resulting makespan
+      (1.0 = every task went to a makespan-optimal route).
+
+    Both are deterministic functions of the state, so the weights no longer average
+    over acceptance, coupling and seed noise.  Rewards are scaled by 8.0 to keep the
+    adaptive-weight range comparable with the outcome-based rule.  Fallback
+    exclusion still applies afterwards.
+
+    The *magnitude* of the repair regret is deliberately not used for credit: on this
+    problem it is 0.7-1.2% of the makespan for every operator, so it saturates near
+    1.0 and carries no discrimination.  It is still logged by the audit, where the
+    spread across operators is visible.
+    """
 
     @classmethod
     def enhanced(cls, **overrides) -> "ALNSConfig":
@@ -111,6 +208,15 @@ class ALNSConfig:
                     "iteration_cost_penalty requires a positive calibrated "
                     "iteration_cost_reference_seconds"
                 )
+        if self.cost_aware_selection:
+            if self.cost_aware_mode not in {"probability", "throughput"}:
+                raise ValueError("cost_aware_mode must be probability or throughput")
+            if not math.isfinite(self.cost_aware_exponent) or self.cost_aware_exponent < 0:
+                raise ValueError("cost_aware_exponent must be finite and nonnegative")
+            if not math.isfinite(self.cost_aware_clip) or self.cost_aware_clip < 1:
+                raise ValueError("cost_aware_clip must be finite and >= 1")
+            if self.cost_aware_min_samples < 1:
+                raise ValueError("cost_aware_min_samples must be >= 1")
 
 
 @dataclass
@@ -137,6 +243,11 @@ class ALNSResult:
     timing_breakdown_seconds: Dict[str, float] = field(default_factory=dict)
     generated_operator_execution: Dict[str, Dict[str, dict]] = field(default_factory=dict)
     iteration_cost_reference_seconds: float | None = None
+    # [cumulative seconds, calls] per operator, used by spend-aware selection (M2).
+    operator_time_stats: Dict[str, Dict[str, List[float]]] = field(default_factory=dict)
+    # Decision-level audit per operator (exact placement quality), recorded only
+    # when ``config.decision_audit`` is on; it never feeds back into the search.
+    decision_audit: dict | None = None
 
 
 class ALNSSolver:
@@ -173,6 +284,11 @@ class ALNSSolver:
             travel_speed=instance.travel_speed,
         )
         self.route_dp = RouteDPEvaluator(self.cost_matrix, self.states_by_task)
+        # Exact insertion pricing without re-running the route DP per candidate:
+        # same optimum, O(one table build per route) instead of O(len(route)) per slot.
+        self.insertion_pricer = RouteIncrementalEvaluator(
+            self.cost_matrix, self.states_by_task
+        )
         self.solution_evaluator = MultiRobotSolutionEvaluator(
             self.route_dp, instance=instance
         )
@@ -191,12 +307,21 @@ class ALNSSolver:
         self.solution_evaluator.evaluate = timed_full_evaluate
 
         self.initial_solution = resolve_constructor(constructor)(instance)
+        self._task_centres: Dict[int, Tuple[float, float]] = {
+            task.task_id: (
+                (task.x_left + task.x_right) / 2.0,
+                (task.y_bottom + task.y_top) / 2.0,
+            )
+            for task in instance.tasks
+        }
 
         self.destroy_ops: Dict[str, DestroyFn] = {
             "random_destroy": self._random_destroy,
             "bottleneck_route_destroy": self._bottleneck_route_destroy,
             "geometry_aware_destroy": self._geometry_aware_destroy,
         }
+        if self.config.transfer_gain_destroy:
+            self.destroy_ops["transfer_gain_destroy"] = self._transfer_gain_destroy
         self.repair_ops: Dict[str, RepairFn] = {
             "greedy_insertion": self._greedy_insertion,
             "regret_k_insertion": self._regret_k_insertion,
@@ -223,6 +348,16 @@ class ALNSSolver:
             group: {name: OperatorRecord() for name in records}
             for group, records in self.operator_stats.items()
         }
+        # [cumulative seconds, calls] per operator, for spend-aware selection (M2).
+        self.operator_time_stats: Dict[str, Dict[str, List[float]]] = {
+            "destroy": {name: [0.0, 0.0] for name in self.destroy_ops},
+            "repair": {name: [0.0, 0.0] for name in self.repair_ops},
+        }
+        # Same, scoped to the current adaptive-weight segment.
+        self.segment_time_stats: Dict[str, Dict[str, List[float]]] = {
+            group: {name: [0.0, 0.0] for name in records}
+            for group, records in self.operator_time_stats.items()
+        }
         self._last_selection_action = "independent"
         self.coupled_selection_preference = 1.0
         self.pair_action_stats = {
@@ -239,6 +374,8 @@ class ALNSSolver:
             "coupled": OperatorRecord(),
         }
         self.generated_operator_execution = {"destroy": {}, "repair": {}}
+        # Populated by solve() when config.decision_audit is on; observation only.
+        self._decision_recorder: DecisionAuditRecorder | None = None
 
     def register_development_repair(self, proxy: CandidateProxy, *, name: str) -> None:
         """Add a loader-validated, bounded repair for development experiments."""
@@ -251,6 +388,8 @@ class ALNSSolver:
         self.repair_weights[name] = 1.0
         self.operator_stats["repair"][name] = OperatorRecord()
         self.segment_stats["repair"][name] = OperatorRecord()
+        self.operator_time_stats["repair"][name] = [0.0, 0.0]
+        self.segment_time_stats["repair"][name] = [0.0, 0.0]
 
     def register_development_destroy(self, proxy: CandidateProxy, *, name: str) -> None:
         """Add a loader-validated, bounded destroy to the existing adaptive pool."""
@@ -263,6 +402,8 @@ class ALNSSolver:
         self.destroy_weights[name] = 1.0
         self.operator_stats["destroy"][name] = OperatorRecord()
         self.segment_stats["destroy"][name] = OperatorRecord()
+        self.operator_time_stats["destroy"][name] = [0.0, 0.0]
+        self.segment_time_stats["destroy"][name] = [0.0, 0.0]
 
     def solve(self) -> ALNSResult:
         started_at = perf_counter()
@@ -273,6 +414,7 @@ class ALNSSolver:
             raise ValueError("configured coupled pair must be registered before solve()")
         calls_start = self.route_dp.statistics()["calls"] + self.generated_route_dp_calls
         misses_start = self.route_dp.statistics()["cache_misses"] + self.generated_route_dp_cache_misses
+        self.insertion_pricer.clear_cache()
         current_solution = MultiRobotSolution(routes=[list(route) for route in self.initial_solution.routes])
         self._full_evaluation_scope = "initial"
         current_eval = self.solution_evaluator.evaluate(current_solution)
@@ -293,6 +435,11 @@ class ALNSSolver:
             "repair_execution_seconds": 0.0,
             "local_search_seconds": 0.0,
         }
+        self._decision_recorder = (
+            DecisionAuditRecorder()
+            if self.config.decision_audit or self.config.decision_driven_selection
+            else None
+        )
 
         iteration = 0
         termination_reason = "iterations"
@@ -331,14 +478,42 @@ class ALNSSolver:
             repair_seconds = perf_counter() - stage_started
             phase_seconds["repair_execution_seconds"] += repair_seconds
 
+            decision_destroy_audit = None
+            decision_repair_audit = None
+            if (self._decision_recorder is not None
+                    or self.config.decision_driven_selection):
+                # Observation only: reads the pricer, returns nothing the search uses.
+                decision_destroy_audit, decision_repair_audit = (
+                    self._audit_iteration_decision(
+                        destroy_name,
+                        repair_name,
+                        solution_routes=current_solution.routes,
+                        removed_tasks=removed_tasks,
+                        partial_routes=partial_solution.routes,
+                        partial_costs=partial_eval.per_robot_costs,
+                        repaired_routes=repaired_solution.routes,
+                    )
+                )
+
             stage_started = perf_counter()
             self._full_evaluation_scope = "local_search"
             try:
-                refined_solution, refined_eval = run_stronger_local_search(
-                    repaired_solution,
-                    self.solution_evaluator,
-                    max_iterations=1,
-                )
+                if self.config.priced_local_search:
+                    # Identical decisions, priced from the exact route tables: the
+                    # reference scan pays one full Route-DP per candidate move,
+                    # which on 8x80 costs ~2 s per unsuccessful scan.
+                    refined_solution, refined_eval = run_priced_local_search(
+                        repaired_solution,
+                        self.solution_evaluator,
+                        self.insertion_pricer,
+                        max_iterations=1,
+                    )
+                else:
+                    refined_solution, refined_eval = run_stronger_local_search(
+                        repaired_solution,
+                        self.solution_evaluator,
+                        max_iterations=1,
+                    )
             finally:
                 self._full_evaluation_scope = None
             local_search_seconds = perf_counter() - stage_started
@@ -347,6 +522,8 @@ class ALNSSolver:
                 destroy_seconds + partial_evaluation_seconds
                 + repair_seconds + local_search_seconds
             )
+            self._record_operator_time("destroy", destroy_name, destroy_seconds)
+            self._record_operator_time("repair", repair_name, repair_seconds)
 
             previous_eval = current_eval
             accepted, reason = self._accept(current_eval, refined_eval, temperature)
@@ -425,6 +602,29 @@ class ALNSSolver:
                     else "credited",
                 }
 
+            decision_quality = None
+            if (self.config.decision_driven_selection
+                    and decision_destroy_audit is not None
+                    and decision_repair_audit is not None):
+                # H-Q: credit the decision, not the outcome.  Both qualities are
+                # exact and deterministic, so the weights stop averaging over
+                # acceptance, coupling and seed noise.  Scaling by 8.0 keeps the
+                # adaptive-weight range comparable with the 8/3/1 rule.
+                repair_profile = decision_repair_audit.summary()
+                if repair_profile.get("calls"):
+                    destroy_quality = min(1.0, max(0.0, decision_destroy_audit.precision))
+                    repair_quality = min(
+                        1.0, max(0.0, float(repair_profile["makespan_hit_rate"]))
+                    )
+                    decision_quality = {
+                        "destroy": destroy_quality,
+                        "repair": repair_quality,
+                    }
+                    if reward_attribution["destroy"] == "credited":
+                        destroy_reward = 8.0 * destroy_quality
+                    if reward_attribution["repair"] == "credited":
+                        repair_reward = 8.0 * repair_quality
+
             coupled_pair_fallback = coupled_pair_selected and fallback_used
             if coupled_pair_selected:
                 self.pair_action_stats["uses"] += 1
@@ -494,6 +694,13 @@ class ALNSSolver:
                     "cost_penalty_factor": cost_penalty_factor,
                     "score_raw": score_raw,
                     "score_effective": score,
+                    "cost_factors": {
+                        "destroy": self._cost_factor("destroy", destroy_name),
+                        "repair": self._cost_factor("repair", repair_name),
+                    },
+                    "decision_quality": decision_quality,
+                    "destroy_reward": destroy_reward,
+                    "repair_reward": repair_reward,
                 }
             )
 
@@ -528,6 +735,14 @@ class ALNSSolver:
             },
             generated_operator_execution=self.generated_operator_execution,
             iteration_cost_reference_seconds=self.config.iteration_cost_reference_seconds,
+            operator_time_stats={
+                group: {name: list(record) for name, record in records.items()}
+                for group, records in self.operator_time_stats.items()
+            },
+            decision_audit=(
+                None if self._decision_recorder is None
+                else self._decision_recorder.summary()
+            ),
         )
 
     def _initial_temperature(self, makespan: float) -> float:
@@ -1017,8 +1232,8 @@ class ALNSSolver:
                     phase,
                 )
         self._last_selection_action = "independent"
-        destroy_name = self._weighted_pick(self.destroy_weights)
-        repair_name = self._weighted_pick(self.repair_weights)
+        destroy_name = self._weighted_pick(self.destroy_weights, "destroy")
+        repair_name = self._weighted_pick(self.repair_weights, "repair")
         if (destroy_name == self.config.coupled_destroy_operator
                 and repair_name == self.config.coupled_repair_operator):
             self.pair_action_stats["independent_coincidental_uses"] += 1
@@ -1055,11 +1270,108 @@ class ALNSSolver:
         pair.uses = pair.score = 0.0
         independent.uses = independent.score = 0.0
 
-    def _weighted_pick(self, weights: Dict[str, float]) -> str:
+    def _weighted_pick(self, weights: Dict[str, float], group: str | None = None) -> str:
         names = list(weights.keys())
-        values = [max(1e-6, weights[name]) for name in names]
+        if group is None:
+            values = [max(1e-6, weights[name]) for name in names]
+        else:
+            values = [
+                max(1e-6, weights[name]) * self._cost_factor(group, name)
+                for name in names
+            ]
         chosen = self.rng.choices(names, weights=values, k=1)[0]
         return chosen
+
+    def _audit_iteration_decision(
+        self,
+        destroy_name: str,
+        repair_name: str,
+        *,
+        solution_routes,
+        removed_tasks,
+        partial_routes,
+        partial_costs,
+        repaired_routes,
+    ):
+        """Score what this iteration's destroy and repair actually decided.
+
+        Every number comes from the exact Route-DP tables, so it is deterministic
+        given the state and independent of acceptance, seed and makespan noise.
+        Returns ``(destroy_audit, repair_audit)``; either may be ``None`` when the
+        decision cannot be attributed.  Recording is a side effect, never a
+        requirement: instrumentation must not abort a search iteration.
+        """
+
+        try:
+            destroy_audit = audit_destroy(
+                solution_routes, removed_tasks, self.insertion_pricer
+            )
+            repair_audit = audit_repair(
+                partial_routes,
+                partial_costs,
+                removed_tasks,
+                repaired_routes,
+                self.insertion_pricer,
+            )
+        except (ValueError, KeyError):
+            # A generated operator may return a state the audit cannot attribute
+            # (for example a task outside every route).
+            return None, None
+
+        recorder = self._decision_recorder
+        if recorder is not None:
+            recorder.record_destroy(destroy_name, destroy_audit)
+            recorder.record_repair(repair_name, repair_audit)
+        return destroy_audit, repair_audit
+
+    def _record_operator_time(self, group: str, name: str, seconds: float) -> None:
+        spent = max(0.0, seconds)
+        record = self.operator_time_stats.get(group, {}).get(name)
+        if record is not None:
+            record[0] += spent
+            record[1] += 1.0
+        segment = self.segment_time_stats.get(group, {}).get(name)
+        if segment is not None:
+            segment[0] += spent
+            segment[1] += 1.0
+
+    def _mean_operator_seconds(self, group: str, name: str) -> float | None:
+        record = self.operator_time_stats.get(group, {}).get(name)
+        if record is None or record[1] < self.config.cost_aware_min_samples:
+            return None
+        if record[0] <= 0:
+            return None
+        return record[0] / record[1]
+
+    def _cost_reference_seconds(self, group: str) -> float | None:
+        """Median measured call seconds over operators with enough samples."""
+        means = [
+            value
+            for name in self.operator_time_stats.get(group, {})
+            if (value := self._mean_operator_seconds(group, name)) is not None
+        ]
+        if len(means) < 2:
+            return None
+        return statistics.median(means)
+
+    def _cost_factor(self, group: str, name: str) -> float:
+        """Down-weight operators that cost more seconds per call than the median.
+
+        Returns 1.0 unless spend-aware selection is on and at least two operators
+        have measurements, so an unmeasured or homogeneous pool is untouched.
+        """
+        if not self.config.cost_aware_selection:
+            return 1.0
+        if self.config.cost_aware_mode != "probability":
+            # Throughput mode keeps the draw uniform and credits the weights instead.
+            return 1.0
+        reference = self._cost_reference_seconds(group)
+        mean = self._mean_operator_seconds(group, name)
+        if reference is None or mean is None:
+            return 1.0
+        factor = (reference / mean) ** self.config.cost_aware_exponent
+        clip = self.config.cost_aware_clip
+        return min(clip, max(1.0 / clip, factor))
 
     def _accept(
         self,
@@ -1090,12 +1402,38 @@ class ALNSSolver:
             # React to the last segment, retaining (1-rho) of the prior weight.
             # Unused operators retain their weight; a small floor keeps exploration.
             rho = self.config.reaction_factor
+            throughput = (
+                self.config.cost_aware_selection
+                and self.config.cost_aware_mode == "throughput"
+            )
             for group, weights in (("destroy", self.destroy_weights), ("repair", self.repair_weights)):
+                reference = None
+                if throughput:
+                    measured = [
+                        self.segment_time_stats.get(group, {}).get(name, [0.0, 0.0])[0]
+                        for name, rec in self.segment_stats[group].items()
+                        if rec.uses
+                        and self.segment_time_stats.get(group, {}).get(name, [0.0, 0.0])[0] > 0
+                    ]
+                    if len(measured) >= 2:
+                        reference = statistics.median(measured)
                 for name, rec in self.segment_stats[group].items():
                     if rec.uses:
-                        weights[name] = max(0.1, (1 - rho) * weights[name] + rho * rec.score / rec.uses)
+                        effective_uses = float(rec.uses)
+                        if reference is not None:
+                            seconds = self.segment_time_stats.get(group, {}).get(name, [0.0, 0.0])[0]
+                            if seconds > 0:
+                                # One "median-cost call" of search time; an operator that
+                                # earns the same reward in half the time counts twice.
+                                effective_uses = max(1e-9, seconds / reference)
+                        weights[name] = max(
+                            0.1,
+                            (1 - rho) * weights[name] + rho * rec.score / effective_uses,
+                        )
                     rec.uses = 0
                     rec.score = 0.0
+                    if name in self.segment_time_stats.get(group, {}):
+                        self.segment_time_stats[group][name] = [0.0, 0.0]
             return
         for name, rec in self.operator_stats["destroy"].items():
             self.destroy_weights[name] = 1.0 + rec.score / max(1, rec.uses)
@@ -1123,6 +1461,71 @@ class ALNSSolver:
                     kept.append(task_id)
             new_routes.append(kept)
         return MultiRobotSolution(routes=new_routes), removed
+
+    def _estimate_insert_position(self, route: List[int], task_id: int) -> int:
+        """Cheapest insertion slot by Manhattan detour on task centres (no DP)."""
+
+        centre = self._task_centres[task_id]
+        depot = self.instance.depot
+        best_position = 0
+        best_detour = float("inf")
+        for position in range(len(route) + 1):
+            before = depot if position == 0 else self._task_centres[route[position - 1]]
+            after = depot if position == len(route) else self._task_centres[route[position]]
+            detour = _manhattan(before, centre) + _manhattan(centre, after) - _manhattan(before, after)
+            if detour < best_detour - 1e-12:
+                best_detour = detour
+                best_position = position
+        return best_position
+
+    def _transfer_gain_destroy(
+        self,
+        solution: MultiRobotSolution,
+        evaluation: SolutionEvaluation,
+        remove_count: int,
+    ) -> tuple[MultiRobotSolution, List[int]]:
+        """Ruin the routes whose tasks can be moved elsewhere at the lowest DP cost."""
+
+        costs = list(evaluation.per_robot_costs)
+        if not costs or len(solution.routes) < 2:
+            return self._random_destroy(solution, evaluation, remove_count)
+
+        target = min(remove_count, sum(len(route) for route in solution.routes))
+        if target <= 0:
+            return self._random_destroy(solution, evaluation, remove_count)
+
+        scored: List[tuple[float, int]] = []
+        scored_ids: set[int] = set()
+        for route_index in sorted(range(len(solution.routes)), key=lambda idx: -costs[idx]):
+            route = list(solution.routes[route_index])
+            if not route:
+                continue
+            current = costs[route_index]
+            for task_id in route:
+                released = current - self.route_dp.evaluate_route([t for t in route if t != task_id]).total_cost
+                added = float("inf")
+                for other_index, other_route in enumerate(solution.routes):
+                    if other_index == route_index:
+                        continue
+                    position = self._estimate_insert_position(other_route, task_id)
+                    trial = list(other_route)
+                    trial.insert(position, task_id)
+                    delta = self.route_dp.evaluate_route(trial).total_cost - costs[other_index]
+                    if delta < added:
+                        added = delta
+                if added == float("inf"):
+                    continue
+                scored.append((released - added, task_id))
+                scored_ids.add(task_id)
+            if len(scored) >= target:
+                break
+
+        if not scored:
+            return self._random_destroy(solution, evaluation, remove_count)
+
+        scored.sort(key=lambda item: (-item[0], item[1]))
+        chosen = [task_id for _, task_id in scored[:target]]
+        return self._remove_tasks(solution, chosen)
 
     def _random_destroy(
         self,
@@ -1197,15 +1600,13 @@ class ALNSSolver:
 
         for robot_idx, route in enumerate(solution.routes):
             others_max = max((cost for idx, cost in enumerate(base_costs) if idx != robot_idx), default=0.0)
-            for insert_idx in range(len(route) + 1):
-                candidate_route = list(route)
-                candidate_route.insert(insert_idx, task_id)
-                route_eval = self.route_dp.evaluate_route(candidate_route)
-                new_makespan = max(others_max, route_eval.total_cost)
+            priced = self.insertion_pricer.insertion_costs(route, task_id)
+            for insert_idx, route_cost in enumerate(priced):
+                new_makespan = max(others_max, route_cost)
 
                 if objective == "balance":
                     projected = list(base_costs)
-                    projected[robot_idx] = route_eval.total_cost
+                    projected[robot_idx] = route_cost
                     avg = sum(projected) / len(projected) if projected else 0.0
                     balance_penalty = sum(abs(v - avg) for v in projected) / max(1, len(projected))
                     score = new_makespan + 0.1 * balance_penalty
@@ -1257,11 +1658,10 @@ class ALNSSolver:
                 choices: List[tuple[int, int, float]] = []
                 for robot_idx, route in enumerate(routes):
                     others_max = max((cost for idx, cost in enumerate(base_costs) if idx != robot_idx), default=0.0)
-                    for insert_idx in range(len(route) + 1):
-                        candidate_route = list(route)
-                        candidate_route.insert(insert_idx, task_id)
-                        route_eval = self.route_dp.evaluate_route(candidate_route)
-                        score = max(others_max, route_eval.total_cost)
+                    for insert_idx, route_cost in enumerate(
+                        self.insertion_pricer.insertion_costs(route, task_id)
+                    ):
+                        score = max(others_max, route_cost)
                         choices.append((robot_idx, insert_idx, score))
                 choices.sort(key=lambda x: x[2])
                 best = choices[0]

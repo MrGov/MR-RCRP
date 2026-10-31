@@ -23,11 +23,14 @@ def test_time_limit_stops_at_boundary_and_records_work(monkeypatch):
     s = solver(iterations=None, max_runtime_seconds=1.0)
     clock = [0.0]
     monkeypatch.setattr(module, "perf_counter", lambda: clock[0])
-    original = module.run_stronger_local_search
+    # Both local-search entry points advance the fake clock: the priced one is the
+    # default since E24, the reference one is used when the switch is turned off.
+    original = module.run_priced_local_search
     def step(*args, **kwargs):
         result = original(*args, **kwargs)
         clock[0] += 0.6
         return result
+    monkeypatch.setattr(module, "run_priced_local_search", step)
     monkeypatch.setattr(module, "run_stronger_local_search", step)
     result = s.solve()
     assert result.iterations_completed == 2
@@ -69,9 +72,11 @@ def test_global_best_survives_accepted_worsening(monkeypatch):
     monkeypatch.setattr(s, "_select_operators", lambda ctx: ("noop", "noop", "test"))
     monkeypatch.setattr(s, "_update_operator_stats", lambda *args: None)
     values = iter([initial - 10, initial + 10])
-    monkeypatch.setattr(module, "run_stronger_local_search", lambda sol, *args, **kw:
-                        (MultiRobotSolution(routes=[list(r) for r in sol.routes]),
-                         SimpleNamespace(makespan=next(values))))
+    fake_local_search = lambda sol, *args, **kw: (
+        MultiRobotSolution(routes=[list(r) for r in sol.routes]),
+        SimpleNamespace(makespan=next(values)))
+    monkeypatch.setattr(module, "run_stronger_local_search", fake_local_search)
+    monkeypatch.setattr(module, "run_priced_local_search", fake_local_search)
     monkeypatch.setattr(s, "_accept", lambda *args: (True, "sa"))
     monkeypatch.setattr(s, "_build_context", lambda *args: None)
     result = s.solve()

@@ -1,0 +1,16 @@
+[
+  "data/structural_benchmark_v1/development/BASE/R2_T10_0.txt",
+  "data/structural_benchmark_v1/development/BASE/R4_T40_0.txt",
+  "data/structural_benchmark_v1/development/BOTTLENECK/R2_T10_0.txt",
+  "data/structural_benchmark_v1/development/BOTTLENECK/R4_T40_0.txt",
+  "data/structural_benchmark_v1/development/HV-GEOM/R2_T10_0.txt",
+  "data/structural_benchmark_v1/development/HV-GEOM/R4_T40_0.txt",
+  "data/structural_benchmark_v1/development/SPATIAL/R2_T10_0.txt",
+  "data/structural_benchmark_v1/development/SPATIAL/R4_T40_0.txt",
+  "data/structural_benchmark_v1/development/SWEEP-NARROW/R2_T10_0.txt",
+  "data/structural_benchmark_v1/development/SWEEP-NARROW/R4_T40_0.txt",
+  "data/structural_benchmark_v1/development/TRAVEL-HIGH/R2_T10_0.txt",
+  "data/structural_benchmark_v1/development/TRAVEL-HIGH/R4_T40_0.txt",
+  "data/structural_benchmark_v1/development/TURN-HIGH/R2_T10_0.txt",
+  "data/structural_benchmark_v1/development/TURN-HIGH/R4_T40_0.txt"
+]

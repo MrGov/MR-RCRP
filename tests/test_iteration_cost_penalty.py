@@ -236,11 +236,19 @@ def test_penalty_actually_reaches_operator_weights() -> None:
 
 # --- E15 calibration round trip -------------------------------------------
 def test_calibration_round_trip_is_self_consistent(tmp_path) -> None:
-    record = stage_calibrate(tmp_path, instance_path=ROOT / "data/R2_T6_0.txt",
-                             repeats=5, kappa=8.0)
-    assert record["repeats"] == 5
-    assert len(record["samples_seconds"]) == 5
-    assert abs(record["t_ref_seconds"] - 8.0 * record["t_probe_seconds"]) < 1e-12
+    record = stage_calibrate(
+        tmp_path,
+        probe_instance=ROOT / "data/R2_T6_0.txt",
+        pilot_instances=("BASE:0",),
+        repeats=5,
+        kappa=1.0,
+    )
+    assert record["probe_repeats"] == 5
+    entry = record["per_instance"]["BASE:0"]
+    assert entry["iterations"] == record["pilot_iterations"]
+    assert abs(record["t_ref_seconds"] - record["kappa"]
+               * record["t_iteration_median_seconds"]) < 1e-12
+    assert record["calibration_unit"] == "alns_iteration"
     summary = stage_verify(tmp_path)
     assert summary["problems"] == []
 

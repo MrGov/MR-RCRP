@@ -15,7 +15,7 @@ from time import perf_counter
 
 from .e3_alns import ROOT, INSTANCES, SEEDS, write_json
 from .e5_destroy_repair import D_NAME, R_NAME, digest, read, load_choice
-from .e6_pair_selection import config_for, make_solver
+from .e6_pair_selection import config_for, make_solver, _registered_proxy
 from .e7_cooperative_evolution import SELECTION, load_inputs
 from .e1_real_llm_pilot import compute_exact_dp_behavior
 from .e2_c1_pilot import _write_csv
@@ -149,17 +149,22 @@ def complementarity(parent, candidate):
         caveat='exploratory evidence across three selection instances; no significance or generalization claim')
 
 
-def portfolio_solver(instance,seed,selected,aux,method,*,iterations=None,budget=None):
+def portfolio_solver(instance,seed,selected,aux,method,*,iterations=None,budget=None,executor='original',config_overrides=None):
     """Fixed four repair slots; all calls still use existing loader/registry.
 
     V1 is constructed without mutation. AUX replaces only the generated main
     slot. PORT replaces the predeclared manual balancing slot with aux, keeping
     R* in its original slot. Insert order, initial weights and stats stay aligned.
+
+    ``executor`` selects how generated operators are invoked: ``original`` keeps
+    the historical per-call process spawn, ``warm`` reuses one resident worker
+    per operator for the whole solve. The candidate code and every per-call
+    check are unchanged in both modes; only the process lifetime differs.
     """
     if method not in METHODS:raise ValueError(method)
     choice=dict(selected)
     if method=='AUX':choice['repair']=aux
-    solver=make_solver(instance,seed,choice,'V1',iterations=iterations)
+    solver=make_solver(instance,seed,choice,'V1',iterations=iterations,executor=executor,config_overrides=config_overrides)
     if budget is not None:solver.config.max_runtime_seconds=budget
     if method=='V1':return solver
     if method=='AUX':
@@ -167,19 +172,28 @@ def portfolio_solver(instance,seed,selected,aux,method,*,iterations=None,budget=
     else:
         old=REPLACE_SLOT
         # Remove just the declared slot and all of its existing selection stats.
-        for group in (solver.repair_ops,solver.repair_weights,solver.operator_stats['repair'],solver.segment_stats['repair']):
+        for group in (solver.repair_ops,solver.repair_weights,solver.operator_stats['repair'],solver.segment_stats['repair'],
+                      solver.operator_time_stats['repair'],solver.segment_time_stats['repair']):
             group.pop(old)
-        solver.register_development_repair(load_choice(aux,'repair').callable_obj,name=AUX_NAME)
+        created=[]
+        solver.register_development_repair(
+            _registered_proxy(aux,'repair',executor,created),name=AUX_NAME)
+        solver.extra_executors=list(getattr(solver,'extra_executors',[]))+created
         order=['greedy_insertion','regret_k_insertion',AUX_NAME,R_NAME]
-        for group in (solver.repair_ops,solver.repair_weights,solver.operator_stats['repair'],solver.segment_stats['repair']):
+        for group in (solver.repair_ops,solver.repair_weights,solver.operator_stats['repair'],solver.segment_stats['repair'],
+                      solver.operator_time_stats['repair'],solver.segment_time_stats['repair']):
             ordered={name:group[name] for name in order}
             group.clear();group.update(ordered)
         return solver
     # AUX needs an aux wrapper/name; remove the temporary original registry name.
-    for group in (solver.repair_ops,solver.repair_weights,solver.operator_stats['repair'],solver.segment_stats['repair']):
+    for group in (solver.repair_ops,solver.repair_weights,solver.operator_stats['repair'],solver.segment_stats['repair'],
+                  solver.operator_time_stats['repair'],solver.segment_time_stats['repair']):
         group.pop(old)
     solver.frozen_repair_ops.remove(old)
-    solver.register_development_repair(load_choice(aux,'repair').callable_obj,name=AUX_NAME)
+    created=[]
+    solver.register_development_repair(
+        _registered_proxy(aux,'repair',executor,created),name=AUX_NAME)
+    solver.extra_executors=list(getattr(solver,'extra_executors',[]))+created
     return solver
 
 

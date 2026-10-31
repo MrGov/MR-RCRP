@@ -17,14 +17,16 @@ from .e2_c1_pilot import _write_csv
 from ..core.instance_loader import load_instance
 from ..core.models import MultiRobotSolution
 from ..heuristics.alns_solver import ALNSConfig, ALNSSolver
+from ..llm.operator_evolution.persistent_candidate_execution import PersistentCandidateProxy
+from dataclasses import replace
 
 METHODS = ("B1+R", "V1", "V2")
 E5 = ROOT / "outputs/e5_llm_destroy_repair"
 BASE_HEAD = "297a9495aa2dc04ebad21dc0314172b8df78ef00"
 
 
-def config_for(instance, seed, method, *, iterations=None):
-    return ALNSConfig.enhanced(
+def config_for(instance, seed, method, *, iterations=None, overrides=None):
+    config = ALNSConfig.enhanced(
         iterations=iterations,
         max_runtime_seconds=float(instance.task_count) if iterations is None else None,
         random_seed=seed,
@@ -32,16 +34,57 @@ def config_for(instance, seed, method, *, iterations=None):
         coupled_destroy_operator=D_NAME if method != "B1+R" else None,
         coupled_repair_operator=R_NAME if method != "B1+R" else None,
     )
+    if overrides:
+        config = replace(config, **overrides)
+    return config
 
 
-def make_solver(instance, seed, selected, method, *, iterations=None):
+EXECUTORS = ("original", "warm")
+
+
+def _registered_proxy(choice, kind, executor, sink):
+    """Return the proxy handed to ALNS, optionally reusing a resident process.
+
+    ``original`` keeps the historical per-call spawn. ``warm`` reuses the same
+    validated worker over the solve: identical candidate code, identical
+    hash/AST/timeout/contract checks per call, but the process start and the
+    trusted package import are paid once instead of once per call.
+    """
+    loaded = load_choice(choice, kind).callable_obj
+    if executor == "original":
+        return loaded
+    if executor != "warm":
+        raise ValueError(f"unknown executor {executor!r}")
+    proxy = PersistentCandidateProxy.from_validated(loaded)
+    sink.append(proxy)
+    return proxy
+
+
+def close_extra_executors(solver):
+    for proxy in getattr(solver, "extra_executors", ()):  # noqa: B004 - best effort
+        proxy.close()
+    solver.extra_executors = []
+
+
+def make_solver(instance, seed, selected, method, *, iterations=None, executor="original",
+                config_overrides=None):
     solver = ALNSSolver(instance, constructor="spatial_sort",
-                        config=config_for(instance, seed, method, iterations=iterations))
-    if method != "B1+R":
-        solver.register_development_destroy(load_choice(selected["destroy"], "destroy").callable_obj,
-                                            name=D_NAME)
-    solver.register_development_repair(load_choice(selected["repair"], "repair").callable_obj,
-                                       name=R_NAME)
+                        config=config_for(instance, seed, method, iterations=iterations,
+                                          overrides=config_overrides))
+    if executor not in EXECUTORS:
+        raise ValueError(f"unknown executor {executor!r}")
+    created = []
+    try:
+        if method != "B1+R":
+            solver.register_development_destroy(
+                _registered_proxy(selected["destroy"], "destroy", executor, created), name=D_NAME)
+        solver.register_development_repair(
+            _registered_proxy(selected["repair"], "repair", executor, created), name=R_NAME)
+    except BaseException:
+        for proxy in created:
+            proxy.close()
+        raise
+    solver.extra_executors = created
     return solver
 
 

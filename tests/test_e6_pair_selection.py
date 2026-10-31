@@ -48,7 +48,7 @@ def test_coupled_and_independent_pair_selections_are_distinguished() -> None:
     solver = _solver()
     solver.destroy_weights["llm_destroy"] = 1.0
     solver.repair_weights["llm_repair"] = 1.0
-    solver._weighted_pick = lambda weights: (
+    solver._weighted_pick = lambda weights, group=None: (
         "llm_destroy" if weights is solver.destroy_weights else "llm_repair"
     )
 

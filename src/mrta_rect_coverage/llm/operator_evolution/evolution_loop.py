@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+import json
 from pathlib import Path
 from typing import Dict, List, Optional, Sequence
 
@@ -12,7 +13,7 @@ from .evaluator import (
     evaluate_destroy_candidates,
     evaluate_repair_candidates,
 )
-from .feedback_builder import build_feedback_payload
+from .feedback_builder import build_dataset_evidence, build_feedback_payload
 from .eligibility_policy import (
     build_generated_artifact_metadata,
     candidate_is_benchmark_eligible,
@@ -33,6 +34,11 @@ class EvolutionLoopConfig:
     repair_candidates_per_round: int = 3
     destroy_candidates_per_round: int = 1
     benchmark_instance_glob: str = "data/R*_T*_*.txt"
+    # Optional explicit instance list (JSON array of paths); overrides the glob when set.
+    benchmark_instance_list: str = ""
+    # P2 evidence: glob of e14 state-regret reports used to build dataset evidence.
+    evidence_report_glob: str = ""
+    evidence_budget_bytes: int = 2500
     seeds: Sequence[int] = (0, 1)
     timeout_ms: float = 1000.0
     top_k_to_keep: int = 2
@@ -77,9 +83,28 @@ def run_evolution_loop(
     else:
         prompt_builder.use_rich_prompts = False
 
-    instance_paths = sorted(config.project_root.glob(config.benchmark_instance_glob))
+    if config.benchmark_instance_list:
+        list_path = _resolve(config.project_root, Path(config.benchmark_instance_list))
+        if not list_path.is_file():
+            raise ValueError(f"Benchmark instance list not found: {list_path}")
+        relatives = json.loads(list_path.read_text(encoding="utf-8"))
+        if not isinstance(relatives, list) or not relatives:
+            raise ValueError(f"Benchmark instance list must be a non-empty JSON array: {list_path}")
+        instance_paths = [_resolve(config.project_root, Path(rel)) for rel in relatives]
+    else:
+        instance_paths = sorted(config.project_root.glob(config.benchmark_instance_glob))
     if not instance_paths:
         raise ValueError(f"No benchmark instances matched: {config.benchmark_instance_glob}")
+    missing = [str(path) for path in instance_paths if not path.is_file()]
+    if missing:
+        raise ValueError(f"Benchmark instances missing on disk: {missing}")
+
+    evidence: Optional[dict] = None
+    if config.evidence_report_glob:
+        evidence = _build_evidence(
+            config.project_root, config.evidence_report_glob, config.evidence_budget_bytes
+        )
+        write_json(output_root / "evidence.json", evidence)
 
     previous_feedback: Dict[str, Dict[str, object]] = {}
     all_rounds: List[dict] = []
@@ -105,6 +130,7 @@ def run_evolution_loop(
                 top_k_to_keep=config.top_k_to_keep,
                 source_provider=config.provider_name,
                 allow_unsafe_candidate_execution=config.allow_unsafe_candidate_execution,
+                evidence=evidence,
             )
             round_rows.extend(repair_rows)
             prompts["repair"] = repair_prompt
@@ -124,6 +150,7 @@ def run_evolution_loop(
                 top_k_to_keep=config.top_k_to_keep,
                 source_provider=config.provider_name,
                 allow_unsafe_candidate_execution=config.allow_unsafe_candidate_execution,
+                evidence=evidence,
             )
             round_rows.extend(destroy_rows)
             prompts["destroy"] = destroy_prompt
@@ -255,6 +282,7 @@ def _run_one_type(
     top_k_to_keep: int,
     source_provider: str,
     allow_unsafe_candidate_execution: bool,
+    evidence: Optional[dict] = None,
 ) -> tuple[List[dict], str, Dict[str, object]]:
     if previous_feedback:
         prompt = prompt_builder.build_revision_prompt(
@@ -263,6 +291,7 @@ def _run_one_type(
             previous_summary=previous_feedback.get("summary", {}),
             top_operators=previous_feedback.get("top_operators", []),
             weak_operators=previous_feedback.get("weak_operators", []),
+            evidence=evidence,
         )
         drafts = provider.revise_operator_candidates(
             prompt,
@@ -272,7 +301,9 @@ def _run_one_type(
             round_id,
         )
     else:
-        prompt = prompt_builder.build_initial_generation_prompt(operator_type=operator_type, round_id=round_id)
+        prompt = prompt_builder.build_initial_generation_prompt(
+            operator_type=operator_type, round_id=round_id, evidence=evidence
+        )
         drafts = provider.generate_operator_candidates(
             prompt,
             count,
@@ -372,6 +403,23 @@ def _run_one_type(
     rows = evaluated_rows + invalid_rows
     feedback = build_feedback_payload(rows, top_k=top_k_to_keep)
     return rows, prompt, feedback
+
+
+def _build_evidence(
+    project_root: Path, report_glob: str, budget_bytes: int
+) -> dict:
+    """Aggregate e14 state-regret reports into one dataset-level evidence payload."""
+    # Any *_summary.json is an aggregate, not a report; feeding it back in would
+    # add a phantom instance with no makespan and no position table.
+    report_paths = [
+        path
+        for path in sorted(project_root.glob(report_glob))
+        if not path.name.endswith("_summary.json")
+    ]
+    if not report_paths:
+        raise ValueError(f"No evidence reports matched: {report_glob}")
+    reports = [json.loads(path.read_text(encoding="utf-8")) for path in report_paths]
+    return build_dataset_evidence(reports, budget_bytes=budget_bytes)
 
 
 def _is_eligible(row: dict) -> bool:

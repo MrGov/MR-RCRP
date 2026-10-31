@@ -1,0 +1,36 @@
+﻿# Operator Evolution driven by Exact Route-DP behavioural evidence (B2-a).
+#
+# Two things differ from configs/operator_evolution_langchain.yaml:
+#   1. benchmark instances come from an explicit v1 development list instead of the
+#      legacy `data/R*_T*_*.txt` glob (still supported for old runs);
+#   2. the revision prompt carries the F2_state_v2 dataset evidence built from an
+#      e14 state-regret panel, so the LLM sees *where* the DP says state choice
+#      matters instead of only a scalar makespan.
+#
+# Usage:
+#   $env:PYTHONPATH='src'
+#   e14 --stage alns --instances configs/instances_v1_dev_14.json --budget 20 --seeds 0
+#   python -m mrta_rect_coverage.experiments.operator_evolution_runner \
+#       --config configs/operator_evolution_dp_evidence.yaml
+
+operator_evolution:
+  provider_name: langchain_openai_compatible
+  round_count: 2
+  repair_candidates_per_round: 2
+  destroy_candidates_per_round: 2
+  benchmark_instance_list: "configs/instances_v1_dev_14.json"
+  evidence_report_glob: "outputs/e14_state_regret_instrument/alns/*.json"
+  evidence_budget_bytes: 2500
+  seeds: [0]
+  timeout_ms: 2000.0
+  # Same acknowledgement the E5/E7 research runs use: generated candidates are
+  # executed in a bounded subprocess so their metrics are real. This is not a
+  # capability sandbox; it is only acceptable for this offline research panel.
+  allow_unsafe_candidate_execution: true
+  top_k_to_keep: 2
+  operator_types_to_evolve:
+    - repair
+    - destroy
+  use_rich_prompts: true
+  generated_dir: generated_operators
+  output_dir: outputs/operator_evolution_dp_evidence

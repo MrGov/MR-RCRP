@@ -46,6 +46,11 @@ class CandidateProxy:
     expected_code_hash: str = ""
     timeout_ms: float = 1000.0
     max_output_chars: int = 4096
+    # Import budget of the child process.  Spawning a fresh interpreter and
+    # importing the package under load can exceed one second, which aborted
+    # legitimate loads (`Candidate import timed out`); the call budget in
+    # `timeout_ms` stays tight.
+    import_timeout_s: float = 3.0
 
     def execute(
         self, args: Sequence[Any], *, timeout_ms: float
@@ -55,6 +60,7 @@ class CandidateProxy:
             operator_type=self.operator_type,
             args=args,
             timeout_ms=timeout_ms,
+            import_timeout_s=self.import_timeout_s,
             max_output_chars=self.max_output_chars,
             expected_code_hash=self.expected_code_hash,
         )

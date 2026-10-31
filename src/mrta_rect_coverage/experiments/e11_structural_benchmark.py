@@ -74,11 +74,13 @@ def identities():
     return {k:{f:d[k][f] for f in ('source_path','source_hash','operator_id','generation')} for k in ('destroy','main','aux')}
 
 
-def make_solver(instance,seed,method):
+def make_solver(instance,seed,method,*,executor='original',config_overrides=None):
     if method not in METHODS:raise ValueError(method)
-    if method=='B1':return ALNSSolver(instance,constructor='spatial_sort',config=config_for(instance,seed,'B1+R'))
+    if method=='B1':
+        config=config_for(instance,seed,'B1+R',overrides=config_overrides)
+        return ALNSSolver(instance,constructor='spatial_sort',config=config)
     d=identities()
-    return portfolio_solver(instance,seed,dict(destroy=d['destroy'],repair=d['main']),d['aux'],method)
+    return portfolio_solver(instance,seed,dict(destroy=d['destroy'],repair=d['main']),d['aux'],method,executor=executor,config_overrides=config_overrides)
 
 
 def setup(output):
