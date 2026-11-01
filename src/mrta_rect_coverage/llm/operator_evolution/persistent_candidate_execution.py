@@ -5,7 +5,8 @@ module, output bounds and DP counters on EVERY call. Arguments/results still
 cross a process boundary. Timeout/error discards the worker. Trusted Python
 imports remain warm; process lifetime isolation differs from the original
 per-call process. This is timeout-only isolation, not an OS security sandbox.
-Use only for the frozen, reviewed stateless E5/E7 operators.
+Use only for explicitly reviewed, hash-bound stateless operators. The gap
+revision runner separately checks its reviewed source allowlist before use.
 """
 from __future__ import annotations
 
@@ -77,6 +78,8 @@ class PersistentCandidateProxy(CandidateProxy):
 
     def execute(self, args, *, timeout_ms):
         wall = perf_counter()
+        startup_ms = 0.0
+        validation_ms = 0.0
         def outcome(status, *, runtime=0., message='', response=None):
             data = response or ()
             success = status == 'success'
@@ -87,7 +90,8 @@ class PersistentCandidateProxy(CandidateProxy):
                 stdout_truncated=bool(data[4]) if len(data)>4 else False,
                 stderr_truncated=bool(data[5]) if len(data)>5 else False,
                 route_dp_calls=data[6].get('calls',0) if success and len(data)>6 else 0,
-                route_dp_cache_misses=data[6].get('cache_misses',0) if success and len(data)>6 else 0)
+                route_dp_cache_misses=data[6].get('cache_misses',0) if success and len(data)>6 else 0,
+                startup_ms=startup_ms, validation_import_ms=validation_ms)
         if not self.expected_code_hash:
             return outcome('source_hash_missing', message='Expected source hash required')
         try:
@@ -103,11 +107,14 @@ class PersistentCandidateProxy(CandidateProxy):
                     return outcome('timeout', message='Candidate host import timed out')
                 if self._connection.recv()[0] != 'host_ready':
                     raise RuntimeError('Unexpected host handshake')
+                startup_ms = (perf_counter()-wall)*1000
+            validation_started = perf_counter()
             self._connection.send('call')
             if not self._connection.poll(self.import_timeout_s):
                 self.close()
                 return outcome('timeout', message='Candidate import timed out')
             ready = self._connection.recv()
+            validation_ms = (perf_counter()-validation_started)*1000
             if ready[0] != 'ready':
                 self.close()
                 return outcome(str(ready[0]), message=str(ready[1]), response=ready)

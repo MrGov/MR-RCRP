@@ -53,6 +53,33 @@ python -m pytest tests/test_operator_gap_revision.py tests/test_operator_portfol
 
 The complete suite passed 425 tests during the batch; the final targeted suite passed 21 tests, including an added failed-evaluation serialization regression. The saved `final_deployment.json` is a zero-call smoke replay of the selected manual pool; it does not revise selection. `cost_probe.py/json` preserve a separate post-selection executor-cost diagnostic. After noticing test-process overlap with part of the original deployment window, `timing_recheck.py/json` reran every group once after tests stopped; all four means and the manual-only selection were unchanged. These diagnostics made no provider calls and are not independent evaluations.
 
+## Resident Executor / Replacement Recheck (No LLM Calls)
+
+The existing lineage has been checked with both executor modes and only the five requested compositions. The completed output is `outputs/operator_gap_revision/executor_recheck_001`. To repeat the small study without overwriting it:
+
+```powershell
+$env:PYTHONPATH='src'
+python -m mrta_rect_coverage.experiments.operator_gap_recheck --config configs/operator_gap_recheck.json --output outputs/operator_gap_revision/executor_recheck_002
+```
+
+This command never builds or invokes a model. It verifies the three frozen source identities, replays the six existing development states, compares original/resident execution at 40 fixed iterations, then calibrates one time budget from startup/loading/call costs and freezes it before timed comparisons. The completed run froze 2.4 seconds. Do not run tests or other heavy jobs concurrently with calibration/timing. Both modes retain subprocess validation and output checks; resident mode is permitted only for the explicitly reviewed hashes. Cold startup occurs inside solve, and full validation/loading/cleanup is included separately in end-to-end time. Budget overrun is recorded.
+
+The recheck selected manual-only. Reloading its saved choice uses the corrected deployment entry point and makes no model calls:
+
+```powershell
+python -m mrta_rect_coverage.experiments.operator_gap_revision --deploy-result outputs/operator_gap_revision/executor_recheck_001/results.json --deployment-output outputs/operator_gap_revision/executor_recheck_001/user_replay_001.json
+```
+
+Use a fresh output filename. This is a replay of consumed development inputs, not an independent check. `summary.json` contains compact fixed/time results; `results.json` retains member statistics, workload and traces; `calibration.json` freezes the cost-derived budget. `next_prompt.txt` is an unsent 23,242-character sample with one true parent source and three deterministically selected cases. Its `current_composition` is the actual manual-only winner; the evolution parent is separately child 2. The actual old requests and sources remain untouched.
+
+Required focused verification (32 tests passed for this change):
+
+```powershell
+python -m pytest tests/test_gap_deployment_revision.py tests/test_executor_equivalence.py tests/test_e13_persistent_execution.py tests/test_operator_gap_revision.py tests/test_operator_portfolio_mechanism.py -q
+```
+
+The focused suite includes both new children, repeated-call isolation, fixed-iteration solver traces, hash drift, timeout, invalid output, runtime failure and exception/early-exit cleanup. The full historical experiment system was not rerun. Execution acceleration alone is not evidence of improved operator quality; see the current status page for the C decision and its narrow development scope.
+
 ## Focused Tests
 
 ```powershell

@@ -1,0 +1,17 @@
+{
+  "source_result": "outputs/operator_gap_revision/batch_001/results.json",
+  "output_dir": "outputs/operator_gap_revision/executor_recheck_001",
+  "reviewed_warm_hashes": [
+    "7d89728c5ef8665e2b84f931732097093c916a6aa55f1fb6de66ed0b460f6dfc",
+    "d31db7883c19d524e0153a63a76699139a39f152e7716439ad31608dfbbf6196",
+    "ebea0de01c3a5d340655133313a1c9095a37bb3bdb7ad9507257bc8e1a8e89f4"
+  ],
+  "seeds": [23, 29],
+  "fixed_iterations": 40,
+  "calibration_subsequent_calls": 5,
+  "minimum_seconds": 1.0,
+  "calibration_startup_multiplier": 3,
+  "calibration_call_multiplier": 100,
+  "minimum_gain": 0.001,
+  "llm_calls": 0
+}

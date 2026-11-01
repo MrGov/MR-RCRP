@@ -37,6 +37,8 @@ class CandidateExecutionResult:
     wall_time_ms: float = 0.0
     route_dp_calls: int = 0
     route_dp_cache_misses: int = 0
+    startup_ms: float = 0.0
+    validation_import_ms: float | None = None
 
 
 @dataclass
@@ -147,6 +149,7 @@ def execute_candidate_process(
             )
 
         started = perf_counter()
+        startup_ms = (started - wall_started) * 1000.0
         parent_conn.send(("run", tuple(args)))
         timeout_s = max(0.0, timeout_ms / 1000.0)
         if not parent_conn.poll(timeout_s):
@@ -190,6 +193,7 @@ def execute_candidate_process(
                 wall_time_ms=(perf_counter() - wall_started) * 1000.0,
                 route_dp_calls=message[6].get("calls", 0) if len(message) > 6 else 0,
                 route_dp_cache_misses=message[6].get("cache_misses", 0) if len(message) > 6 else 0,
+                startup_ms=startup_ms,
             )
         return CandidateExecutionResult(
             status="runtime_error",

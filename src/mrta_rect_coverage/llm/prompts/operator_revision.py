@@ -7,6 +7,33 @@ from typing import Dict, List
 from . import common
 
 
+def build_compact_gap_revision_prompt(*, parent, feedback, target):
+    """One source, one aggregate table, at most three externally linked cases."""
+    import hashlib
+    from pathlib import Path
+    source = Path(parent["source_path"]).read_text(encoding="utf-8")
+    if hashlib.sha256(source.encode()).hexdigest() != parent["source_hash"]:
+        raise ValueError("parent repair source hash changed")
+    return (
+        f"Offline repair revision; parent SHA-256 {parent['source_hash']}.\n"
+        f"Actual parent source (once):\n```python\n{source}\n```\n"
+        f"{common.PROBLEM_DESCRIPTION}\n{common.CONSTRAINTS}\n{common.REPAIR_SIGNATURE}\n"
+        "Return RepairResult from mrta_rect_coverage.llm.operator_evolution.protocols and "
+        "MultiRobotSolution from mrta_rect_coverage.core.models. Preserve exactly-once coverage. "
+        "Context exposes only instance, per_robot_costs, route_costs_makespan, bottleneck_route_id; "
+        "there is no evaluator or DP callable. Instance has sweep_width/sweep_speed/travel_speed/turning_time; "
+        "tasks have task_id/x_left/y_bottom/x_right/y_top/width/height. Use only supplied rng. "
+        "No global state, module mutation, IO, reflection, subprocesses or reimplementation of Route-DP. "
+        "Use bounded local work; current measured execution costs and failure cases are evidence, not targets to fabricate.\n"
+        "Development feedback (complete raw traces are linked locally):\n"
+        + json.dumps(feedback, ensure_ascii=False, separators=(",", ":")) + "\n"
+        + f"Revision target: {target}\n"
+        "First state one falsifiable revision_hypothesis linking an observed failure to a concrete behavior change. "
+        "Return exactly one JSON-array element with revision_hypothesis, name, description and complete code. "
+        "Do not claim offline traces are available online or include untested performance claims.\n"
+    )
+
+
 def build_paired_repair_revision_prompt(*, parent, feedback, n=2):
     """One parent-grounded repair revision conditioned on a frozen destroy."""
     import hashlib
