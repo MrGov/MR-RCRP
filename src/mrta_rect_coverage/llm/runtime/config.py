@@ -18,9 +18,10 @@ class LLMRuntimeConfig:
     api_key: str = ""
     base_url: str = ""
     model: str = "gpt-4o"
-    temperature: float = 0.7
+    temperature: float | None = 0.7
     timeout: int = 120
     max_retries: int = 2
+    max_output_tokens: int | None = None
 
 
 def load_from_env() -> LLMRuntimeConfig:
@@ -40,10 +41,19 @@ def load_from_env() -> LLMRuntimeConfig:
         api_key=os.getenv("OPERATOR_LLM_API_KEY", ""),
         base_url=os.getenv("OPERATOR_LLM_BASE_URL", ""),
         model=os.getenv("OPERATOR_LLM_MODEL", "gpt-4o"),
-        temperature=float(os.getenv("OPERATOR_LLM_TEMPERATURE", "0.7")),
+        temperature=_parse_temperature(os.getenv("OPERATOR_LLM_TEMPERATURE", "0.7")),
         timeout=int(os.getenv("OPERATOR_LLM_TIMEOUT", "120")),
         max_retries=int(os.getenv("OPERATOR_LLM_MAX_RETRIES", "2")),
+        max_output_tokens=_parse_optional_int(os.getenv("OPERATOR_LLM_MAX_OUTPUT_TOKENS")),
     )
+
+
+def _parse_temperature(value: str) -> float | None:
+    return None if value.strip().lower() in {"", "none", "null"} else float(value)
+
+
+def _parse_optional_int(value: str | None) -> int | None:
+    return int(value) if value and value.strip() else None
 
 
 def _load_local_dotenv() -> None:

@@ -36,6 +36,7 @@ def test_load_from_env_reads_env_vars() -> None:
         "OPERATOR_LLM_TEMPERATURE": "0.3",
         "OPERATOR_LLM_TIMEOUT": "60",
         "OPERATOR_LLM_MAX_RETRIES": "5",
+        "OPERATOR_LLM_MAX_OUTPUT_TOKENS": "1800",
     }
     with patch.dict(os.environ, env, clear=False):
         cfg = load_from_env()
@@ -47,6 +48,14 @@ def test_load_from_env_reads_env_vars() -> None:
     assert cfg.temperature == 0.3
     assert cfg.timeout == 60
     assert cfg.max_retries == 5
+    assert cfg.max_output_tokens == 1800
+
+
+def test_load_from_env_supports_no_temperature_for_single_attempt_calls() -> None:
+    with patch("dotenv.load_dotenv", return_value=None):
+        with patch.dict(os.environ, {"OPERATOR_LLM_TEMPERATURE": "none"}, clear=False):
+            cfg = load_from_env()
+    assert cfg.temperature is None
 
 
 def test_load_from_env_uses_defaults_when_vars_missing() -> None:
@@ -58,6 +67,7 @@ def test_load_from_env_uses_defaults_when_vars_missing() -> None:
         "OPERATOR_LLM_TEMPERATURE",
         "OPERATOR_LLM_TIMEOUT",
         "OPERATOR_LLM_MAX_RETRIES",
+        "OPERATOR_LLM_MAX_OUTPUT_TOKENS",
     ]
     cleaned = {k: v for k, v in os.environ.items() if k not in env_keys}
     # Patch dotenv.load_dotenv so the real .env file doesn't leak values

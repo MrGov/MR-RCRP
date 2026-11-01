@@ -44,6 +44,7 @@ def test_build_passes_correct_kwargs() -> None:
         temperature=0.5,
         timeout=90,
         max_retries=3,
+        max_output_tokens=1800,
         base_url="https://api.example.com/v1",
     )
 
@@ -60,6 +61,7 @@ def test_build_passes_correct_kwargs() -> None:
     assert call_kwargs["temperature"] == 0.5
     assert call_kwargs["api_key"] == "sk-test-key"
     assert call_kwargs["max_retries"] == 3
+    assert call_kwargs["max_completion_tokens"] == 1800
     assert call_kwargs["request_timeout"] == 90
     assert call_kwargs["base_url"] == "https://api.example.com/v1"
 

@@ -1,14 +1,17 @@
 {
   "manifest": "data/structural_benchmark_v1/manifest.json",
-  "development_instances": 1,
+  "development_instances": 2,
   "check_instances": 1,
   "seed": 23,
   "trace_iterations": 12,
-  "deployment_iterations": 12,
+  "deployment_runtime_seconds": 1.0,
   "candidate_archive_capacity": 12,
   "deployment_capacity": 2,
   "min_state_gain": 0.001,
-  "candidate_evaluation_budget": 36,
+  "candidate_evaluation_budget": 72,
+  "behavior_shortlist_capacity": 2,
+  "min_behavior_delta": 2.0,
+  "max_candidate_runtime_ms": 500.0,
   "max_rounds": 1,
   "stagnation_patience": 2,
   "minimum_effective_improvement": 0.001,
@@ -19,5 +22,5 @@
     "rounds": 0,
     "candidates_per_round": 0
   },
-  "output_dir": "outputs/operator_portfolio_evolution/run_008"
+  "output_dir": "outputs/operator_portfolio_evolution/run_012"
 }

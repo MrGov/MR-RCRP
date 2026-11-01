@@ -42,6 +42,18 @@ def build_langchain_chat_model(config: LLMRuntimeConfig) -> ChatOpenAI:
         "use_responses_api": True,
     }
     signature = inspect.signature(_ChatOpenAI)
+    if config.max_output_tokens is not None:
+        if config.max_output_tokens <= 0:
+            raise ValueError("max_output_tokens must be positive when configured")
+        if "max_completion_tokens" in signature.parameters or any(
+            parameter.kind is inspect.Parameter.VAR_KEYWORD
+            for parameter in signature.parameters.values()
+        ):
+            kwargs["max_completion_tokens"] = config.max_output_tokens
+        elif "max_tokens" in signature.parameters:
+            kwargs["max_tokens"] = config.max_output_tokens
+        else:
+            kwargs["model_kwargs"] = {"max_tokens": config.max_output_tokens}
     accepts_kwargs = any(
         parameter.kind is inspect.Parameter.VAR_KEYWORD
         for parameter in signature.parameters.values()

@@ -29,10 +29,13 @@ def build_paired_repair_revision_prompt(*, parent, feedback, n=2):
         "workload features, never substitutes for Route-DP. There is no separate mode-switch penalty.\n"
         "Measured frozen-pair feedback (associations, not proven causes):\n"
         + json.dumps(feedback, sort_keys=True) + "\n"
-        "For these released tasks and retained routes, how should robot selection, insertion position and workload "
-        "projection change to restore a smaller feasible makespan? Revise this actual repair; do not generate or change "
-        "the destroy. Do not fabricate metrics or call/reimplement DP. Do not merely copy formulas into unused code. "
-        "Return up to two distinct child strategies with concise descriptions connecting code changes to evidence. "
+        "First formulate one falsifiable revision_hypothesis naming the observed state pattern, the code behavior to "
+        "change, and the expected paired pre/post-local-search Route-DP outcome. Then implement that hypothesis in "
+        "this parent repair. Do not generate or change the destroy. Do not fabricate metrics or call/reimplement DP. "
+        "Do not claim the recorded fixed-route DP chain is an online feature available through RepairContext. "
+        "Do not merely copy formulas into unused code. Return exactly one child in the JSON array, with keys "
+        "revision_hypothesis, name, description, and complete code; the description must link the behavior change "
+        "to the supplied evidence. "
         "No fixed manual repair algorithm is mandated. Preserve existing tasks and insert all removed tasks exactly once.\n"
         f"{common.OUTPUT_FORMAT_JSON}\n")
 
