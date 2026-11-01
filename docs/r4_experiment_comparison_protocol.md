@@ -1,5 +1,7 @@
 # R4 Experiment Comparison Protocol
 
+> Historical design draft. Its proposed arms and stop conditions are not current experiment authorization or a mandatory matrix. Current principles and actual evidence are in [experiment_protocol.md](experiment_protocol.md) and [program_status_and_design.md](program_status_and_design.md).
+
 Design only; no execution authorization.
 
 ## Main Chain

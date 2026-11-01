@@ -1,5 +1,7 @@
 # R4 Research Method vNext
 
+> Historical design freeze. Its C1/C2/C3 labels and readiness status are phase-specific proposals; they do not make DP feedback, complementarity, or counterexample revision predetermined contributions. Current positioning: [research_positioning.md](research_positioning.md).
+
 Status: design freeze complete. `LLM_RESEARCH_METHOD_READY = TRUE`.
 
 This document does not implement production mechanisms or authorize real providers, candidates, pilots, benchmarks, formal experiments, final-test or T6.

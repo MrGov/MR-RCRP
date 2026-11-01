@@ -1,5 +1,7 @@
 # 研究内容、方法与问题梳理
 
+> 历史综合稿。旧数据规模、阶段结论和具体收益数字按原记录保留，不代表当前核验状态或路线承诺。当前口径：[research_positioning.md](research_positioning.md) 与 [program_status_and_design.md](program_status_and_design.md)。
+
 本文件把仓库里已经实现、已经跑过的东西整理成一条可写论文的主线，并标出目前证据能支撑到哪一步、哪些地方还站不住。所有性能数字都来自 `outputs/` 下的真实记录，属于 development/exploratory 级别，不是 confirmatory 结论。
 
 > 说明：用户提供的 GitHub 地址 `https://github.com/15628112531/MRTA_Rectangular_Coverage` 当前返回 HTTP 404，用户页与 GitHub API 亦为 404，站内搜索 "MRTA rectangular coverage" 命中 0 条。本梳理以本地工作区 `mrta_rect_coverage/` 为唯一事实来源。

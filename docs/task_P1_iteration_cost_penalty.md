@@ -1,5 +1,7 @@
 # P1 实施任务单：`iteration_cost_penalty` + 运行时 `t_ref` 标定
 
+> 历史阶段任务单。实现与 E16 关闭结论保留在代码/实验记录；下方阶段限制不再是当前任务入口。本文件仅供追溯。
+
 - 依据：`docs/dp_feedback_chain_design_v0.3.md` §7（口径 (b)：四项耗时总和，不归因到单个算子）
 - 前置：P0′/P0″ 已通过（19 个测试全绿，22 份报告 failures = []）
 - 本轮改动范围：**1 个新实验脚本 + 1 个新测试文件 + `heuristics/alns_solver.py` 的受控小改**

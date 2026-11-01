@@ -1,5 +1,7 @@
 # LLM Operator Evolution Research Plan
 
+> Historical planning document. Proposed mechanisms below are not all implemented and do not override the objective in [research_positioning.md](research_positioning.md) or evidence status in [program_status_and_design.md](program_status_and_design.md).
+
 ## 1. 研究目标与边界
 
 本文研究对象是一种用于组合优化的、可验证且可复用的 **LLM 辅助离线算子演化框架**。LLM 不直接输出 MR-RCRP 的最终任务分配解，而是在离线阶段生成、批评和修订 ALNS destroy/repair operators。候选代码经过 fail-closed 的验证、评价、选择和冻结流程后，才可能成为在线搜索可复用的组件。

@@ -1,5 +1,7 @@
 # MR-RCRP 正式实例协议
 
+> Historical formal-dataset proposal. Its old “two instances only” and pending travel-speed migration statements are stale. Current model and dataset status are in [modeling_decisions.md](modeling_decisions.md) and [../data/README.md](../data/README.md); this proposal does not authorize opening test data.
+
 ## 1. 状态、目标与 no-go
 
 - **状态：** Phase 5A-SR 修订候选，等待 documentation-entry review 批准；尚未生成或修改任何数据。

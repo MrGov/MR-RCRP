@@ -1,65 +1,29 @@
-# Core Runtime and R1 Scientific Correctness Runbook
+# Runtime Runbook
 
 ## Environment
 
-- Windows PowerShell
-- Python executable: `C:\Anaconda\python.exe`
-- Pytest executable: `C:\Anaconda\Scripts\pytest.exe`
-- Set `PYTHONPATH=src` from the Python project root.
+Use Python 3.11 or newer in the project environment. Run commands from the `mrta_rect_coverage/` project root and set `PYTHONPATH=src`. Commands below use `python` from the active environment; a machine-specific absolute interpreter path is not part of the project contract.
 
-## Project and invocation
-
-- Workspace root: `C:\VScode\20251217-yang\R_MRTA_01-copy`
-- Python project root: `C:\VScode\20251217-yang\R_MRTA_01-copy\mrta_rect_coverage`
-- Package: `mrta_rect_coverage`
-- Canonical CLI: `C:\Anaconda\python.exe -m mrta_rect_coverage.main --config <config>`
-
-Run commands from the Python project root:
+## Main Solver
 
 ```powershell
 $env:PYTHONPATH='src'
-C:\Anaconda\python.exe -m mrta_rect_coverage.main --config configs/runtime_smoke_baseline.yaml
-C:\Anaconda\python.exe -m mrta_rect_coverage.main --config configs/runtime_smoke_alns.yaml
-C:\Anaconda\python.exe -m mrta_rect_coverage.main --config configs/runtime_smoke_baseline_t10.yaml
-C:\Anaconda\python.exe -m mrta_rect_coverage.main --config configs/runtime_smoke_alns_t10.yaml
+python -m mrta_rect_coverage.main --config configs/default.yaml
 ```
 
-## Inputs and outputs
+The configured instance and output paths are relative to the project root. The default config selects ALNS/B1. Inspect `configs/default.yaml` before running if local edits changed it.
 
-- `data/R2_T6_0.txt`: 2 robots, 6 tasks, sweep width 2.0, sweep speed 1.0, travel speed 1.0, turning time 0.5.
-- `data/R2_T10_0.txt`: 2 robots, 10 tasks, sweep width 3.0, sweep speed 1.0, travel speed 1.0, turning time 5.0.
-- Smoke configs use built-in operators, `advisor_mode: none`, no frozen/generated operators, and 20 ALNS iterations.
-- Outputs are written to `outputs/r0_smoke/`.
-
-## Verification target
-
-The authorized core test target is:
+## Focused Tests
 
 ```powershell
-C:\Anaconda\Scripts\pytest.exe tests/test_instance_loader.py tests/test_baseline_solver.py tests/test_dp_evaluator.py tests/test_alns_solver.py -q
+$env:PYTHONPATH='src'
+python -m pytest tests/test_instance_loader.py tests/test_baseline_solver.py tests/test_dp_evaluator.py tests/test_alns_solver.py -q
 ```
 
-R1 scientific-correctness contracts are covered by
-`tests/test_scientific_correctness.py`. Complete-solution evaluation requires
-the exact task universe; ALNS partial states use `evaluate_partial()`.
+For a change, run the directly related test modules and state the exact verification scope. Do not use this historical command as a substitute for tests required by a broader change.
 
-R0 validity checks require two routes, the exact task universe once each, finite Route-DP costs, finite makespan, and `makespan == max(route_costs)`. Baseline and ALNS T6 runs use seed 0 and are reproducible for routes, per-route costs, and makespan.
+## Historical Environment Notes
 
-## Known limitations and boundaries
+Earlier versions of this runbook named `C:\Anaconda\python.exe` and a workspace under `C:\VScode\...`; those are personal-machine examples, not portable requirements. The E13-Fix smoke notes used `G:\Anaconda\envs\mrta_env\python.exe` on one workstation. These paths were not verified on other machines.
 
-- These are runtime smoke instances, not paper-grade benchmark evidence.
-- Both smoke inputs explicitly set `sweep_speed == travel_speed == 1.0`, so their R0 objective values remain unchanged after the R1 unit correction.
-- `dp_aware_insertion` is not a selectable repair or benchmark mode; all real insertion operators already use exact Route DP.
-- A pre-existing Matplotlib warning is emitted by `visualization/plot_solution.py:118`: legend handles for `Annotation` instances are unsupported. It does not change solver outputs.
-- R0 uses no real LLM/provider, generated candidate, pilot, benchmark, formal experiment, large-scale experiment, or final-test data.
-- Gate P2 remains OPEN. T6 remains NOT AUTHORIZED.
-- R0 completion does not authorize R1; the next permitted recommendation is `R1 - Scientific Correctness`.
-
-## R2 sanity data protocol
-
-`src/mrta_rect_coverage/experiments/dataset_protocol.py` provides the
-deterministic generator, intrinsic feature extractor, and split-scoped
-manifest loader. The checked-in sanity artifacts live under
-`data/r2_sanity/` with manifests in `manifests/`. They are parser/provenance
-validation inputs only, not formal benchmark data. Do not replace manifest
-access with a `data/R*_T*_*.txt` glob.
+Smoke inputs are not paper-grade performance evidence. Follow [`../data/README.md`](../data/README.md) and [`experiment_protocol.md`](experiment_protocol.md) for split and comparison rules. Final-test access remains governed by [`final_test_lockbox_protocol.md`](final_test_lockbox_protocol.md); this runbook does not authorize it.

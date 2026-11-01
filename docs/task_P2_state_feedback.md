@@ -1,5 +1,7 @@
 # P2 实施任务单：状态证据反馈（regime 标签 + 三档 payload + prompt 注入）
 
+> 历史任务规格，F2 命名只属于 P2 设计阶段。代码注释保留对本文件的来源引用，因此文件留在原路径；它不是当前反馈配置的通用定义或默认研发指令。
+
 - 依据：`docs/p2_feedback_design.md`（v0.1，§7 三项取舍已拍板）与
   `docs/e16_cost_penalty_ablation_result.md`（成本惩罚已关闭，不进 P2）
 - 适用范围：**只读反馈层**。禁止修改 `core/dp_evaluator.py`、

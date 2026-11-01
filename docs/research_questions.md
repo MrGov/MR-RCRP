@@ -1,5 +1,7 @@
 # Paper-Grade Research Questions
 
+> Historical hypothesis set. Its sample-size requirements, method names and phase status are not current project facts or mandatory work. Current objective and claim boundary: [research_positioning.md](research_positioning.md). Verified implementation/evidence: [program_status_and_design.md](program_status_and_design.md).
+
 ## 1. 状态与共同边界
 
 - **状态：** Phase 5B documentation specification；尚无正式实验结果。

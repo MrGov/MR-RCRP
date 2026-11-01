@@ -1,5 +1,7 @@
 # P0′ 实施任务单：只读状态链 / 状态 regret 仪表
 
+> 历史阶段任务单快照。下文待办状态仅描述文档编写时情况，不是当前代码状态；按 [program_status_and_design.md](program_status_and_design.md) 核对实现与证据。本文件不单独授权新的代码或实验工作。
+
 > 依据：`docs/dp_feedback_chain_design_v0.3.md` §2.2、§3、§10。
 > 授权：本任务单只允许**新增文件**。**禁止修改** `core/dp_evaluator.py`、`core/solution_evaluator.py`、`core/cost_matrix.py`、`core/state_generator.py`、`core/models.py`、`heuristics/alns_solver.py`、`llm/operator_evolution/*`。
 > 当前状态：**尚未创建任何文件，尚未运行任何测试**。下列各项均待执行。

@@ -1,5 +1,7 @@
 # Research Hypotheses
 
+> Historical pre-registration draft. Do not treat its proposed hierarchy, no-go state, current-data count, or conditions as an up-to-date status statement. Use [experiment_protocol.md](experiment_protocol.md) for compact current principles and [program_status_and_design.md](program_status_and_design.md) for verified facts.
+
 ## 1. 共同评价规则
 
 以下均为待实验验证的可证伪假设，不是性能结论。所有主比较采用预先固定的 generation/train、selection/dev 和 held-out final test；final test 的任何结果都不得反馈给 LLM、prompt、operator/portfolio selection 或参数调优。

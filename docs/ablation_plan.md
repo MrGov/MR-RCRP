@@ -1,5 +1,7 @@
 # Ablation Plan
 
+> Historical planning matrix. Mechanisms and cells below are optional hypotheses, not a required backlog. Select ablations only to test a current claim; see [research_positioning.md](research_positioning.md) and [experiment_protocol.md](experiment_protocol.md).
+
 ## 1. 状态与共同控制
 
 - **状态：** Phase 5B documentation specification；全部消融尚待实现和实验验证。

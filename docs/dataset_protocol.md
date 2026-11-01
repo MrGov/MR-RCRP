@@ -1,5 +1,7 @@
 # R2 Dataset Protocol
 
+> Historical R2 sanity-set protocol. It describes that dataset's validation scope, not the current benchmark inventory or a blanket ban on later development experiments. See [../data/README.md](../data/README.md) for present dataset roles.
+
 Status: paper-data protocol draft validated by a small sanity dataset. This document does not authorize solver benchmarking, LLM use, pilot execution, or final-test execution.
 
 ## Current instance contract

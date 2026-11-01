@@ -1,5 +1,7 @@
 # Innovation Review
 
+> Historical review snapshot. Its novelty assessments are not a current literature review or a binding selection of the next mechanism. Current objective and candidate status: [research_positioning.md](research_positioning.md).
+
 ## 1. 评价边界
 
 本文件比较四条 LLM 创新方向。新颖性评分是**候选潜力判断**，不是文献查新结论；所有性能判断均待真实 LLM、严格数据隔离和统计实验验证。

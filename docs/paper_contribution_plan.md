@@ -1,5 +1,7 @@
 # Paper Contribution Plan
 
+> Historical contribution draft. It does not define the current project main line; see [research_positioning.md](research_positioning.md). No candidate contribution here is established without matching evidence.
+
 ## 1. 中心论点
 
 论文面向跨领域 AI-for-Optimization，研究如何把 LLM 生成的搜索算子经由多轮、可证伪、fail-closed 的离线演化流程，转化为可冻结并重复部署的组合优化组件。MR-RCRP + DP-aware ALNS 提供结构化验证载体，而不是论文主创新本身。

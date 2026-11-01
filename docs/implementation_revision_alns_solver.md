@@ -1,5 +1,7 @@
 # 实现修订记录：`heuristics/alns_solver.py`（供 E12 重新运行使用）
 
+> 历史、范围有限的兼容性记录。下文行为等价仅覆盖记录的旧版与其对比版本、固定迭代 40、指定种子和三个实例；它不是对当前 HEAD 或后续 ALNS 版本的通用证明。当前代码/实验问题见 [program_status_and_design.md](program_status_and_design.md)。
+
 日期：2026-10-30
 用途：`e12_comparison --accept-hash-change docs/implementation_revision_alns_solver.md` 的验收凭据。
 

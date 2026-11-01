@@ -1,5 +1,7 @@
 # 数据集统一与重跑计划（2026-10-30）
 
+> Historical decision proposal. The “awaiting confirmation” choices are not current tasks, and its runtime estimates/sample suggestions reflect the implementation at that time. Current data roles and research objective: [../data/README.md](../data/README.md) and [research_positioning.md](research_positioning.md).
+
 状态：**待确认**。本文件只做盘点与列单，未执行任何重跑。已完成的只有：删除 53 个无引用根实例 + 3 个空占位目录，重写 `data/README.md`，在 `docs/data_directory_audit.md` 追加更新段。
 
 ## §0 结论先行
