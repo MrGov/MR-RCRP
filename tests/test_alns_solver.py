@@ -14,6 +14,15 @@ def _load_instance():
     return load_instance(project_root / "data" / "R2_T6_0.txt")
 
 
+def test_dp_insertion_constructor_builds_complete_solution():
+    from mrta_rect_coverage.heuristics.alns_solver import ALNSSolver
+
+    solver = ALNSSolver(_load_instance(), constructor="dp_greedy", config=ALNSConfig(iterations=0))
+    flattened = [task for route in solver.initial_solution.routes for task in route]
+    assert len(flattened) == solver.instance.task_count
+    assert set(flattened) == {task.task_id for task in solver.instance.tasks}
+
+
 def test_dp_aware_insertion_cannot_be_enabled_as_independent_operator() -> None:
     instance = _load_instance()
     with pytest.raises(ValueError, match="not an independent"):

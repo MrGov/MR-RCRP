@@ -45,6 +45,26 @@ def _manhattan(first: Tuple[float, float], second: Tuple[float, float]) -> float
     return abs(first[0] - second[0]) + abs(first[1] - second[1])
 
 
+def _dp_greedy_constructor(instance, route_dp, insertion_pricer) -> MultiRobotSolution:
+    """Assign longest exact-DP singleton tasks by exact projected makespan."""
+    routes = [[] for _ in range(instance.robot_count)]
+    costs = [0.0] * instance.robot_count
+    tasks = sorted(
+        instance.tasks,
+        key=lambda task: (-route_dp.evaluate_route([task.task_id]).total_cost, task.task_id),
+    )
+    for task in tasks:
+        choices = []
+        for robot, route in enumerate(routes):
+            other_max = max((cost for idx, cost in enumerate(costs) if idx != robot), default=0.0)
+            for position, route_cost in enumerate(insertion_pricer.insertion_costs(route, task.task_id)):
+                choices.append((max(other_max, route_cost), len(route), robot, position, route_cost))
+        _, _, robot, position, cost = min(choices)
+        routes[robot].insert(position, task.task_id)
+        costs[robot] = cost
+    return MultiRobotSolution(routes=routes)
+
+
 DestroyFn = Callable[[MultiRobotSolution, SolutionEvaluation, int], tuple[MultiRobotSolution, List[int]]]
 RepairFn = Callable[[MultiRobotSolution, List[int], SolutionEvaluation], MultiRobotSolution]
 
@@ -94,6 +114,8 @@ class ALNSConfig:
     cost_aware_exponent: float = 1.0
     cost_aware_clip: float = 4.0
     transfer_gain_destroy: bool = False
+    capture_operator_states: bool = False
+    operator_minimum_uses: int = 0
     """Opt-in ruin criterion that scores candidate removals by exact DP transfer gain.
 
     For every task on the loaded routes it prices, with the same exact Route-DP the
@@ -190,6 +212,8 @@ class ALNSConfig:
             raise ValueError("unknown weight update or cooling schedule")
         if self.segment_length < 1 or not 0 < self.reaction_factor <= 1:
             raise ValueError("segment_length >= 1 and 0 < reaction_factor <= 1 required")
+        if self.operator_minimum_uses < 0:
+            raise ValueError("operator_minimum_uses must be nonnegative")
         if not 0 < self.initial_acceptance_probability < 1 or not 0 < self.initial_worsening_fraction < 1:
             raise ValueError("initial probability and worsening fraction must be in (0, 1)")
         if not 0 < self.final_temperature_ratio <= 1 or not 0 < self.cooling_rate <= 1:
@@ -306,7 +330,10 @@ class ALNSSolver:
 
         self.solution_evaluator.evaluate = timed_full_evaluate
 
-        self.initial_solution = resolve_constructor(constructor)(instance)
+        if isinstance(constructor, str) and constructor.strip().lower() == "dp_greedy":
+            self.initial_solution = _dp_greedy_constructor(instance, self.route_dp, self.insertion_pricer)
+        else:
+            self.initial_solution = resolve_constructor(constructor)(instance)
         self._task_centres: Dict[int, Tuple[float, float]] = {
             task.task_id: (
                 (task.x_left + task.x_right) / 2.0,
@@ -457,6 +484,10 @@ class ALNSSolver:
             selection_probability = (self._coupled_selection_probability()
                                      if self.config.pair_selection_mode == "coupled" else 0.0)
             destroy_name, repair_name, phase = self._select_operators(context)
+            iteration_start_eval = current_eval
+            iteration_start_solution = MultiRobotSolution(
+                routes=[list(route) for route in current_solution.routes]
+            )
 
             destroy_fn = self.destroy_ops[destroy_name]
             repair_fn = self.repair_ops[repair_name]
@@ -659,6 +690,9 @@ class ALNSSolver:
                     "phase": phase,
                     "destroy": destroy_name,
                     "repair": repair_name,
+                    **({
+                        "state_routes": [list(route) for route in iteration_start_solution.routes],
+                    } if self.config.capture_operator_states else {}),
                     "accepted": accepted,
                     "accept_reason": reason,
                     "current_makespan": current_eval.makespan,
@@ -669,6 +703,13 @@ class ALNSSolver:
                     "route_dp_cache_misses": self.route_dp.statistics()["cache_misses"] + self.generated_route_dp_cache_misses - misses_start,
                     "candidate_makespan": refined_eval.makespan,
                     "candidate_delta": refined_eval.makespan - previous_eval.makespan,
+                    **({
+                        "removed_tasks": list(removed_tasks),
+                        "partial_routes": [list(route) for route in partial_solution.routes],
+                        "repaired_routes": [list(route) for route in repaired_solution.routes],
+                        "refined_routes": [list(route) for route in refined_solution.routes],
+                        "per_robot_costs": list(iteration_start_eval.per_robot_costs),
+                    } if self.config.capture_operator_states else {}),
                     "fallback_used": fallback_used,
                     "fallback_reason": fallback_reason,
                     "llm_operator_success": generated_selected and not fallback_used,
@@ -1229,6 +1270,22 @@ class ALNSSolver:
                 return (
                     str(self.config.coupled_destroy_operator),
                     str(self.config.coupled_repair_operator),
+                    phase,
+                )
+        if self.config.operator_minimum_uses:
+            untried_destroy = [
+                name for name, stats in self.operator_stats["destroy"].items()
+                if stats.uses < self.config.operator_minimum_uses
+            ]
+            untried_repair = [
+                name for name, stats in self.operator_stats["repair"].items()
+                if stats.uses < self.config.operator_minimum_uses
+            ]
+            if untried_destroy or untried_repair:
+                self._last_selection_action = "minimum_exploration"
+                return (
+                    self.rng.choice(untried_destroy) if untried_destroy else self._weighted_pick(self.destroy_weights, "destroy"),
+                    self.rng.choice(untried_repair) if untried_repair else self._weighted_pick(self.repair_weights, "repair"),
                     phase,
                 )
         self._last_selection_action = "independent"

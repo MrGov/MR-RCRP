@@ -13,6 +13,19 @@ python -m mrta_rect_coverage.main --config configs/default.yaml
 
 The configured instance and output paths are relative to the project root. The default config selects ALNS/B1. Inspect `configs/default.yaml` before running if local edits changed it.
 
+## Problem-State Repair Portfolio Replay
+
+Run the small offline candidate replay and matched short ALNS checks:
+
+```powershell
+$env:PYTHONPATH='src'
+python -m mrta_rect_coverage.experiments.operator_portfolio_evolution --config configs/operator_portfolio_evolution.json
+```
+
+The config uses one manifest-qualified development instance for state-based selection and a second for a one-pass stage-end check. It is fixed at 12 baseline trace iterations, 12 candidate repair sources, 36 paired repair evaluations, two repair slots, one short ALNS seed, and 12 deployment iterations. It also compares `spatial_sort` with the exact-DP insertion constructor; this initializer check is kept separate from the operator comparison. The runner validates source and manifest hashes and refuses to overwrite an existing output directory. The current config has `llm.enabled=false`, `max_calls=0`, and `max_tokens=0`; it replays previously recorded E17 artifacts only. The completed run is `outputs/operator_portfolio_evolution/run_007/portfolio_evolution.json`; the current config defaults to a fresh `run_008` output and writes candidate hashes, paired outcomes, structural revision prompt, initialization and group-selection results, operator calls/rewards/acceptance/improvements/timing/fallbacks, LLM accounting, and stop reason.
+
+To change the output directory before rerunning, edit `output_dir` in the JSON config and choose a new path. Do not enable provider calls without an explicitly authorized call/token budget. The stage-end entry is reported separately and does not influence candidate or deployment selection.
+
 ## Focused Tests
 
 ```powershell

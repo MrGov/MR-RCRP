@@ -97,6 +97,24 @@ def test_segment_updates_only_at_boundaries(monkeypatch):
     assert result.iterations_completed == 5
 
 
+def test_minimum_operator_exploration_selects_each_registered_repair_once():
+    s = solver(iterations=3, operator_minimum_uses=1)
+    result = s.solve()
+    assert all(record.uses >= 1 for record in result.operator_usage_stats["repair"].values())
+
+
+def test_state_capture_records_paired_destroy_and_repair_state():
+    s = solver(iterations=1, capture_operator_states=True)
+    result = s.solve()
+    row = result.iteration_history[0]
+    assert row["state_routes"] == s.initial_solution.routes
+    original = {task for route in row["state_routes"] for task in route}
+    destroyed = {task for route in row["partial_routes"] for task in route} | set(row["removed_tasks"])
+    repaired = {task for route in row["repaired_routes"] for task in route}
+    assert original == destroyed == repaired
+    assert len(row["per_robot_costs"]) == s.instance.robot_count
+
+
 def test_b1_yaml_and_original_defaults():
     cfg = load_config("configs/e3_b1.yaml")
     assert cfg.alns_profile == "B1" and cfg.alns_iterations is None

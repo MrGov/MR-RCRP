@@ -1,0 +1,23 @@
+{
+  "manifest": "data/structural_benchmark_v1/manifest.json",
+  "development_instances": 1,
+  "check_instances": 1,
+  "seed": 23,
+  "trace_iterations": 12,
+  "deployment_iterations": 12,
+  "candidate_archive_capacity": 12,
+  "deployment_capacity": 2,
+  "min_state_gain": 0.001,
+  "candidate_evaluation_budget": 36,
+  "max_rounds": 1,
+  "stagnation_patience": 2,
+  "minimum_effective_improvement": 0.001,
+  "llm": {
+    "enabled": false,
+    "max_calls": 0,
+    "max_tokens": 0,
+    "rounds": 0,
+    "candidates_per_round": 0
+  },
+  "output_dir": "outputs/operator_portfolio_evolution/run_008"
+}
