@@ -246,7 +246,9 @@ def _evaluate_candidate(solver, candidate, trace):
         wall_ms = (perf_counter() - started) * 1000
         runtimes.append(wall_ms)
         if result.status != "success" or not solver._is_valid_full_solution(result.result.solution):
-            outcomes.append({"case": case_id, "status": result.status if result.status != "success" else "invalid_solution"})
+            outcomes.append({"case": case_id, "status": result.status if result.status != "success" else "invalid_solution",
+                             "error_message": getattr(result, "error_message", ""),
+                             "instance_id": item["instance_id"], "band": item["band"]})
             gains.append(float("nan"))
             raw_gains.append(float("nan"))
             continue
@@ -317,7 +319,7 @@ def _evaluate_candidate(solver, candidate, trace):
         "valid": valid,
         "score": mean(gains) if valid else -1e12,
         "gains": gains if valid else [],
-        "raw_repair_gains": raw_gains,
+        "raw_repair_gains": [value if value == value else None for value in raw_gains],
         "runtime_ms": mean(runtimes) if runtimes else 0.0,
         "paired_evaluation_runtime_ms": mean(evaluation_runtimes) if evaluation_runtimes else 0.0,
         "route_dp_calls": sum(row.get("route_dp_calls", 0) for row in outcomes),

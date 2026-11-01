@@ -1,0 +1,14 @@
+{
+  "replay": "outputs/operator_portfolio_evolution/run_012/portfolio_evolution.json",
+  "output_dir": "outputs/operator_gap_revision/batch_001",
+  "max_requests": 16,
+  "max_rounds": 2,
+  "candidates_per_round": 1,
+  "max_repairs_per_candidate": 1,
+  "max_output_tokens": 8000,
+  "deployment_seconds": 1.0,
+  "seeds": [23, 29],
+  "runtime_cap_ms": 500,
+  "minimum_gain": 0.001,
+  "min_behavior_delta": 2.0
+}
