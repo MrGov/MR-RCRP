@@ -418,6 +418,20 @@ class ALNSSolver:
         self.operator_time_stats["repair"][name] = [0.0, 0.0]
         self.segment_time_stats["repair"][name] = [0.0, 0.0]
 
+    def register_bounded_repair(self, kernel, *, name: str) -> None:
+        """Register the trusted two-step kernel; its policy stays in a worker."""
+        from .bounded_repair_search import BoundedRepairSearch
+        if not isinstance(kernel, BoundedRepairSearch) or kernel.solver is not self:
+            raise ValueError("Expected this solver's bounded repair kernel")
+        if name in self.repair_ops:
+            raise ValueError(f"duplicate repair name: {name}")
+        self.repair_ops[name] = kernel
+        self.repair_weights[name] = 1.0
+        self.operator_stats["repair"][name] = OperatorRecord()
+        self.segment_stats["repair"][name] = OperatorRecord()
+        self.operator_time_stats["repair"][name] = [0.0, 0.0]
+        self.segment_time_stats["repair"][name] = [0.0, 0.0]
+
     def register_development_destroy(self, proxy: CandidateProxy, *, name: str) -> None:
         """Add a loader-validated, bounded destroy to the existing adaptive pool."""
         if not isinstance(proxy, CandidateProxy) or not proxy.expected_code_hash:

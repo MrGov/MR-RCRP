@@ -101,6 +101,19 @@ def test_parse_json_truncates_to_n() -> None:
 # ------------------------------------------------------------------
 
 
+def test_parse_pair_strategy_fence():
+    provider = _make_provider('```python\ndef rank_pairs(features, rng):\n    return []\n```')
+    drafts = provider.generate_operator_candidates('prompt', 1, 'pair_strategy', 1)
+    assert len(drafts) == 1
+    assert drafts[0].operator_type == 'pair_strategy'
+    assert provider.last_call_metadata['raw_response_candidate_count'] == 1
+
+
+def test_pair_strategy_fence_rejects_full_repair():
+    provider = _make_provider('```python\ndef repair(partial_solution, unassigned_tasks, context, rng):\n    pass\n```')
+    assert provider.generate_operator_candidates('prompt', 1, 'pair_strategy', 1) == []
+
+
 def test_parse_code_fences_repair() -> None:
     response = (
         "Here is a repair operator:\n"

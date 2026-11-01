@@ -12,7 +12,7 @@ from pathlib import Path
 from time import perf_counter
 from typing import Any, Sequence
 
-from .candidate_security import validate_candidate_source
+from .candidate_security import validate_candidate_source, candidate_function_name
 
 
 TRUSTED_EXECUTOR_SANDBOX_LEVEL = "timeout_only"
@@ -266,7 +266,7 @@ def _candidate_worker(
             sys.modules[module_name] = module
             compiled = compile(source_text, str(candidate_path), "exec")
             exec(compiled, module.__dict__)
-            fn_name = "repair" if operator_type == "repair" else "destroy"
+            fn_name = candidate_function_name(operator_type)
             function = getattr(module, fn_name, None)
             if function is None:
                 raise AttributeError(f"Missing required function: {fn_name}")

@@ -71,16 +71,20 @@ def code_sha256(source: str) -> str:
     return hashlib.sha256(source.encode("utf-8")).hexdigest()
 
 
+def candidate_function_name(operator_type: str) -> str:
+    return {"repair": "repair", "destroy": "destroy", "pair_strategy": "rank_pairs"}[operator_type]
+
+
 def validate_candidate_source(source: str, operator_type: str) -> ast.Module:
     """Parse and reject forbidden capabilities before any candidate import."""
 
     tree = ast.parse(source)
-    expected_name = "repair" if operator_type == "repair" else "destroy"
-    expected_args = (
-        ["partial_solution", "unassigned_tasks", "context", "rng"]
-        if operator_type == "repair"
-        else ["solution", "context", "rng"]
-    )
+    expected_name = candidate_function_name(operator_type)
+    expected_args = {
+        "repair": ["partial_solution", "unassigned_tasks", "context", "rng"],
+        "destroy": ["solution", "context", "rng"],
+        "pair_strategy": ["features", "rng"],
+    }[operator_type]
 
     target_functions = [
         node
@@ -105,6 +109,15 @@ def validate_candidate_source(source: str, operator_type: str) -> ast.Module:
         raise ValueError(f"Invalid signature {actual_args}, expected {expected_args}")
 
     for node in ast.walk(tree):
+        if operator_type == "pair_strategy":
+            # This narrow interface needs only arithmetic/list logic. In particular,
+            # it cannot import the solver/DP or mutate persistent imported modules.
+            if isinstance(node, ast.Import) and any(a.name != "math" for a in node.names):
+                raise CandidateSecurityError("Pair strategies may import only math")
+            if isinstance(node, ast.ImportFrom) and (node.module != "math" or node.level):
+                raise CandidateSecurityError("Pair strategies may import only math")
+            if isinstance(node, ast.Attribute) and isinstance(node.ctx, (ast.Store, ast.Del)):
+                raise CandidateSecurityError("Pair strategies cannot mutate object attributes")
         if isinstance(node, ast.Import):
             for alias in node.names:
                 _reject_module(alias.name)

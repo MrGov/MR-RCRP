@@ -1,0 +1,23 @@
+{
+  "output_dir": "outputs/bounded_repair_search/run_001",
+  "replay": "outputs/operator_gap_revision/executor_recheck_001/results.json",
+  "added_instances": ["development/SPATIAL/R2_T20_0", "development/BOTTLENECK/R4_T40_0"],
+  "instance_rule": "replicate 0, next larger spatial layout (R2/T20), then four-robot bottleneck layout (R4/T40); fixed before outcomes",
+  "trace_iterations": 24,
+  "trace_seed": 23,
+  "trace_removed": 4,
+  "stagnation_patience": 4,
+  "extra_ls_case_indices": [0, 3, 6, 9],
+  "extra_ls_iterations": 3,
+  "search": {"max_tasks": 6, "max_pairs": 2, "first_width": 3, "second_width": 2, "completions_per_pair": 2, "max_expansions": 36, "max_prices": 4096},
+  "max_rounds": 2,
+  "candidates_per_round": 1,
+  "max_requests": 6,
+  "max_output_tokens": 6000,
+  "deployment_iterations": 40,
+  "deployment_seconds": 2.4,
+  "deployment_seeds": [23, 29],
+  "selection_rule": "Eligible = valid and executed with zero strategy errors. Compare fixed-iteration and 2.4-second means on all four development instances; retain a generated policy only if its timed mean improves both manual pool and deterministic-kernel group by at least 1 model-time unit. Otherwise retain manual pool pending mechanism judgment. No significance claim.",
+  "stop_rule": "At most two generations, one candidate per generation; one optional engineering fix per candidate within six actual requests; stop on unavailable useful reference action space or no actionable feedback. No automatic retries.",
+  "independent_check": "None: all four instances are development feedback/selection inputs; no independent validation claimed."
+}

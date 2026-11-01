@@ -4,6 +4,7 @@ from __future__ import annotations
 import json
 import logging
 import re
+from .candidate_security import candidate_function_name
 from pathlib import Path
 from time import perf_counter
 from typing import TYPE_CHECKING, Dict, List, Optional
@@ -251,7 +252,7 @@ class LangChainOperatorEvolutionProvider(OperatorEvolutionProvider):
             return 1
         if isinstance(parsed, list):
             return len(parsed)
-        func_name = "repair" if operator_type == "repair" else "destroy"
+        func_name = candidate_function_name(operator_type)
         blocks = re.findall(r"```(?:python)?\s*\n(.*?)```", text, re.DOTALL)
         return sum(f"def {func_name}(" in block for block in blocks) or None
 
@@ -334,7 +335,7 @@ class LangChainOperatorEvolutionProvider(OperatorEvolutionProvider):
         if not blocks:
             return []
 
-        func_name = "repair" if operator_type == "repair" else "destroy"
+        func_name = candidate_function_name(operator_type)
         drafts: List[GeneratedOperatorDraft] = []
         for idx, code in enumerate(blocks):
             code = code.strip()

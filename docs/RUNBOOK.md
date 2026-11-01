@@ -80,6 +80,34 @@ python -m pytest tests/test_gap_deployment_revision.py tests/test_executor_equiv
 
 The focused suite includes both new children, repeated-call isolation, fixed-iteration solver traces, hash drift, timeout, invalid output, runtime failure and exception/early-exit cleanup. The full historical experiment system was not rerun. Execution acceleration alone is not evidence of improved operator quality; see the current status page for the C decision and its narrow development scope.
 
+## Bounded Repair Strategy Prototype (Completed Development Batch)
+
+`configs/bounded_repair_search.json` defines the new two-step host search and isolated pair-ranking experiment. `outputs/bounded_repair_search/run_001/analysis.json` is the compact result, `decision.json` contains the manual-only deployment decision, and `request_01/` → `request_02/` contains the real evaluated parent/child chain. Both candidates use the same host pricing/branching/completion kernel as the deterministic reference. This batch made two calls and is complete; do not automatically open another paid batch.
+
+Commands below are the exact staged workflow. From the project directory, use the working local interpreter (the PATH `python` can be a WindowsApps stub):
+
+```powershell
+$env:PYTHONPATH='src'
+& G:\Anaconda\envs\mrta_env\python.exe -m mrta_rect_coverage.experiments.bounded_repair_strategy --stage capability
+& G:\Anaconda\envs\mrta_env\python.exe -m mrta_rect_coverage.experiments.bounded_repair_strategy --stage request --round 1
+& G:\Anaconda\envs\mrta_env\python.exe -m mrta_rect_coverage.experiments.bounded_repair_strategy --stage evaluate --round 1
+& G:\Anaconda\envs\mrta_env\python.exe -m mrta_rect_coverage.experiments.bounded_repair_strategy --stage request --round 2
+& G:\Anaconda\envs\mrta_env\python.exe -m mrta_rect_coverage.experiments.bounded_repair_strategy --stage evaluate --round 2
+& G:\Anaconda\envs\mrta_env\python.exe -m mrta_rect_coverage.experiments.bounded_repair_strategy --stage deploy
+```
+
+The existing output names are immutable: these commands now refuse to overwrite completed stages. `capability-evaluate` can finish an interrupted prepared capability run from its saved cases without resampling; it also refuses to overwrite a completed capability decision. Only `request` invokes the configured provider. A new run requires an explicitly chosen fresh `output_dir` in a copied config passed with `--config`; do not reuse historical responses as new calls. Requests are charged before invocation; the six-request ceiling includes failures, retries are disabled, and this driver requests one candidate in each of two rounds. No automatic model repair is performed. Deployment checks four prescribed groups on four development inputs and two seeds, at 40 iterations and 2.4 seconds; do not run tests or other heavy tasks concurrently.
+
+The following **small local verification command is directly runnable now**, uses the saved candidates, makes no model requests and writes no historical results:
+
+```powershell
+& G:\Anaconda\envs\mrta_env\python.exe -m pytest tests/test_bounded_repair_search.py tests/test_bounded_strategy_candidates.py tests/test_langchain_provider_parsing.py tests/test_executor_equivalence.py tests/test_alns_solver.py tests/test_alns_search_control.py tests/test_e13_persistent_execution.py tests/test_gap_deployment_revision.py tests/test_operator_gap_revision.py -q
+```
+
+The recorded command passed **76 tests**. Actual-candidate tests are explicitly skipped if this local output batch is absent; all four were present and executed here. Runtime artifacts include explicit source hashes, original/resident checks, individual member calls and rewards, full per-state joint branches, feasible completed solutions, DP work, pricing work and initialization/worker startup costs. `analysis.json` clarifies that the old global `insertion_prices` statistic is a mixed operation counter; use `kernel_price_requests` for the new kernel's enforced insertion-slot budget. `summary.json` is retained as the initial extraction; its global `price_requests` label is qualified by this clarification and the corrected field in `analysis.json`.
+
+For direct solver use, instantiate `BoundedRepairSearch(solver)` and call `solver.register_bounded_repair(kernel, name="bounded_reference")`. For an archived LLM strategy, use `with StrategyExecutor(candidate_path, expected_hash=recorded_hash) as policy`, construct the same kernel with `ranker=policy`, register it and solve inside the context. Never import generated candidate code into the main process. The selected default from this batch remains manual-only; explicit registration is an experiment opt-in. See the current status page for the negative/mixed LLM result and the single next cost hypothesis.
+
 ## Focused Tests
 
 ```powershell
