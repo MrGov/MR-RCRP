@@ -43,7 +43,7 @@ def test_joint_routes_exact_and_inputs_unchanged():
         costs = [s.route_dp.evaluate_route(r).total_cost for r in branch['routes']]
         assert branch['costs'] == pytest.approx(costs)
     assert any(len(set(b['robots'])) == 2 for b in record['joint_branches'])
-    assert record['pricing_work']['insertion_prices'] == record['price_requests']
+    assert record['pricing_work']['insertion_requests'] == record['price_requests']
 
 
 @pytest.mark.parametrize('prices,expansions', [(100,36),(400,36),(4096,18),(4096,0)])
@@ -54,7 +54,7 @@ def test_actual_caps_not_just_declared(prices, expansions):
     result = kernel(partial,removed,s.solution_evaluator.evaluate_partial(partial))
     r = kernel.records[-1]
     assert r['price_requests'] <= prices
-    assert r['pricing_work']['insertion_prices'] == r['price_requests']
+    assert r['pricing_work']['insertion_requests'] == r['price_requests']
     assert r['expansions'] <= expansions
     assert s._is_valid_full_solution(result)
 
@@ -163,7 +163,8 @@ def test_reference_and_policy_have_identical_kernel_capabilities(tmp_path):
             kernel=BoundedRepairSearch(s,ranker=policy or reference_rank_pairs)
             result=kernel(partial,removed,s.solution_evaluator.evaluate_partial(partial))
             record=kernel.records[-1]
-            outputs.append((result.routes,{k:record[k] for k in ('features','selected_pairs','joint_branches','price_requests','expansions','dp_work','pricing_work')}))
+            outputs.append((result.routes,{k:record[k] for k in ('features','selected_pairs','joint_branches','price_requests','expansions','dp_work')},
+                            {k:v for k,v in record['pricing_work'].items() if not k.endswith('_seconds')}))
         finally:
             if policy:
                 policy.close()

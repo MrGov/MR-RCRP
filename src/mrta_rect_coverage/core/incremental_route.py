@@ -30,6 +30,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from math import inf
+from time import perf_counter
 from typing import Dict, Iterable, List, Optional, Tuple
 
 from .cost_matrix import CostMatrix
@@ -79,6 +80,13 @@ class RouteIncrementalEvaluator:
         self._table_builds = 0
         self._insertion_calls = 0
         self._price_hits = 0
+        # Dedicated insertion-only counters. Legacy insertion_prices below also
+        # includes removal/replacement work and is retained for old consumers.
+        self._insertion_requests = 0
+        self._insertion_computations = 0
+        self._insertion_cache_hits = 0
+        self._table_build_seconds = 0.0
+        self._insertion_compute_seconds = 0.0
 
     # -- tables -----------------------------------------------------------
     def tables(self, route: List[int] | Tuple[int, ...]) -> RouteTables:
@@ -88,7 +96,9 @@ class RouteIncrementalEvaluator:
         cached = self._cache.get(key)
         if cached is not None:
             return cached
+        started = perf_counter()
         tables = self._build(key)
+        self._table_build_seconds += perf_counter() - started
         if len(self._cache) >= self._cache_limit:
             # Generational reset: routes are replaced constantly, so an eviction
             # policy would not buy hit rate and would cost bookkeeping.
@@ -179,6 +189,19 @@ class RouteIncrementalEvaluator:
         tables = self.tables(route)
         if task_id not in self._task_states:
             raise ValueError(f"Unknown task id {task_id}")
+        return [self.insertion_cost_at(tables, position, task_id)
+                for position in range(len(tables.route) + 1)]
+
+    def insertion_costs_uncached(self, route: List[int] | Tuple[int, ...], task_id: int) -> List[float]:
+        """Pre-cache vector path retained for semantic tests, not a second pricer.
+
+        Uses the same recurrence and table cache, but neither reads nor populates
+        the insertion-price cache. Both paths charge every logical slot request.
+        """
+        tables = self.tables(route)
+        if task_id not in self._task_states:
+            raise ValueError(f"Unknown task id {task_id}")
+        self._insertion_requests += len(tables.route) + 1
         return [self._insertion_at(tables, position, task_id)
                 for position in range(len(tables.route) + 1)]
 
@@ -210,10 +233,12 @@ class RouteIncrementalEvaluator:
             raise ValueError(
                 f"position {position} out of range for route of length {len(tables.route)}"
             )
+        self._insertion_requests += 1
         key = ("insert", tables.route, task_id, position)
         cached = self._price_cache.get(key)
         if cached is not None:
             self._price_hits += 1
+            self._insertion_cache_hits += 1
             return cached
         value = self._insertion_at(tables, position, task_id)
         self._remember_price(key, value)
@@ -221,6 +246,14 @@ class RouteIncrementalEvaluator:
 
     def _insertion_at(self, tables: RouteTables, position: int, task_id: int) -> float:
         self._insertion_calls += 1
+        self._insertion_computations += 1
+        started = perf_counter()
+        try:
+            return self._compute_insertion_at(tables, position, task_id)
+        finally:
+            self._insertion_compute_seconds += perf_counter() - started
+
+    def _compute_insertion_at(self, tables: RouteTables, position: int, task_id: int) -> float:
         transition = self._cost_matrix.transition
         depot_to_state = self._cost_matrix.depot_to_state
         state_to_depot = self._cost_matrix.state_to_depot
@@ -434,8 +467,13 @@ class RouteIncrementalEvaluator:
         self._removal_cache.clear()
 
     # -- introspection ----------------------------------------------------
-    def statistics(self) -> Dict[str, int]:
-        """Return cheap counters; they never include floating point state."""
+    def statistics(self) -> Dict[str, int | float]:
+        """Counts are cumulative across cache clears; timers measure actual work.
+
+        insertion_requests == insertion_computations + insertion_cache_hits.
+        Caches are instance-local, valid for this evaluator's immutable cost
+        matrix/state data, and bounded by the existing generational capacities.
+        """
 
         return {
             "table_builds": self._table_builds,
@@ -443,6 +481,11 @@ class RouteIncrementalEvaluator:
             "price_cache_hits": self._price_hits,
             "cached_routes": len(self._cache),
             "cached_prices": len(self._price_cache),
+            "insertion_requests": self._insertion_requests,
+            "insertion_cache_hits": self._insertion_cache_hits,
+            "insertion_computations": self._insertion_computations,
+            "table_build_seconds": self._table_build_seconds,
+            "insertion_compute_seconds": self._insertion_compute_seconds,
         }
 
     def clear_cache(self) -> None:

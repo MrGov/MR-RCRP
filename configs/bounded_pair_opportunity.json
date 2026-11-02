@@ -1,0 +1,21 @@
+{
+  "output_dir": "outputs/bounded_repair_search/cache_opportunity_001",
+  "source_run": "outputs/bounded_repair_search/run_001",
+  "representative_rules": [
+    "First saved SPATIAL R2/T20 paired state with more available pairs than max_pairs",
+    "First saved BOTTLENECK R4/T40 paired state with more available pairs than max_pairs",
+    "First recorded reference-kernel call on BOTTLENECK R4/T40, fixed 40 iterations, seed 23, with six pooled tasks"
+  ],
+  "diagnostic_max_states": 3,
+  "diagnostic_max_tasks": 6,
+  "diagnostic_max_pairs_per_state": 15,
+  "diagnostic_rule": "Force each eligible pair first in a separate one-pair kernel run; same depth, per-pair beams, two selected leaves, greedy incumbent/tail and one-pass LS. Extra offline work, never an equal-budget deployment score.",
+  "revision_gate": "At least one diagnosed state has a strictly better post-LS forced pair missed by reference and both old policies, and one normal two-pair counterfactual ranking realizes that improvement. This is supervised development opportunity, not general superiority.",
+  "max_rounds": 2,
+  "candidates_per_round": 1,
+  "max_requests": 6,
+  "max_output_tokens": 6000,
+  "parent": "request_02/candidate.py",
+  "minimum_improvement": 0.000001,
+  "stop_rule": "No model call unless actionable ranking opportunity is found. At most two evaluated revisions; no automatic retries; at most one engineering fix per candidate within six charged requests."
+}

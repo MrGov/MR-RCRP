@@ -108,6 +108,33 @@ The recorded command passed **76 tests**. Actual-candidate tests are explicitly 
 
 For direct solver use, instantiate `BoundedRepairSearch(solver)` and call `solver.register_bounded_repair(kernel, name="bounded_reference")`. For an archived LLM strategy, use `with StrategyExecutor(candidate_path, expected_hash=recorded_hash) as policy`, construct the same kernel with `ranker=policy`, register it and solve inside the context. Never import generated candidate code into the main process. The selected default from this batch remains manual-only; explicit registration is an experiment opt-in. See the current status page for the negative/mixed LLM result and the single next cost hypothesis.
 
+## Shared Price Cache / Pair-Ranking Opportunity Recheck
+
+The completed no-call run is `outputs/bounded_repair_search/cache_opportunity_001/`. Read `analysis.json` for paired per-instance/seed results, actual pricing/DP work, startup and end-to-end costs, bounded enumeration, source hashes and the stop decision. `diagnostic_states.json` records the three states fixed before new outcomes. `recheck/deployment_*.json` retains full traces and member statistics. The current decision is manual-only; stop this pair-ranking lineage. The next single question is whether a state-based call/skip decision can allocate extra search productively.
+
+Run the small verification now; it makes no provider requests and does not modify experiment outputs:
+
+```powershell
+$env:PYTHONPATH='src'
+& G:\Anaconda\envs\mrta_env\python.exe -m pytest tests/test_insertion_price_cache.py tests/test_incremental_route.py tests/test_priced_local_search.py tests/test_bounded_repair_search.py tests/test_bounded_strategy_candidates.py tests/test_pair_opportunity_analysis.py -q
+```
+
+The completed command passed **62 tests**; all actual-candidate tests ran. The old vector calculation is available as `pricer.insertion_costs_uncached` for semantic tests. Production uses the cached vector API automatically. Search budgets still charge logical insertion-slot requests on every hit. Read `insertion_requests`, `insertion_cache_hits`, `insertion_computations`, `table_builds` and the two `_seconds` fields; do not reinterpret the retained mixed `insertion_prices` field.
+
+The completed workflow was:
+
+```powershell
+& G:\Anaconda\envs\mrta_env\python.exe -m mrta_rect_coverage.experiments.bounded_pair_opportunity --stage prepare
+& G:\Anaconda\envs\mrta_env\python.exe -m mrta_rect_coverage.experiments.bounded_pair_opportunity --stage verify
+& G:\Anaconda\envs\mrta_env\python.exe -m mrta_rect_coverage.experiments.bounded_pair_opportunity --stage recheck
+& G:\Anaconda\envs\mrta_env\python.exe -m mrta_rect_coverage.experiments.bounded_pair_opportunity --stage diagnose
+& G:\Anaconda\envs\mrta_env\python.exe -m mrta_rect_coverage.experiments.bounded_pair_opportunity --stage summarize
+```
+
+Default config: `configs/bounded_pair_opportunity.json`. Existing completed stages refuse overwrite. If a future **deliberate repeat** is needed, copy this config, set a fresh `output_dir` and pass that same copied file with `--config` to every stage; keep `source_run` and public settings unchanged. Do not rerun simply to seek a favorable result. `summarize` only reads saved results and writes a fresh summary. The no-call driver has no provider request stage: conditional generation requires actual positive opportunity evidence, which this run did not find.
+
+`recheck` performs precisely the original four groups × four instances × two seeds, first fixed 40 iterations then the original nominal 2.4-second budget; no calibration or parameter scan is repeated. Run it serially, without tests/heavy jobs alongside timing. Cold worker startup remains inside solve; end-to-end records include setup/load/cleanup. The 161.168 ms maximum observed deadline overrun is reported, not hidden. `diagnose` performs only the 27 fixed-pool pair interventions and three-policy controls on the three preselected states, and is extra offline work, not an equal-budget deployment claim. It does not use final/lockbox or generate candidates.
+
 ## Focused Tests
 
 ```powershell

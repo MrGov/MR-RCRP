@@ -2,6 +2,8 @@
 
 This is the current factual status page. It describes the repository at the reviewed local HEAD and available records; it is not an authorization to run providers, experiments, or locked data. Historical reports and raw outputs are preserved as recorded.
 
+**Latest development decision (2026-11-01):** shared insertion-price caching is implemented and behavior-preserving on the recorded checks. The frozen four-instance deployment recheck and 27-pair diagnosis are complete in `outputs/bounded_repair_search/cache_opportunity_001/analysis.json`. Retain the manual pool, stop the current pair-ranking lineage, and next test only a state-based decision about **whether to invoke optional two-step search**. No new LLM requests were made in this recheck. The evidence and limits are detailed in the cache/opportunity section below; earlier next-step statements are historical.
+
 ## Implemented Solver
 
 - The production loader reads the six-line instance format and requires `sweep_width sweep_speed travel_speed turning_time` on line 2.
@@ -112,6 +114,58 @@ The aggregate hides a material structure difference. Timed SPATIAL seed results 
 **Decision: modify the new search kernel before further generation.** The bounded search action space has useful paired and fixed-iteration evidence, with a real cross-robot, non-first-branch example. Its extra computation loses aggregate value under the tested time budget, and the current LLM pair-selection revisions have not established additional value. The next single priority is an equivalence-preserving check of cached exact slot pricing in this new kernel, holding branch decisions, candidates and caps fixed, to test the BOTTLENECK cost deficit. Code evidence: the reused `insertion_costs` vector calls `_insertion_at` for every slot without the memo used by `insertion_cost_at`; at R4/T40 with ten removed tasks, one kernel call uses 385 incumbent + 340 feature + 420 second-step + 1264 completion prices. This is a concrete cost hypothesis, not a promise of a win or a new algorithmic innovation. Do not deepen this policy lineage or claim general superiority from the current development results.
 
 Focused verification passed **76 tests**, recorded in `verification.txt`. It covers exact joint routes against full Route-DP, budget enforcement, task coverage, input/RNG isolation, invalid IDs, timeout/runtime/source-drift cleanup, parser compatibility, actual generated-source cold/resident equivalence, fixed-iteration ALNS trace equivalence, and existing ALNS/executor regressions. All four local actual-candidate tests executed, with no artifact-related skips. No historical experiment system was rerun. `execution_notes.json` preserves the initial logging-only failure and subsequent test/reporting corrections; the algorithm, cases and budgets were unchanged during evaluation.
+
+### Shared Pricing Cache and Pair-Ranking Opportunity Check (2026-11-01)
+
+`incremental_route.py::insertion_costs` now reuses `insertion_cost_at` for each slot, in its original order. The same public implementation serves manual repair, bounded search and local search. `insertion_costs_uncached` retains the old vector evaluation using the same recurrence/table cache as a test reference. Price keys retain operation, route tuple, task ID and position; each evaluator owns its own immutable instance-specific matrix/states and caches. Existing capacities remain 256 route tables and 50,000 insertion/replacement price entries, with generational eviction; explicit cache clearing drops entries, not cumulative counters. No Route-DP recurrence or tie rule changed.
+
+New instrumentation separates `insertion_requests`, `insertion_cache_hits`, `insertion_computations`, `table_builds`, `table_build_seconds` and `insertion_compute_seconds`. The insertion-only identity is requests = hits + computations; legacy `insertion_prices`/`price_cache_hits` remain mixed-operation counters and must not be relabeled as insertion-only work. `SearchBudget` still charges every logical slot, including hits. The six-task/two-pair pool, width 3/2, two completions per pair, 36 expansions and 4,096 logical prices were not enlarged.
+
+**Semantic verification:** 36 paired cache/uncached controls (12 states × reference and two saved policies) preserve full ranking, selected pairs, materialized branches, retained/completed leaves, returned routes, makespan, post-LS results and logical requests. Four additional 12-iteration, no-deadline controls preserve solver traces. All 32 optimized 40-iteration deployment runs also match saved pre-cache trajectories/results. Actual computations and elapsed time are deliberately not required to match. Across the reference's 12 paired states including the same one-pass LS, requests stay **7,285**; hits rise **502 → 4,010**, actual insertions fall **6,783 → 3,275** (51.7%), table builds stay **360**, and measured insertion-compute time falls **0.1220 → 0.0590 seconds**. The generated controls show similar reductions; this is engineering reuse of exact work, not a new search capability.
+
+**One frozen deployment recheck:** same four development instances, seeds 23/29, 40 iterations or nominal 2.4 seconds. Initialization, acceptance, LS, destroy pool, repair weights/exploration/rewards and search budgets are unchanged. All groups use the optimized shared pricer; generated policies still run in the checked resident executor. No tests or heavy agent jobs ran alongside timed solves. Each non-manual group contains the same three manual repairs plus exactly one indicated kernel, with no addition-subset sweep.
+
+The table gives paired two-seed means; parentheses are differences from manual on the same instance (negative is better). These are consumed development inputs, not an independent check or a significance result.
+
+| Fixed 40 iterations | Manual | Reference | Existing LLM 1 | Existing LLM 2 |
+|---|---:|---:|---:|---:|
+| BASE R2/T10 | 1292.000 | 1292.500 (+0.500) | 1292.500 (+0.500) | 1292.500 (+0.500) |
+| HV-GEOM R2/T10 | 1308.000 | 1308.000 (0) | 1308.000 (0) | 1308.000 (0) |
+| SPATIAL R2/T20 | 3148.500 | 3070.000 (−78.500) | 3073.500 (−75.000) | 3059.500 (−89.000) |
+| BOTTLENECK R4/T40 | 3640.450 | 3263.049 (−377.402) | 3229.202 (−411.249) | 3285.672 (−354.779) |
+| Eight-run mean | 2347.238 | 2233.387 | 2225.800 | 2236.418 |
+
+| Nominal 2.4 seconds | Manual | Reference | Existing LLM 1 | Existing LLM 2 |
+|---|---:|---:|---:|---:|
+| BASE R2/T10 | 1292.000 | 1292.000 (0) | 1292.500 (+0.500) | 1292.500 (+0.500) |
+| HV-GEOM R2/T10 | 1308.000 | 1308.000 (0) | 1308.000 (0) | 1308.000 (0) |
+| SPATIAL R2/T20 | 3062.500 | 3036.500 (−26.000; −0.849%) | 3044.000 (−18.500; −0.604%) | 3033.500 (−29.000; −0.947%) |
+| BOTTLENECK R4/T40 | 2880.225 | 2942.842 (+62.617; +2.174%) | 2963.985 (+83.760; +2.908%) | 3007.631 (+127.406; +4.423%) |
+| Eight-run mean | **2135.681** | 2144.835 | 2152.121 | 2160.408 |
+
+Individual seed results, percent/absolute differences, member calls/acceptances/improvements/shared rewards, actual DP/pricing work and source hashes are in `analysis.json` and raw `recheck/deployment_*.json`. Fixed iteration counts are not equal computation: reference uses 189,038 logical insertions and 7,536 full DP calls, versus manual 132,051 and 3,920 across eight runs. Timed iteration totals are manual/reference/LLM1/LLM2 **48,224 / 21,185 / 10,191 / 8,652**. Compared with the saved pre-cache timed run these are larger, but time-progress cooling means timed trajectories need not have identical prefixes; no controlled timing-speedup factor or monotonic quality claim is inferred from that comparison.
+
+Timed kernel calls are **6,156 / 2,994 / 2,548** for reference/LLM1/LLM2; full per-member statistics remain available, so selection frequency is not labeled complementarity. Generated cold startup remains inside the solve budget: cumulative startup is **1.257 / 1.239 seconds** across eight runs; validation/loading outside solve is **0.0067 / 0.0097 seconds**, while per-call validation/import inside solve totals **3.291 / 4.478 seconds**. Mean subsequent isolated call latency is **1.311 / 1.989 ms**. End-to-end totals, including setup/loading/startup/cleanup, are manual/reference/LLM1/LLM2 **19.373 / 19.489 / 19.391 / 19.484 seconds**. The deadline is checked between iterations; maximum observed overshoot is **161.168 ms**, not a strict 2.4-second execution cap. All 64 solves are feasible, with no strategy errors/fallbacks, all workers closed and maximum kernel use 2,409 logical prices, below the unchanged cap.
+
+**Ranking opportunity, before any new generation:** replaying the 12 states changes full rankings / selected sets / completed routes / post-LS makespans by **3 / 1 / 0 / 0** for reference → LLM1, and **5 / 3 / 2 / 2** for LLM1 → LLM2. The latter two objective changes are regressions, not gains. Both policies are called once before expansion. LLM2's second-ranked pair depends on the first-ranked pair's identity/features, **not** on the observed result of searching that pair.
+
+The old timed records contain 2,868 kernel calls, of which **2,609 (91.0%) have only one eligible pair**. The fixed-iteration records have 177/334 such calls. The cached timed recheck has 10,918/11,698 (93.3%). There are no zero-candidate calls, multi-pair calls where the whole pool is searched, or budget-truncated prefixes in these records. These call-weighted percentages are dominated by throughput on small instances. One pair removes ranking freedom; it does not prove two-step branching is useless.
+
+Before new outcomes, `diagnostic_states.json` fixed: first SPATIAL paired state with ranking choice, first BOTTLENECK paired state with choice, and first reference BOTTLENECK seed-23 deployment call with six pooled tasks. The diagnostic forces each existing pair through one-pair runs with the same per-pair beams, two retained leaves, incumbent/tail completion and one-pass LS. It examines **6 + 6 + 15 = 27 pairs**, not all subsets or all task pairs in the full instance. It consumes **30,033 repair-slot requests / 11,846 actual insertion computations**, plus separately logged LS work; summed enumeration LS time is 0.222 seconds and the whole diagnostic including normal-policy controls takes 2.122 seconds. This extra offline enumeration is excluded from deployment scores and never presented as a global optimum or improvement ceiling.
+
+| Preselected state | Pair count | Distinct returned full routes | Reference post-LS | Best diagnosed post-LS | Diagnosed post-LS range |
+|---|---:|---:|---:|---:|---:|
+| SPATIAL early | 6 | 3 | 3628.000 | 3628.000 | 3628–3645 |
+| BOTTLENECK early | 6 | 5 | 5144.355 | 5144.355 | 5144.355–5148.120 |
+| BOTTLENECK first six-task-pool deployment call | 15 | 3 | 4109.292 | 4109.292 | 4109.292–4109.292 |
+
+This is not evidence that every pair produces the same route. Retained-partial → distinct tail-completed-route counts are **12 → 6**, **12 → 11**, and **30 → 29**, respectively. The first state exhibits some tail coalescence; it cannot explain the largest state. There all 30 retained leaves use first-rank-zero insertion into robot 0 and leave robot 2's existing route `[33,40,4,16,34,2,5,11]` unchanged, at **4116.1534**. Of 180 expanded joint branches, 59 change that route, but none survives the exact-partial-objective leaf screen. The retained leaves already have identical makespan before tail completion. Tail completions mostly differ yet do not beat the greedy incumbent; all returned solutions reach 4109.292 after the same LS. This locates the observed insensitivity before the tail, in the retained action set's lack of influence on the binding route. It does **not** show that excluded tasks, pruned branches or a different completion would be valueless; those alternatives were not evaluated.
+
+**Decision:** cache optimization is supported; two-step search retains useful evidence on SPATIAL, but its tested BOTTLENECK fixed-iteration advantage still does not survive equal time. LLM pair ranking adds no demonstrated independent benefit. No diagnostic state exposes a better post-LS pair missed by the reference, so the predefined revision gate is false: **0 new model requests, 0 new tokens, 0 new candidates**. Both existing LLM policies remain archived; neither is deployed. Actual deployment stays `greedy_insertion`, `regret_k_insertion`, `bottleneck_balancing_insertion`.
+
+Stop this ranking lineage. The **single next priority** is a state-based **call/skip decision for optional two-step search**, motivated by retained insertions that cannot influence the current binding route and by the structure-dependent cost/benefit. Its proposed inputs are existing exact singleton/route-cost evidence and measured cost, not instance names; no rule is implemented or claimed validated yet. Do not simultaneously widen the pool, change first-step beams or evolve tail completion. Failure of the present ranking decision does not reject two-step search.
+
+Focused verification passed **62 tests** in 5.98 seconds (`verification_final.txt`), including all saved-candidate tests without skips. `verification.txt` preserves a reporting-module syntax error discovered during final test collection; it was corrected before rerunning, with no change to search/pricing decisions or completed experiments. `analysis.json` is produced by a read-only `summarize` stage and contains source/artifact hashes. Historical outputs remain unchanged; no new development inputs, final/lockbox files, model calls, commit or push were used.
 
 ## Evidence Map
 

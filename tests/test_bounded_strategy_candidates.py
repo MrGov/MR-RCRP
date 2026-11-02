@@ -54,6 +54,7 @@ def test_actual_policies_in_fixed_alns_match_across_executor(generation):
         keys=('destroy','repair','accepted','candidate_delta','best_makespan','repaired_routes','refined_routes')
         outputs.append((r.best_solution.routes,
                         [tuple(h.get(k) for k in keys) for h in r.iteration_history],
-                        [x['selected_pairs'] for x in kernel.records],s.insertion_pricer.statistics(),
+                        [x['selected_pairs'] for x in kernel.records],
+                        {k:v for k,v in s.insertion_pricer.statistics().items() if not k.endswith('_seconds')},
                         {k:v for k,v in s.route_dp.statistics().items() if k!='compute_time_sec'}))
     assert outputs[0]==outputs[1]

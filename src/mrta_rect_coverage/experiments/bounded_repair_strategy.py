@@ -71,7 +71,9 @@ def snapshot(s):
 def work(before, after):
     return {group: {k: after[group][k]-before[group][k] for k in keys}
             for group, keys in [('dp', ('calls', 'cache_misses')),
-                                ('prices', ('table_builds', 'insertion_prices', 'price_cache_hits'))]}
+                                ('prices', ('table_builds', 'insertion_prices', 'price_cache_hits',
+                                            'insertion_requests', 'insertion_cache_hits', 'insertion_computations',
+                                            'table_build_seconds', 'insertion_compute_seconds'))]}
 
 
 def paired(out, config, label, policy_path=None):
@@ -298,14 +300,15 @@ def request_generation(out, round_id):
     print(json.dumps(row),flush=True)
 
 
-def deploy(out):
+def deploy(out, *, policy_paths=None, groups=None, modes=('iterations','time')):
     config, entries = read(out/'config.json'), read(out/'entries.json')
     fresh(out/'deployment.json')
-    groups = ['manual', 'reference'] + [f'generation_{i}' for i in (1,2)
+    groups = groups or ['manual', 'reference'] + [f'generation_{i}' for i in (1,2)
         if (out/f'paired_generation_{i}.json').exists() and read(out/f'paired_generation_{i}.json')['valid']]
+    policy_paths = policy_paths or {}
     # No addition subsets: a single new kernel member competes alongside the same manual pool.
     rows = []
-    for mode in ('iterations','time'):
+    for mode in modes:
         for entry in entries:
             for seed in config['deployment_seeds']:
                 for label in groups:
@@ -315,9 +318,8 @@ def deploy(out):
                     s = make_solver(entry,seed,**kwargs)
                     with ExitStack() as stack:
                         policy = None
-                        if label.startswith('generation_'):
-                            i = int(label[-1])
-                            policy_path = out/f'request_{i:02d}/candidate.py'
+                        if label.startswith('generation_') or label in policy_paths:
+                            policy_path = Path(policy_paths[label]) if label in policy_paths else out/f'request_{int(label[-1]):02d}/candidate.py'
                             policy = stack.enter_context(StrategyExecutor(policy_path,
                                 expected_hash=read(policy_path.parent/'lineage.json')['hash']))
                         kernel = None
@@ -344,14 +346,14 @@ def deploy(out):
         save(out/f'deployment_{mode}.json',rows[-len(entries)*len(config['deployment_seeds'])*len(groups):])
     save(out/'deployment.json',rows)
     summary = {mode:{label:mean(r['makespan'] for r in rows if r['mode']==mode and r['group']==label)
-                     for label in groups} for mode in ('iterations','time')}
-    eligible = [lab for lab in groups if lab.startswith('generation_') and
+                     for label in groups} for mode in modes}
+    eligible = [lab for lab in groups if 'time' in summary and lab.startswith('generation_') and
         all(r['valid'] and not r['fallbacks'] and r['executor']['calls']>0 and
             not any(k['strategy_error'] for k in r['kernel_records']) for r in rows if r['group']==lab) and
         summary['time'][lab] <= min(summary['time']['manual'],summary['time']['reference'])-1]
     selected = min(eligible,key=lambda lab:summary['time'][lab]) if eligible else None
     save(out/'decision.json',{'means':summary,'retained_generated':selected,'manual_pool':MANUAL,
-         'stop_reason':'two evaluated generations complete; no additional generation authorized in this run',
+         'stop_reason':config.get('run_stop_reason','two evaluated generations complete; no additional generation authorized in this run'),
          'selection_rule':config['selection_rule']})
     print(json.dumps(summary),flush=True)
 

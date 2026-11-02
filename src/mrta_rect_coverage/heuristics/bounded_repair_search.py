@@ -136,7 +136,7 @@ class BoundedRepairSearch:
         dp_before = s.route_dp.statistics()
         record = {'config': asdict(cap), 'selected_pairs': [], 'joint_branches': [],
                   'completions': [], 'expansions': 0, 'budget_stop': False,
-                  'strategy_error': None, 'features': None}
+                  'strategy_error': None, 'features': None, 'ranked_pairs': []}
 
         def complete(rr, remaining):
             original = s.insertion_pricer
@@ -200,6 +200,7 @@ class BoundedRepairSearch:
                 ranked = []
                 record['strategy_error'] = f'{type(exc).__name__}: {exc}'
             pair_map = {p['id']: p['tasks'] for p in pairs}
+            record['ranked_pairs'] = list(ranked)
             for pair_id in ranked[:cap.max_pairs]:
                 # Reserve every planned greedy tail before adding any branch.
                 tail_prices = _tail_cost(routes, len(tasks)) - (2*slots + 1)
@@ -244,7 +245,10 @@ class BoundedRepairSearch:
         after = s.insertion_pricer.statistics()
         dp_after = s.route_dp.statistics()
         record.update(price_requests=pricer.used, makespan=best_key[0], routes=deepcopy(best.routes),
-                      pricing_work={k: after[k]-before[k] for k in ('table_builds','insertion_prices','price_cache_hits')},
+                      pricing_work={k: after[k]-before[k] for k in (
+                          'table_builds','insertion_prices','price_cache_hits',
+                          'insertion_requests','insertion_cache_hits','insertion_computations',
+                          'table_build_seconds','insertion_compute_seconds')},
                       dp_work={k: dp_after[k]-dp_before[k] for k in ('calls','cache_misses')},
                       runtime_seconds=perf_counter()-start)
         self.records.append(record)
