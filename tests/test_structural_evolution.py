@@ -42,7 +42,7 @@ def test_joint_kernel_exact_and_feasible():
     p,removed=k.destroy(s.initial_solution,e,4)
     result=k.repair(p,removed,s.solution_evaluator.evaluate_partial(p))
     assert s._is_valid_full_solution(result)
-    assert k.records[-1]['prices']<=k.price_cap
+    assert k.records[-1]['price_requests']<=k.price_cap
     assert k.records[-1]['max_live_branches']<=k.width
     assert all(abs(s.route_dp.evaluate_route(r).total_cost-c)<1e-8
                for r,c in zip(result.routes,k.records[-1]['costs']))
@@ -90,3 +90,85 @@ def test_crlf_artifact_hash_and_normalized_worker_hash(tmp_path):
         assert ex({'phase':'destroy','routes':[[1]],'remove_limit':1},random.Random(2))==[1]
     p.write_bytes(b'def search_step(features, rng):\r\n    return [2]\r\n')
     with pytest.raises(ValueError): StructuralExecutor(p,expected_hash=digest)
+
+def test_budget_exhaustion_keeps_last_complete_solution_without_reward():
+    import time
+    from mrta_rect_coverage.heuristics.structural_search import StructuralKernel, PairPortfolioSolver
+    s=solver(iterations=8)
+    def slow(features,rng):
+        time.sleep(.03)
+        return [features['routes'][0][0]]
+    k=StructuralKernel(s,slow)
+    s=PairPortfolioSolver(s.instance,config=s.config)
+    k.solver=s
+    s.add_kernel('slow',k)
+    s.set_pairs([('slow:destroy','slow:repair')])
+    initial=s.solution_evaluator.evaluate(s.initial_solution).makespan
+    s.config.max_runtime_seconds=.02
+    result=s.solve()
+    assert result.termination_reason=='structural_budget'
+    assert result.iterations_completed==0
+    assert result.incomplete_iterations==1
+    assert result.best_evaluation.makespan==initial
+    assert s._is_valid_full_solution(result.best_solution)
+    assert s.deployment_stats['slow:destroy|slow:repair']['calls']==0
+    assert s.deployment_stats['slow:destroy|slow:repair']['attempts']==1
+    assert all(h['score_raw']==0 for h in result.iteration_history)
+    assert k.records[-1]['status']=='budget_exhausted'
+
+def test_executor_timeout_at_deadline_keeps_incumbent_as_budget_stop(tmp_path):
+    from mrta_rect_coverage.heuristics.structural_search import StructuralExecutor
+    p=tmp_path/'slow_policy.py'
+    p.write_text('def search_step(features, rng):\n    while True:\n        pass\n')
+    s=solver(iterations=3)
+    s=PairPortfolioSolver(s.instance,config=s.config)
+    k=StructuralKernel(s,StructuralExecutor(p))
+    s.add_kernel('slow',k)
+    s.set_pairs([('slow:destroy','slow:repair')])
+    s.config.max_runtime_seconds=.01
+    result=s.solve()
+    assert result.termination_reason=='structural_budget'
+    assert result.iterations_completed==0 and result.incomplete_iterations==1
+    assert s._is_valid_full_solution(result.best_solution)
+    assert s.deployment_stats['slow:destroy|slow:repair']['calls']==0
+    assert k.records[-1]['status']=='budget_exhausted'
+
+def test_destroy_feature_pricing_obeys_shared_price_cap():
+    from mrta_rect_coverage.heuristics.structural_search import StructuralKernel, PairPortfolioSolver, reference_step
+    s=solver(iterations=2)
+    s=PairPortfolioSolver(s.instance,config=s.config)
+    k=StructuralKernel(s,reference_step,price_cap=1)
+    s.add_kernel('reference',k)
+    s.set_pairs([('reference:destroy','reference:repair')])
+    result=s.solve()
+    assert result.termination_reason=='structural_budget'
+    assert result.iterations_completed==0 and result.incomplete_iterations==1
+    assert s._is_valid_full_solution(result.best_solution)
+    row=k.records[-1]
+    assert row['budget_exhausted_at']=='destroy_feature_price'
+    assert row['price_requests']<=1
+
+def test_structural_phase_cost_accounting_and_live_beam_bound():
+    s=solver()
+    k=StructuralKernel(s,reference_step)
+    ev=s.solution_evaluator.evaluate(s.initial_solution)
+    partial,removed=k.destroy(s.initial_solution,ev,4)
+    k.repair(partial,removed,s.solution_evaluator.evaluate_partial(partial))
+    row=k.records[-1]
+    assert set(row['phase_costs'])=={'feature_construction','exact_pricing','strategy_execution','reconstruction','completion'}
+    assert row['phase_calls']['strategy_execution']>0
+    assert row['phase_calls']['exact_pricing']>0
+    assert row['max_live_branches']<=k.width
+
+def test_destroy_policy_delay_is_not_double_counted_as_reconstruction():
+    import time
+    s=solver()
+    def delayed(features,rng):
+        time.sleep(.03)
+        return [features['routes'][0][0]]
+    k=StructuralKernel(s,delayed)
+    ev=s.solution_evaluator.evaluate(s.initial_solution)
+    k.destroy(s.initial_solution,ev,2)
+    row=k._active_record
+    assert row['phase_costs']['strategy_execution']>=.025
+    assert row['phase_costs']['reconstruction']<.01

@@ -32,12 +32,23 @@ already studies seven modules and composition effects, and evALNS already mixes
 expert and LLM lineages. These generic mechanisms are not novelty claims here.
 The problem-specific structural-feedback hypothesis and complete-solve portfolio
 benefit require empirical support, including a deterministic mechanism reference.
-The completed run_001 batch did not establish an LLM increment: its best single
-generated member was slightly behind the deterministic state-chain reference on
-development, and the two-member set was worse than the single member. All four
-batch-held rows favored manual ALNS; those instances have prior descriptive use
-and do not constitute independent validation. The structural-feedback and
-portfolio-complementarity hypotheses remain unconfirmed.
+The run_001 results remain the historical record of the original search process.
+The zero-model-call corrected-kernel review in
+[`review_002/analysis.json`](../outputs/structural_population/review_002/analysis.json)
+supersedes its deployment comparison: the deterministic
+reference improved the original manual ALNS by 0.78% on 12 development rows; the
+best single generated member (`r4_c2`) improved it by 1.67%, and the original
+two-member replacement set by 1.64%. Against the fixed manual-pair control, these
+gains were 3.40%, 4.25%, and 4.18%, respectively. `r4_c2` beat the deterministic
+reference on five rows, lost five and tied two, so the LLM increment is
+suggestive but inconclusive. Removing `r2_c2` from the two-member composition
+raised its development mean to 1.98%; removing `r4_c2` degraded it. This is
+evidence that utility depends on exact pairing, not that more members help.
+The two stage-regression instances were already used descriptively in E14 and
+are development regressions, not independent validation. No superiority,
+generalization, or novelty claim is established; see `operator_evolution.md` for
+the per-row record, cost breakdown, historical-contamination audit and next
+priority.
 
 ## Contribution Candidates and Evidence
 

@@ -6,6 +6,7 @@ timeout process and cleanup are those of the existing persistent executor.
 from copy import deepcopy
 import hashlib
 from pathlib import Path
+import random
 from time import perf_counter
 
 from .alns_solver import ALNSSolver, OperatorRecord
@@ -13,6 +14,7 @@ from ..core.models import MultiRobotSolution
 from ..llm.operator_evolution.candidate_execution import CandidateProxy
 from ..llm.operator_evolution.persistent_candidate_execution import PersistentCandidateProxy
 from ..llm.operator_evolution.candidate_security import code_sha256, validate_candidate_source
+from .search_budget import SearchBudgetExhausted
 
 MANUAL_PAIRS = [('random_destroy','greedy_insertion'),
                 ('bottleneck_route_destroy','regret_k_insertion'),
@@ -64,10 +66,9 @@ class StructuralExecutor:
     def close(self): self.backend.close()
 
     def __call__(self,features,rng):
-        # Advance the solver RNG once per decision; copies prevent shared mutation.
-        import random
-        outcome=self.backend.execute((deepcopy(features),random.Random(rng.getrandbits(64))),
-                                     timeout_ms=self.backend.timeout_ms)
+        outcome=self.backend.execute((deepcopy(features),deepcopy(rng)),
+                                     timeout_ms=min(self.backend.timeout_ms,
+                                         max(1.,1000*features.get('budget_remaining_seconds',1e6))))
         self.samples.append({k:getattr(outcome,k) for k in
                              ('status','wall_time_ms','runtime_ms','startup_ms','validation_import_ms')})
         if outcome.status!='success':
@@ -112,8 +113,69 @@ class StructuralKernel:
         self.record_features=record_features
         self.records=[]
         self.events=[]
+        self._active_record=None
+
+    def _new_record(self):
+        self._active_record={'status':'running','price_requests':0,'policy_calls':0,
+            'phase_costs':{k:0. for k in ('feature_construction','exact_pricing','strategy_execution','reconstruction','completion')},
+            'phase_calls':{k:0 for k in ('feature_construction','exact_pricing','strategy_execution','reconstruction','completion')},
+            'max_live_branches':1}
+
+    def _finish_record(self,status,*,phase=None,detail=''):
+        if self._active_record is None: self._new_record()
+        row=self._active_record
+        row.update(status=status,seconds=sum(row['phase_costs'].values()),
+                   budget_exhausted_at=phase,budget_detail=detail)
+        self.records.append(row)
+        self._active_record=None
+
+    def _check(self,phase):
+        deadline=getattr(self.solver,'_structural_deadline',None)
+        if deadline is not None and perf_counter()>=deadline:
+            self._finish_record('budget_exhausted',phase=phase,detail='wall-clock deadline reached')
+            raise SearchBudgetExhausted(phase,detail='wall-clock deadline reached')
+
+    def _priced(self,phase,fn,*args,units=1):
+        self._check(phase)
+        if self._active_record['price_requests']+units>self.price_cap:
+            self._finish_record('budget_exhausted',phase=phase,detail='exact-pricing cap reached')
+            raise SearchBudgetExhausted(phase,detail='exact-pricing cap reached')
+        started=perf_counter()
+        self._active_record['phase_calls']['exact_pricing']+=1
+        try:
+            result=fn(*args)
+        finally:
+            self._active_record['phase_costs']['exact_pricing']+=perf_counter()-started
+        self._active_record['price_requests']+=units
+        return result
+
+    def _decide(self,features):
+        self._check(features['phase']+'_before_strategy')
+        remaining=None
+        deadline=getattr(self.solver,'_structural_deadline',None)
+        if deadline is not None: remaining=max(0.,deadline-perf_counter())
+        features['budget_remaining_seconds']=remaining if remaining is not None else 1e6
+        rng=random.Random(self.solver.rng.getrandbits(64))
+        started=perf_counter()
+        self._active_record['policy_calls']+=1
+        self._active_record['phase_calls']['strategy_execution']+=1
+        exhausted=False
+        try:
+            value=self.policy(features,rng)
+        except Exception:
+            exhausted=deadline is not None and perf_counter()>=deadline
+            if not exhausted: raise
+        finally:
+            self._active_record['phase_costs']['strategy_execution']+=perf_counter()-started
+        if exhausted:
+            phase=features['phase']+'_strategy_execution'
+            self._finish_record('budget_exhausted',phase=phase,detail='strategy call consumed remaining wall-clock budget')
+            raise SearchBudgetExhausted(phase,detail='strategy call consumed remaining wall-clock budget')
+        self._check(features['phase']+'_after_strategy')
+        return value
 
     def destroy_features(self,solution,evaluation,remove_count):
+        if self._active_record is None: self._new_record()
         s=self.solver
         routes=deepcopy(solution.routes)
         limit=min(s.instance.task_count,max(2,min(24,2*remove_count)))
@@ -121,64 +183,85 @@ class StructuralKernel:
         for robot,route in enumerate(routes):
             chain=evaluation.route_evaluations[robot]
             for pos,t in enumerate(route):
+                self._check('destroy_feature_construction')
+                started=perf_counter(); price_before=self._active_record['phase_costs']['exact_pricing']
+                self._active_record['phase_calls']['feature_construction']+=1
                 state=s.cost_matrix.state(chain.chosen_state_ids[pos])
-                cost=s.insertion_pricer.route_cost_without(route,pos)
+                cost=self._priced('destroy_feature_price',s.insertion_pricer.route_cost_without,route,pos)
                 tasks[str(t)]={'robot':robot,'position':pos,'released':evaluation.per_robot_costs[robot]-cost,
                     'processing':state.processing_time,'entry':state.entry_point,'exit':state.exit_point,
                     'state':state.state_id,'incoming':chain.transition_costs[pos] if pos<len(chain.transition_costs) else 0.,
                     'min_processing':min(x.processing_time for x in s.states_by_task[t])}
+                self._active_record['phase_costs']['feature_construction']+=max(0.,perf_counter()-started-
+                    (self._active_record['phase_costs']['exact_pricing']-price_before))
             # All contiguous windows of up to three tasks: exact joint costs, not singleton sums.
             for size in (2,3):
                 if size>limit: continue
                 for pos in range(len(route)-size+1):
-                    cost=s.insertion_pricer.route_cost(route[:pos]+route[pos+size:])
+                    self._check('destroy_feature_construction')
+                    started=perf_counter(); price_before=self._active_record['phase_costs']['exact_pricing']
+                    self._active_record['phase_calls']['feature_construction']+=1
+                    cost=self._priced('destroy_joint_window_price',s.insertion_pricer.route_cost,route[:pos]+route[pos+size:])
                     cc=list(evaluation.per_robot_costs); cc[robot]=cost
                     windows.append({'robot':robot,'tasks':route[pos:pos+size],
                         'released':evaluation.per_robot_costs[robot]-cost,'costs':cc,'makespan':max(cc)})
+                    self._active_record['phase_costs']['feature_construction']+=max(0.,perf_counter()-started-
+                        (self._active_record['phase_costs']['exact_pricing']-price_before))
         return {'phase':'destroy','routes':routes,'costs':list(evaluation.per_robot_costs),
                 'remove_count':remove_count,'remove_limit':limit,'tasks':tasks,'windows':windows}
 
     def destroy(self,solution,evaluation,remove_count):
-        f=self.destroy_features(solution,evaluation,remove_count)
-        chosen=validate_actions(self.policy(f,self.solver.rng),f)
-        self.events.append({'phase':'destroy','remove':chosen,**({'features':f} if self.record_features else {})})
-        return self.solver._remove_tasks(solution,chosen)
+        self._new_record()
+        try:
+            f=self.destroy_features(solution,evaluation,remove_count)
+            chosen=validate_actions(self._decide(f),f)
+            self._check('destroy_action_application')
+            started=perf_counter()
+            self.events.append({'phase':'destroy','remove':chosen,**({'features':f} if self.record_features else {})})
+            result=self.solver._remove_tasks(solution,chosen)
+            self._active_record['phase_costs']['reconstruction']+=perf_counter()-started
+            self._active_record['phase_calls']['reconstruction']+=1
+            return result
+        except SearchBudgetExhausted:
+            raise
+        except Exception as exc:
+            self._finish_record('error',phase='destroy',detail=f'{type(exc).__name__}: {exc}')
+            raise
 
     def repair(self,partial,removed,partial_eval):
         s=self.solver
-        start=perf_counter()
+        if self._active_record is None: self._new_record()
+        self._check('repair_start')
         if not removed: return deepcopy(partial)
         if (len(partial.routes)!=s.instance.robot_count or
                 sorted([t for r in partial.routes for t in r]+list(removed))!=sorted(s.states_by_task)):
             raise ValueError('invalid initial partition')
         branches=[{'routes':deepcopy(partial.routes),'costs':list(partial_eval.per_robot_costs),'remaining':list(removed)}]
-        prices=0
-        budget_stop=False
         for depth in range(len(removed)):
-            # Reserve exact cheapest sequential tail for every live branch.
-            needed=sum(len(b['remaining'])*(sum(map(len,b['routes']))+len(b['routes'])) for b in branches)
-            tails=sum(len(b['remaining'])*(sum(map(len,b['routes']))+len(b['routes']))+
-                      len(b['remaining'])*(len(b['remaining'])-1)//2 for b in branches)
-            if prices+needed+tails>self.price_cap:
-                budget_stop=True
-                break
+            self._check('repair_branch_price')
             offered=[]
             for b in branches:
                 opts=[]
                 for t in b['remaining']:
                     for robot,route in enumerate(b['routes']):
-                        costs=s.insertion_pricer.insertion_costs(route,t)
-                        prices+=len(costs)
+                        self._check('repair_branch_price')
+                        started=perf_counter(); price_before=self._active_record['phase_costs']['exact_pricing']
+                        costs=self._priced('repair_branch_price',s.insertion_pricer.insertion_costs,route,t,
+                                           units=len(route)+1)
                         # Retain all slots. This permits order reconstruction beyond greedy minima.
                         for pos,cost in enumerate(costs):
                             cc=list(b['costs']); cc[robot]=cost
                             opts.append({'task':t,'robot':robot,'position':pos,'cost':cost,
                                          'makespan':max(cc),'total':sum(cc),
                                          'bottleneck':max(range(len(cc)),key=lambda r:cc[r])})
+                        self._active_record['phase_costs']['feature_construction']+=max(0.,perf_counter()-started-
+                            (self._active_record['phase_costs']['exact_pricing']-price_before))
+                        self._active_record['phase_calls']['feature_construction']+=1
                 offered.append({**deepcopy(b),'options':opts})
             f={'phase':'repair','branches':offered,'depth':depth,'width':self.width,
-               'prices_remaining':self.price_cap-prices}
-            actions=validate_actions(self.policy(f,s.rng),f)
+               'prices_remaining':max(0,self.price_cap-self._active_record['price_requests'])}
+            actions=validate_actions(self._decide(f),f)
+            started=perf_counter()
             new={}
             for a in actions:
                 b=deepcopy(branches[a['branch']])
@@ -189,29 +272,35 @@ class StructuralKernel:
             # The action width is a global offspring cap; without truncation a
             # width-k policy can still grow into a k^depth beam in the host.
             branches=sorted(new.values(),key=lambda b:(max(b['costs']),sum(b['costs']),tuple(map(tuple,b['routes']))))[:self.width]
+            self._active_record['phase_costs']['reconstruction']+=perf_counter()-started
+            self._active_record['phase_calls']['reconstruction']+=len(actions)
+            self._active_record['max_live_branches']=max(self._active_record['max_live_branches'],len(branches))
             self.events.append({'phase':'repair','depth':depth,'actions':actions,
                                 'outcomes':[{'costs':b['costs'],'remaining':b['remaining']} for b in branches],
                                 **({'features':f} if self.record_features else {})})
-        # A deterministic budget completion is explicit and counted; it is not an error fallback.
         for b in branches:
             for t in list(b['remaining']):
                 opts=[]
                 for robot,route in enumerate(b['routes']):
-                    if prices+len(route)+1>self.price_cap:
-                        raise RuntimeError('price budget cannot complete branch')
-                    vals=s.insertion_pricer.insertion_costs(route,t); prices+=len(vals)
+                    self._check('repair_completion')
+                    started=perf_counter()
+                    vals=self._priced('repair_completion',s.insertion_pricer.insertion_costs,route,t,
+                                      units=len(route)+1)
                     for pos,c in enumerate(vals):
                         cc=list(b['costs']); cc[robot]=c
                         opts.append((max(cc),sum(cc),robot,pos,c))
+                    self._active_record['phase_costs']['completion']+=perf_counter()-started
+                    self._active_record['phase_calls']['completion']+=1
                 _,_,robot,pos,c=min(opts)
                 b['routes'][robot].insert(pos,t); b['costs'][robot]=c
                 b['remaining'].remove(t)
         best=min(branches,key=lambda b:(max(b['costs']),sum(b['costs'])))
         result=MultiRobotSolution(best['routes'])
         if not s._is_valid_full_solution(result): raise ValueError('invalid repaired solution')
-        self.records.append({'prices':prices,'costs':best['costs'],'budget_stop':budget_stop,
-                             'max_live_branches':max((len(x.get('outcomes',[])) for x in self.events if x['phase']=='repair'),default=1),
-                             'seconds':perf_counter()-start,'routes':deepcopy(result.routes)})
+        self._active_record.update(prices=self._active_record['price_requests'],
+                                   costs=best['costs'],routes=deepcopy(result.routes),
+                                   max_live_branches=max(self._active_record['max_live_branches'],len(branches)))
+        self._finish_record('complete')
         return result
 
 
@@ -223,6 +312,7 @@ class PairPortfolioSolver(ALNSSolver):
         self.deployment_stats={}
         self.pair_weights={}
         self._pair_segment={}
+        self._structural_deadline=None
 
     def add_kernel(self,name,kernel):
         for group,fn in [('destroy',kernel.destroy),('repair',kernel.repair)]:
@@ -238,7 +328,7 @@ class PairPortfolioSolver(ALNSSolver):
         self.pairs=list(dict.fromkeys(tuple(p) for p in pairs))
         if not self.pairs or any(d not in self.destroy_ops or r not in self.repair_ops for d,r in self.pairs):
             raise ValueError('deployment contains unknown/empty pairs')
-        self.deployment_stats={self.key(p):dict(calls=0,reward=0.,accepted=0,best=0) for p in self.pairs}
+        self.deployment_stats={self.key(p):dict(attempts=0,calls=0,reward=0.,accepted=0,best=0) for p in self.pairs}
         self.pair_weights={k:1. for k in self.deployment_stats}
         self._pair_segment={k:[0.,0] for k in self.deployment_stats}
 
@@ -251,6 +341,7 @@ class PairPortfolioSolver(ALNSSolver):
         elif self.rng.random()<.1: pair=self.rng.choice(self.pairs)
         else: pair=self.rng.choices(self.pairs,weights=[self.pair_weights[self.key(p)] for p in self.pairs])[0]
         self._selected_pair=self.key(pair)
+        self.deployment_stats[self._selected_pair]['attempts']+=1
         self._last_selection_action=self._selected_pair
         return *pair,'portfolio'
 
@@ -270,9 +361,15 @@ class PairPortfolioSolver(ALNSSolver):
 
     def solve(self):
         if not self.pairs: raise ValueError('set deployment before solve')
+        self._structural_deadline=(perf_counter()+self.config.max_runtime_seconds
+                                   if self.config.max_runtime_seconds is not None else None)
         result=super().solve()
         for h in result.iteration_history:
             h['pair_reward']=h['score_effective']
             h['destroy_reward']=h['repair_reward']=0.
             h['reward_attribution']={'pair':h['selection_action'],'members':'not_attributed'}
         return result
+
+    def _check_iteration_budget(self):
+        if self._structural_deadline is not None and perf_counter()>=self._structural_deadline:
+            raise SearchBudgetExhausted('before_local_search',detail='wall-clock deadline reached')

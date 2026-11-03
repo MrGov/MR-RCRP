@@ -11,7 +11,7 @@ multiple parents, complete timed solve selection and a reserved post-freeze chec
 The original four-instance cache recheck remains historical evidence, unchanged,
 in `outputs/bounded_repair_search/cache_opportunity_001/analysis.json`.
 
-**Completed structural-population batch (2026-11-03):**
+**Historical run_001 report (2026-11-03; superseded for current selection):**
 `outputs/structural_population/run_001/summary.json` records four rounds, 18
 charged provider attempts, six development instances x two seeds, frozen source
 identities, and a once-only post-freeze two-instance check. The deterministic
@@ -26,6 +26,57 @@ was fixed and the affected member reevaluated; its pre-fix 63,478-second result
 is preserved and excluded. The stage-check IDs had prior E14 descriptive use;
 they are not independent validation. See `operator_evolution.md` for method,
 paper comparison, accounting, claim limits and next priority.
+
+**Corrected full-solve review (review_002, 2026-11-03):**
+`outputs/structural_population/review_002/analysis.json` reevaluates the frozen
+archive under one shared deadline/price budget and disjoint phase timing. No LLM
+calls were made. On 12 development rows (six instances x seeds 23/29), original
+manual ALNS is the baseline; fixed manual-pair deployment is -2.93% (3 wins,
+9 losses); the native state-chain reference is +0.77% (7/5); best single
+generated member `r4_c2` is +1.67% (8 wins, 2 losses, 2 ties); and the original
+two-generated-member composition is +1.64% (8/4). Against the fixed manual-pair
+control those conditions improve 3.40%, 4.25%, and 4.18%. The `r4_c2` versus
+reference paired difference is mixed (5/5/2), so LLM increment remains
+inconclusive. Removing `r2_c2` from the multi set gives +1.98%; removing
+`r4_c2` gives -2.32%. This supports pair compatibility and a smaller development
+composition, not a benefit from larger portfolios.
+
+The two older stage-regression instances were already described in E14 and are
+development regressions, not independent confirmation. On them, manual pairs
+lose 0.84%; reference, `r4_c2` single and original multi improve 4.78%, 9.84%
+and 7.13%, while the shrunk `r4_c2` composition improves 10.23%. The row-level
+and seed-level outcomes and all stage costs are in `review_002/analysis.json`.
+
+The corrected run exposed a late candidate timeout that previously surfaced as
+a runtime error. It now maps a strategy timeout at the shared deadline to an
+incomplete iteration, retaining the last legal solution without reward. Every
+final review row is feasible with zero candidate errors; structural budget
+stops range from 9 to 12 per 12-row condition. In the representative native vs
+isolated reference check, both returned makespan 2299, while native/isolated
+completed 438/114 iterations and charged 0.027/1.05 seconds to the strategy
+phase. Across `r4_c2`'s 12 solves, strategy boundary time is 32.92 seconds of
+the same 80-second scheduled budget, versus 15.83 seconds exact pricing. This is
+measured boundary cost, not evidence that native execution wins after adding
+artificial costs.
+
+The abnormal pre-fix `r1_c3` result is confirmed in request 8's prompt feedback
+and selected as `r2_c3`'s parent; its descendant and later population/composition
+history are contaminated. The final `r4_c2` lineages/freeze are unaffected, and
+current evaluations for the affected candidates were rerun. History remains
+unchanged in `run_001`; failed first-pass review rows are preserved beside the
+corrected rows in `review_002`.
+
+**Current decision and sole next priority:** do not make another LLM request.
+Keep original manual ALNS as the production fallback. For development, retain
+the smaller `random_destroy/greedy_insertion`,
+`bottleneck_route_destroy/regret_k_insertion`, and `r4_c2` pair set as the
+current structural candidate; do not retain `r2_c2` in that composition. The
+sole next action is to batch or reuse checked-executor inputs to reduce its
+measured copy/process overhead without changing policy actions, then rerun a
+matched complete-solve comparison on a newly predeclared development sample.
+Continue LLM evolution only after that comparison shows repeatable practical
+value beyond the native reference. No external strong-algorithm comparison or
+generalization claim has been established.
 
 ## Implemented Solver
 

@@ -121,13 +121,13 @@ class Study:
             'valid':True,'operation':'seed'}
         self.persist()
 
-    def attach(self,s,pairs,stack,record=False):
+    def attach(self,s,pairs,stack,record=False,reference_executor=False):
         kernels={}; executors={}
         ids=sorted({name.split(':')[0] for pair in pairs for name in pair if ':' in name})
         for name in ids:
             a=self.archive[name]
             if sha(ROOT/a['source'])!=a['hash']: raise ValueError('source drift')
-            if name=='reference': policy=reference_step
+            if name=='reference' and not reference_executor: policy=reference_step
             else:
                 policy=stack.enter_context(StructuralExecutor(ROOT/a['source'],expected_hash=a['hash']))
                 executors[name]=policy
@@ -136,7 +136,7 @@ class Study:
         s.set_pairs(pairs)
         return kernels,executors
 
-    def run_one(self,e,seed,pairs):
+    def run_one(self,e,seed,pairs,*,reference_executor=False):
         start=perf_counter()
         allowance=self.cfg['seconds_by_tasks'][str(e['n_tasks'])]
         # Loading, cost matrix and constructor are inside the allowance.
@@ -145,7 +145,8 @@ class Study:
         error=None; result=None; kernels={}; executors={}
         try:
             with ExitStack() as stack:
-                if pairs is not None: kernels,executors=self.attach(s,pairs,stack)
+                if pairs is not None: kernels,executors=self.attach(s,pairs,stack,
+                    reference_executor=reference_executor)
                 setup=perf_counter()-start
                 s.config.max_runtime_seconds=max(.001,allowance-setup)
                 result=s.solve()
@@ -156,21 +157,47 @@ class Study:
              'end_to_end_seconds':elapsed,'overshoot_seconds':max(0,elapsed-allowance),
              'setup_seconds':locals().get('setup',elapsed),'error':error,'valid':result is not None,
              'pairs':pairs,'config':asdict(s.config),'executors':{n:x.samples for n,x in executors.items()},
-             'kernel_summary':{n:{'calls':len(k.records),'prices':sum(r['prices'] for r in k.records),
-                                 'budget_completions':sum(r['budget_stop'] for r in k.records)} for n,k in kernels.items()}}
+             'kernel_summary':{n:{'calls':len(k.records),'prices':sum(r.get('price_requests',r.get('prices',0)) for r in k.records),
+                                 'budget_completions':sum(r.get('status')=='budget_exhausted' or r.get('budget_stop',False)
+                                                          for r in k.records)} for n,k in kernels.items()}}
         if result:
+            best_rows=[h for h in result.iteration_history
+                       if abs(h['best_makespan']-result.best_evaluation.makespan)<1e-9]
+            first_best=(setup+best_rows[0]['elapsed_seconds']) if best_rows else None
+            kernel_rows=[r for k in kernels.values() for r in k.records]
+            phases=('feature_construction','exact_pricing','strategy_execution','reconstruction','completion')
+            kernel_costs={phase:sum(r['phase_costs'][phase] for r in kernel_rows) for phase in phases}
+            kernel_calls={phase:sum(r['phase_calls'][phase] for r in kernel_rows) for phase in phases}
             row.update(makespan=result.best_evaluation.makespan,routes=result.best_solution.routes,
                 initial=result.initial_makespan,iterations=result.iterations_completed,
+                iterations_attempted=result.iterations_completed+result.incomplete_iterations,
+                incomplete_iterations=result.incomplete_iterations,
+                incomplete_iteration_records=result.incomplete_iteration_records,
+                first_legal_complete_seconds=setup,
+                first_final_best_seconds=first_best,
                 solve_seconds=result.runtime_seconds,valid=s._is_valid_full_solution(result.best_solution),
                 dp=s.route_dp.statistics(),pricing=s.insertion_pricer.statistics(),
                 pair_stats=getattr(s,'deployment_stats',{}),fallbacks=result.fallback_events,
+                structural_work={'completed_search_steps':sum(r['status']=='complete' for r in kernel_rows),
+                    'budget_exhausted_steps':sum(r['status']=='budget_exhausted' for r in kernel_rows),
+                    'errors':sum(r['status']=='error' for r in kernel_rows),
+                    'phase_seconds':kernel_costs,'phase_calls':kernel_calls,
+                    'price_requests':sum(r['price_requests'] for r in kernel_rows),
+                    'policy_calls':sum(r['policy_calls'] for r in kernel_rows),
+                    'max_live_branches':max((r['max_live_branches'] for r in kernel_rows),default=0)},
                 history=result.iteration_history)
         return row
 
     def evaluate(self,label,pairs,role='development'):
         pairs=None if pairs is None else [list(pair) for pair in pairs]
         p=self.out/role/f'{label}.json'
-        if p.exists(): return read(p)
+        if p.exists():
+            previous=read(p)
+            if previous.get('pairs')==pairs and previous.get('valid'): return previous
+            suffix='invalid_pair_shape' if previous.get('pairs')!=pairs else 'failed_budget_semantics'
+            backup=p.with_name(f'{p.stem}.{suffix}.json')
+            if backup.exists(): raise FileExistsError(f'refusing to overwrite {backup}')
+            save(backup,previous)
         rows=[]; start=perf_counter()
         # Alternate seed blocks, same predeclared ordering; avoid parallel CPU contention.
         for e in self.entries[role]:

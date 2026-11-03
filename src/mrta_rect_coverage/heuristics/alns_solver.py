@@ -38,6 +38,7 @@ from .baseline_solver import resolve_constructor
 from .local_search import run_stronger_local_search
 from .priced_local_search import run_priced_local_search
 from .decision_audit import DecisionAuditRecorder, audit_destroy, audit_repair
+from .search_budget import SearchBudgetExhausted
 
 def _manhattan(first: Tuple[float, float], second: Tuple[float, float]) -> float:
     """Manhattan distance between two points."""
@@ -272,6 +273,8 @@ class ALNSResult:
     # Decision-level audit per operator (exact placement quality), recorded only
     # when ``config.decision_audit`` is on; it never feeds back into the search.
     decision_audit: dict | None = None
+    incomplete_iterations: int = 0
+    incomplete_iteration_records: List[dict] = field(default_factory=list)
 
 
 class ALNSSolver:
@@ -484,6 +487,7 @@ class ALNSSolver:
 
         iteration = 0
         termination_reason = "iterations"
+        incomplete_iteration_records: List[dict] = []
         while self.config.iterations is None or iteration < self.config.iterations:
             elapsed = perf_counter() - started_at
             if self.config.max_runtime_seconds is not None and elapsed >= self.config.max_runtime_seconds:
@@ -508,20 +512,35 @@ class ALNSSolver:
             fallback_event_start = len(self.fallback_events)
 
             remove_count = max(1, int(self.config.destroy_fraction * self.instance.task_count))
-            stage_started = perf_counter()
-            partial_solution, removed_tasks = destroy_fn(current_solution, current_eval, remove_count)
-            destroy_seconds = perf_counter() - stage_started
-            phase_seconds["destroy_execution_seconds"] += destroy_seconds
+            try:
+                stage_started = perf_counter()
+                partial_solution, removed_tasks = destroy_fn(current_solution, current_eval, remove_count)
+                destroy_seconds = perf_counter() - stage_started
+                phase_seconds["destroy_execution_seconds"] += destroy_seconds
 
-            stage_started = perf_counter()
-            partial_eval = self.solution_evaluator.evaluate_partial(partial_solution)
-            partial_evaluation_seconds = perf_counter() - stage_started
-            phase_seconds["partial_evaluation_seconds"] += partial_evaluation_seconds
+                self._check_iteration_budget()
+                stage_started = perf_counter()
+                partial_eval = self.solution_evaluator.evaluate_partial(partial_solution)
+                partial_evaluation_seconds = perf_counter() - stage_started
+                phase_seconds["partial_evaluation_seconds"] += partial_evaluation_seconds
 
-            stage_started = perf_counter()
-            repaired_solution = repair_fn(partial_solution, removed_tasks, partial_eval)
-            repair_seconds = perf_counter() - stage_started
-            phase_seconds["repair_execution_seconds"] += repair_seconds
+                self._check_iteration_budget()
+                stage_started = perf_counter()
+                repaired_solution = repair_fn(partial_solution, removed_tasks, partial_eval)
+                repair_seconds = perf_counter() - stage_started
+                phase_seconds["repair_execution_seconds"] += repair_seconds
+                self._check_iteration_budget()
+            except SearchBudgetExhausted as exc:
+                termination_reason = "structural_budget"
+                incomplete_iteration_records.append({
+                    "iteration": iteration, "destroy": destroy_name, "repair": repair_name,
+                    "selected_pair": getattr(self, "_selected_pair", None),
+                    "phase": exc.phase, "detail": exc.detail,
+                    "current_makespan": current_eval.makespan,
+                    "best_makespan": best_eval.makespan,
+                    "solution_retained": True, "reward": 0.0,
+                })
+                break
 
             decision_destroy_audit = None
             decision_repair_audit = None
@@ -543,6 +562,7 @@ class ALNSSolver:
             stage_started = perf_counter()
             self._full_evaluation_scope = "local_search"
             try:
+                self._check_iteration_budget()
                 if self.config.priced_local_search:
                     # Identical decisions, priced from the exact route tables: the
                     # reference scan pays one full Route-DP per candidate move,
@@ -559,6 +579,17 @@ class ALNSSolver:
                         self.solution_evaluator,
                         max_iterations=1,
                     )
+            except SearchBudgetExhausted as exc:
+                termination_reason = "structural_budget"
+                incomplete_iteration_records.append({
+                    "iteration": iteration, "destroy": destroy_name, "repair": repair_name,
+                    "selected_pair": getattr(self, "_selected_pair", None),
+                    "phase": exc.phase, "detail": exc.detail,
+                    "current_makespan": current_eval.makespan,
+                    "best_makespan": best_eval.makespan,
+                    "solution_retained": True, "reward": 0.0,
+                })
+                break
             finally:
                 self._full_evaluation_scope = None
             local_search_seconds = perf_counter() - stage_started
@@ -771,7 +802,7 @@ class ALNSSolver:
             operator_usage_stats=self.operator_stats,
             fallback_events=list(self.fallback_events),
             runtime_seconds=perf_counter() - started_at,
-            iterations_completed=iteration,
+            iterations_completed=iteration-len(incomplete_iteration_records),
             route_dp_calls=self.route_dp.statistics()["calls"] + self.generated_route_dp_calls - calls_start,
             route_dp_cache_misses=self.route_dp.statistics()["cache_misses"] + self.generated_route_dp_cache_misses - misses_start,
             termination_reason=termination_reason,
@@ -798,7 +829,13 @@ class ALNSSolver:
                 None if self._decision_recorder is None
                 else self._decision_recorder.summary()
             ),
+            incomplete_iterations=len(incomplete_iteration_records),
+            incomplete_iteration_records=incomplete_iteration_records,
         )
+
+    def _check_iteration_budget(self) -> None:
+        """Subclass hook for stopping before an iteration's next expensive phase."""
+        return None
 
     def _initial_temperature(self, makespan: float) -> float:
         if self.config.initial_temperature is not None:

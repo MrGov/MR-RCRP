@@ -88,7 +88,11 @@ not establish it.
    once, report paired quality/stability, all failures and separate offline cost.
 5. Update current status, positioning and runnable entry points from actual results.
 
-### Completed development batch (run_001, 2026-11-03)
+### Historical development batch (run_001, 2026-11-03)
+
+The records below are immutable results under the first budget and measurement
+semantics. Use the corrected-kernel full-solve review below for current method
+selection and performance claims.
 
 The frozen instance rule produced six development instances (20/40/60/80/100
 tasks, 2/4/8 robots, six structures), each with seeds 23/29, plus two
@@ -163,6 +167,125 @@ Replay the frozen development deployment without model calls:
 $env:PYTHONPATH='src'
 python -m mrta_rect_coverage.experiments.structural_deploy --freeze outputs/structural_population/run_001/freeze.json --instance development/BOTTLENECK/R4_T60_0 --seed 23 --output outputs/structural_population/run_001/replay.json
 ```
+
+### Corrected shared-budget review (review_002, 2026-11-03)
+
+`outputs/structural_population/review_002/` freezes the candidate bytes and the
+corrected implementation hashes. It makes **zero LLM requests** and reuses the
+existing model, Route-DP, exact pricer, feasibility checks, initializer,
+acceptance and local search. One wall-clock deadline and the common logical
+price cap cover destroy feature construction, exact pricing, strategy execution,
+reconstruction and completion. If a strategy timeout reaches that deadline,
+the incomplete ALNS iteration is aborted, the last legal complete solution is
+retained, and the attempt receives no acceptance/reward or pair credit. The
+phase timers are disjoint; reconstruction excludes feature construction,
+pricing and policy time. Frozen-source identity and two targeted deadline tests
+cover these boundaries.
+
+The six development cells (20-100 tasks, 2/4/8 robots) each use seeds 23/29
+and predeclared 3/5/7/10/12-second end-to-end budgets. A further two previously
+viewed E14 instances are reported only as development regressions. Their use
+history is explicit; none of these rows is independent validation. A fixed
+manual-pair-only `PairPortfolioSolver` separates the restriction to specified
+pairs and pair-level credit from the original ALNS's independent destroy and
+repair selection.
+
+| Complete-solve condition | Mean vs original manual | Better / worse / tie | Mean vs manual-pair control | Incomplete iterations |
+|---|---:|---:|---:|---:|
+| Original manual ALNS | 0.00% | 0 / 0 / 12 | - | 0 |
+| Fixed manual pairs only | -2.93% | 3 / 9 / 0 | 0.00% | 7 |
+| Deterministic state-chain reference + manual pairs | +0.77% | 7 / 5 / 0 | +3.40% | 10 |
+| Best single generated pair (`r4_c2`) + three manual pairs | +1.67% | 8 / 2 / 2 | +4.25% | 9 |
+| Original multi-member replacement (`r4_c2`, `r2_c2`) | +1.64% | 8 / 4 / 0 | +4.18% | 12 |
+| Same multi set without `r2_c2` | +1.98% | 8 / 4 / 0 | +4.52% | 10 |
+| Same multi set without `r4_c2` | -2.32% | 2 / 10 / 0 | +0.44% | 11 |
+| `r2_c2` added to all manual pairs | -3.16% | 5 / 7 / 0 | -0.28% | 10 |
+
+The row-level percentages below are paired differences from original manual
+ALNS, averaged only across the two listed seeds per instance in the summary
+table. Exact makespans, both seeds, timing, operator calls, phase costs,
+feasibility, and complete iteration histories are in `analysis.json` and each
+condition's JSON file.
+
+| Instance / seed | Manual pairs | Reference | `r4_c2` single | `r4_c2` + `r2_c2` | Shrunk: `r4_c2`, two manual pairs |
+|---|---:|---:|---:|---:|---:|
+| BASE / 23 | +0.30% | +0.56% | +0.26% | +1.30% | -0.26% |
+| BASE / 29 | -0.61% | +0.22% | 0.00% | -2.73% | +0.26% |
+| HV-GEOM / 23 | +2.33% | +3.37% | +3.37% | +2.87% | +2.87% |
+| HV-GEOM / 29 | -0.04% | -0.34% | 0.00% | -1.42% | -0.17% |
+| SPATIAL / 23 | +0.58% | -1.60% | +1.33% | -0.19% | +0.29% |
+| SPATIAL / 29 | -1.88% | +1.27% | -0.74% | +0.03% | +1.08% |
+| BOTTLENECK / 23 | -12.28% | +5.35% | +1.15% | +6.66% | +3.05% |
+| BOTTLENECK / 29 | -5.87% | -0.32% | +3.99% | +7.05% | +4.17% |
+| TRAVEL-HIGH / 23 | -1.53% | +0.40% | +0.40% | +0.40% | -0.04% |
+| TRAVEL-HIGH / 29 | -2.00% | -0.26% | -1.41% | -1.38% | -0.06% |
+| SWEEP-NARROW / 23 | -1.14% | +3.29% | +6.59% | +5.88% | +5.90% |
+| SWEEP-NARROW / 29 | -12.99% | -2.66% | +5.08% | +1.14% | +6.68% |
+
+The generated `r4_c2` condition beat the deterministic reference on five rows,
+lost five and tied two; the 0.86% mean paired difference is not stable enough to
+attribute a clear LLM increment. The deterministic reference itself beat the
+manual-pair control on 10/12 rows. The single member and the original two-member
+set have nearly identical means, but the multi set has more losses and more
+budget-aborted iterations. In the two bounded removals, dropping `r2_c2` helped
+while dropping `r4_c2` hurt. `r2_c2` alone with three manual pairs regressed.
+The current development candidate is therefore the smaller three-pair
+composition (`r4_c2` plus random/greedy and bottleneck/regret manual pairs),
+not the two-generated-member set. This is a development choice, not a validated
+production promotion.
+
+| Previously viewed regression condition | Mean vs original manual | Better / worse |
+|---|---:|---:|
+| Fixed manual pairs only | -0.84% | 0 / 4 |
+| Deterministic reference + manual pairs | +4.78% | 3 / 1 |
+| `r4_c2` single + manual pairs | +9.84% | 4 / 0 |
+| Original multi-member replacement | +7.13% | 3 / 1 |
+| Shrunk `r4_c2` three-pair composition | +10.23% | 4 / 0 |
+
+These four rows are the two E14-seen instances x two seeds. They diagnose no
+current transfer regression, but cannot establish transfer or generalization.
+
+| Development structural cost over 12 solves | Feature construction (s) | Exact pricing (s) | Strategy boundary (s) | Reconstruction (s) | Completion (s) | Budget stops / errors |
+|---|---:|---:|---:|---:|---:|---:|
+| Native deterministic reference | 9.17 | 34.36 | 1.53 | 1.27 | 0.00 | 10 / 0 |
+| Isolated generated `r4_c2` single | 6.09 | 15.83 | 32.92 | 1.18 | 0.00 | 9 / 0 |
+| Original two-generated-member set | 5.93 | 22.44 | 36.31 | 1.13 | 0.00 | 12 / 0 |
+| Shrunk `r4_c2` three-pair set | 5.93 | 19.05 | 33.40 | 1.16 | 0.00 | 10 / 0 |
+
+All 12 online budgets sum to 80 seconds per development condition. Generated
+strategy calls alone consume about 33 seconds for `r4_c2`; this includes
+feature/RNG copies and the checked persistent-process boundary, and is charged
+to the same solve allowance. On the representative BASE/R2/T20 seed 23 check,
+native and isolated reference decisions matched on fixed destroy and repair
+features; the complete solve returned makespan 2299 in both modes. Under the
+same three-second allowance, native execution completed about 438 iterations
+with 0.027 seconds in the strategy phase; isolated execution completed 114
+iterations with about 1.05 seconds there and one budget-aborted attempt. This
+attributes the throughput gap to the execution boundary on this check, without
+claiming an artificial cost-adjusted win for the native reference.
+
+The corrected evaluation found one additional driver of the earlier record:
+the abnormal pre-fix `r1_c3` result flowed directly into request 8's revision
+prompt, was selected as `r2_c3`'s parent, and its descendants entered later
+population and composition comparisons. The feedback/parent/survival history
+is therefore contaminated, and cannot be described as evolution conducted
+under the corrected kernel. The final `r4_c2` single and multi lineages and the
+frozen deployment do not contain `r1_c3`; these current outcomes were rerun
+under the corrected kernel. The locally fingerprint-identical `r3_c3` has
+different source bytes from `r2_c3`; both received one complete evaluation, so
+the fingerprint is treated only as suspected local duplication.
+
+No new LLM generation should begin yet. The sole next priority is to reduce and
+measure checked-executor input/call overhead while preserving candidate actions,
+then compare the frozen best generated composition with the native structural
+reference under the same end-to-end budget. Continue evolution only if that
+matched comparison shows a repeatable, practically useful candidate increment
+on a newly predeclared development sample; do not select by member count or one
+aggregate mean. The corrected review ran 17 development conditions and six
+regression conditions, used zero model requests, and reports about 1,614 seconds
+of total complete-solve evaluation wall time. The early failed pair-shape
+attempts and the single pre-fix strategy-timeout row are preserved in separate
+files and excluded from final quality summaries.
 
 The sections below describe the older subsystem and remain compatibility notes.
 

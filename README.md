@@ -28,6 +28,18 @@ provider calls. `configs/structural_population.json` freezes the current batch's
 data, budgets and 32-request ceiling. Frozen deployment can be replayed without
 model calls using `python -m mrta_rect_coverage.experiments.structural_deploy --help`.
 
+The corrected shared-budget full-solve review (no LLM calls) is reproducible
+from the frozen `run_001` archive with:
+
+```powershell
+$env:PYTHONPATH='src'
+python -m mrta_rect_coverage.experiments.structural_review
+```
+
+It writes to `outputs/structural_population/review_002/`, resumes completed
+groups, records implementation and candidate hashes, and labels the previously
+viewed stage instances as development regressions.
+
 ## Documentation
 
 Start with [`docs/README.md`](docs/README.md), then read:
