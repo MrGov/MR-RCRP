@@ -131,7 +131,15 @@ def test_actual_children_fixed_iteration_solver_paths_equal(actual):
         warm = gap.deploy(composition, entries[:1], {**config, "executor": "warm"})[0]
         assert original["best_routes"] == warm["best_routes"]
         assert original["makespan"] == warm["makespan"]
-        assert original["insertion_pricing_work"] == warm["insertion_pricing_work"]
+        # Exact operation counts must match; measured wall times are
+        # observational and cannot be bit-identical across executions.
+        original_work = original["insertion_pricing_work"]
+        warm_work = warm["insertion_pricing_work"]
+        timed = {"table_build_seconds", "insertion_compute_seconds"}
+        assert {k: v for k, v in original_work.items() if k not in timed} == {
+            k: v for k, v in warm_work.items() if k not in timed
+        }
+        assert all(original_work[k] >= 0 and warm_work[k] >= 0 for k in timed)
         keys = ["destroy", "repair", "accepted", "accept_reason", "temperature", "best_makespan",
                 "current_makespan", "repaired_routes", "refined_routes", "fallback_used", "route_dp_calls"]
         assert [[r[k] for k in keys] for r in original["history"]] == [[r[k] for k in keys] for r in warm["history"]]

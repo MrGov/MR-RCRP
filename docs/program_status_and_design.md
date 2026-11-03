@@ -2,7 +2,30 @@
 
 This is the current factual status page. It describes the repository at the reviewed local HEAD and available records; it is not an authorization to run providers, experiments, or locked data. Historical reports and raw outputs are preserved as recorded.
 
-**Latest development decision (2026-11-01):** shared insertion-price caching is implemented and behavior-preserving on the recorded checks. The frozen four-instance deployment recheck and 27-pair diagnosis are complete in `outputs/bounded_repair_search/cache_opportunity_001/analysis.json`. Retain the manual pool, stop the current pair-ranking lineage, and next test only a state-based decision about **whether to invoke optional two-step search**. No new LLM requests were made in this recheck. The evidence and limits are detailed in the cache/opportunity section below; earlier next-step statements are historical.
+**Current development scope (2026-11-03):** the authorized structural-population
+batch supersedes the previous call/skip-only next step. Its method and original-
+paper comparison are in `operator_evolution.md`; implementation is
+`heuristics/structural_search.py`, with runner `experiments/structural_population.py`.
+The batch uses explicit destroy-repair deployment actions, structural generation,
+multiple parents, complete timed solve selection and a reserved post-freeze check.
+The original four-instance cache recheck remains historical evidence, unchanged,
+in `outputs/bounded_repair_search/cache_opportunity_001/analysis.json`.
+
+**Completed structural-population batch (2026-11-03):**
+`outputs/structural_population/run_001/summary.json` records four rounds, 18
+charged provider attempts, six development instances x two seeds, frozen source
+identities, and a once-only post-freeze two-instance check. The deterministic
+exact-state-chain reference plus three manual pairs improved 10/12 development
+rows (mean 2.66%), but lost all four stage-check rows to manual ALNS (mean loss
+10.36%). The best single generated member improved the development mean 2.61%,
+slightly below the deterministic reference, and lost the stage-check mean by
+12.76%. The best two-generated-member set improved development by 2.14% and lost
+stage check by 10.67%; removal checks did not support complementarity.
+Recommended deployment remains manual ALNS. A branch-growth integrity defect
+was fixed and the affected member reevaluated; its pre-fix 63,478-second result
+is preserved and excluded. The stage-check IDs had prior E14 descriptive use;
+they are not independent validation. See `operator_evolution.md` for method,
+paper comparison, accounting, claim limits and next priority.
 
 ## Implemented Solver
 
@@ -111,7 +134,7 @@ All 64 solves were feasible, with zero strategy errors or repair fallbacks; ever
 
 The aggregate hides a material structure difference. Timed SPATIAL seed results are manual `[3058,3120]`, reference `[3006,3017]`, and both generated policies `[3006,3061]`. On BOTTLENECK they are manual `[3027.048,3309.884]`, reference `[3255.721,3466.895]`, generation 1 `[3421.866,3227.473]`, generation 2 `[3405.086,3192.085]`. Generated improvements on one seed do not establish a stable LLM increment. The predeclared retention rule required a generated policy to improve both manual and reference timed means by at least one model-time unit; neither passed. Actual deployment remains the three manual repairs, with **no generated member**. Both sources remain archived and runnable through the new kernel.
 
-**Decision: modify the new search kernel before further generation.** The bounded search action space has useful paired and fixed-iteration evidence, with a real cross-robot, non-first-branch example. Its extra computation loses aggregate value under the tested time budget, and the current LLM pair-selection revisions have not established additional value. The next single priority is an equivalence-preserving check of cached exact slot pricing in this new kernel, holding branch decisions, candidates and caps fixed, to test the BOTTLENECK cost deficit. Code evidence: the reused `insertion_costs` vector calls `_insertion_at` for every slot without the memo used by `insertion_cost_at`; at R4/T40 with ten removed tasks, one kernel call uses 385 incumbent + 340 feature + 420 second-step + 1264 completion prices. This is a concrete cost hypothesis, not a promise of a win or a new algorithmic innovation. Do not deepen this policy lineage or claim general superiority from the current development results.
+**Historical decision, superseded 2026-11-03:** the previous bounded pair-search lineage proposed cached slot pricing as its next probe. The structural-population batch instead found an unbounded reconstruction-branch growth defect; the host now enforces the declared beam cap. The current next priority and evidence are recorded in the completed structural batch section and `operator_evolution.md`.
 
 Focused verification passed **76 tests**, recorded in `verification.txt`. It covers exact joint routes against full Route-DP, budget enforcement, task coverage, input/RNG isolation, invalid IDs, timeout/runtime/source-drift cleanup, parser compatibility, actual generated-source cold/resident equivalence, fixed-iteration ALNS trace equivalence, and existing ALNS/executor regressions. All four local actual-candidate tests executed, with no artifact-related skips. No historical experiment system was rerun. `execution_notes.json` preserves the initial logging-only failure and subsequent test/reporting corrections; the algorithm, cases and budgets were unchanged during evaluation.
 

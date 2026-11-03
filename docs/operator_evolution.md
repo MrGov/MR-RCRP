@@ -1,5 +1,171 @@
 # Offline Operator Evolution
 
+## Current method: structural population and deployment selection (2026-11-02)
+
+This section supersedes the repair-first scope below for the current batch. The
+research hypothesis is that exact entry/exit chains, joint removal costs and
+bottleneck migration evidence help evolve useful destruction/reconstruction
+logic, and that selecting combinations improves complete solves. Neither claim
+is assumed true.
+
+An individual is a source-hashed Python `search_step(features, rng)` program with
+two phases: destroy returns an actual task subset; repair selects actual
+task/robot/slot extensions of one or more current reconstruction branches. The
+host prices each new branch exactly, supplies state-chain information and exact
+insertion alternatives, enforces task integrity and caps branch width, removal
+size, pricing work and subprocess time. Candidates can change removal extent,
+contiguity, joint task reassignment, insertion order, slot selection and branch
+survival. They cannot access the solver, implement a replacement objective or
+change acceptance/initialization/LS. This is a small batched action interface,
+not the old pair-ranking or call/skip interface.
+
+Three native manual destroy/repair pair seeds and a deterministic state-chain
+reference start the active population. New sources come from structural mutation,
+two-parent recombination, composition-gap generation and occasional de novo
+design. The immutable archive contains all sources/failures; the active population
+has capacity 10 (not a quota); the deployment is a separate explicit list of
+allowed destroy-repair pairs. Different phases of one source can be paired with
+manual or other generated phases. Pair selection uses initial exploration and
+smoothed 8/3/1 pair reward; no causal credit is assigned to an individual phase.
+
+Correctness/cost checks reject invalid behavior, then fixed-state fingerprints
+detect exact behavioral duplicates and provide feedback. A local gain is NOT an
+admission requirement. Every distinct feasible candidate receives full timed
+ALNS evaluation. Survival uses normalized per-instance complete-solve results,
+an elite, instance specialists within a quality floor and bounded population
+replacement. Deployment checks limited additions, replacements and deletions,
+including at least one two-generated-member combination. It is not top-k ranking.
+
+The batch has at most four rounds, four new candidates per round, 32 actual
+requests including at most one engineering repair per candidate, and no provider
+retries. Two rounds without either new effective behavior or combination progress
+allow stopping. Manual-only selection is allowed. Single-member and multi-member
+comparisons use the same archive. The deterministic reference separates the new
+host search mechanism from LLM assistance; one batch cannot identify a causal
+effect of structural feedback without a matched feedback ablation.
+
+Data/configuration are frozen before any candidate result: six development
+instances, two seeds, task-scaled wall budgets, common spatial-sort initializer,
+enhanced SA, exact priced local search. Setup and boundary/cleanup costs are
+recorded and charged against the end-to-end allowance, with atomic iteration
+overshoot reported. Two development instances are reserved until freeze. Their
+E14 descriptive-use history is explicitly recorded; they are held out from THIS
+batch only, not independent validation. No final/test/lockbox input is opened.
+
+### Direct original-paper check
+
+- **G-LNS, arXiv:2602.08253v1**, local `Com-alg/G-LNS.pdf`, pp. 3-5,
+  sections 3.2-3.5: manual/LLM seeds, separate destroy/repair populations,
+  multi-episode ALNS evaluation, accumulated operator fitness and pair synergy,
+  pruning, logical mutation, homogeneous and synergistic joint crossover. Thus
+  joint evolution and complementary destroy/repair logic are already prior art.
+- **Full-component ALNS evolution, arXiv:2603.06996v2 (19 May 2026)**,
+  local `Com-alg/ALNS 全组件演化.pdf`, pp. 3-4 and 9-12: seven components,
+  isolated evaluation, quality/time/usage score, MAP-Elites, cascade screening,
+  parallel/serial evolution, and explicitly observed composition incompatibility.
+  We hold common controls fixed and select actual deployed combinations using
+  complete timed solves; this distinction is a study design, not novelty proof.
+- **Wang et al., evALNS, DOI:10.1007/s42524-026-5124-4**, local
+  `Com-alg/evALNS.pdf`, sections 3.1-3.3: expert and LLM destroy populations,
+  mutation/crossover and elite exchange, with functional natural language
+  embeddings. Expert/generated mixing and multi-lineage evolution are prior art.
+
+The potential problem-specific increment is exposing the coupled coverage-state
+chain and exact joint reconstruction outcomes to structural evolution, then
+testing budgeted combination utility for MR-RCRP. It requires performance and
+matched mechanism evidence; multiple programs, passing tests and real calls do
+not establish it.
+
+### Implementation and verification sequence
+
+1. Extend existing hash/AST/subprocess execution to the batched structural action
+   contract; test illegal actions, exact branches, timeouts and cleanup.
+2. Add the small host reconstruction kernel and explicit pair-selector subclass;
+   retain production model, DP, pricing, acceptance and local search.
+3. Add one bounded evolution runner/config: lock data, baseline/reference,
+   generate/evaluate/select/feedback, population survival, composition edits.
+4. Run the authorized real batch, freeze sources/pairs, execute reserved checks
+   once, report paired quality/stability, all failures and separate offline cost.
+5. Update current status, positioning and runnable entry points from actual results.
+
+### Completed development batch (run_001, 2026-11-03)
+
+The frozen instance rule produced six development instances (20/40/60/80/100
+tasks, 2/4/8 robots, six structures), each with seeds 23/29, plus two
+batch-held instances checked once after freeze. Both reserve IDs were already
+used descriptively in E14; this is not untouched validation.
+
+The batch made 18 charged request attempts over four rounds. Ten candidate source
+records resulted from structural mutation, two-parent recombination, gap-directed
+generation and de-novo generation, alongside provider/parse failures, one
+interrupted attempt and one engineering repair. Eight distinct feasible LLM
+behaviors were evaluated before the corrected capped rerun; exact behavioral
+duplicates were rejected. Population capacity was 10, with elites, instance
+specialists and one observed replacement. Attempts reporting usage totalled
+201,578 tokens (173,098 prompt, 28,480 completion); some failed/interrupted
+requests have unknown usage. Provider billing is unavailable. Known request
+latency totals 358 seconds. No new request was made for the host correction.
+
+| Complete-solve group | Mean improvement vs manual | Paired rows better / worse |
+|---|---:|---:|
+| Manual ALNS | 0% | reference |
+| Deterministic state-chain reference + three manual pairs | 2.66% | 10 / 2 |
+| Best single LLM member + same manual pairs (`r4_c2`) | 2.61% | 8 / 4 |
+| Best two-LLM-member set + two manual pairs (`r4_replace`) | 2.14% | 7 / 5 |
+| Remove `r4_c2` from that two-member set | 0.60% | 3 / 9 |
+| Capped recheck of `r1_c3` | -2.46% | 0 / 12 |
+
+The selected development freeze was the deterministic reference plus all three
+manual pairs. Its largest gains occurred on BOTTLENECK T60 (+8.56%) and
+SWEEP-NARROW T100 (+5.59%). The best single LLM member was slightly behind this
+reference, and the two-generated-member replacement set was weaker. Removing
+`r4_c2` left the companion set largely ineffective.
+
+The final deployment proposal thus contains three manually designed pairs plus
+the deterministic reference pair. It uses exact entry/exit chains, joint
+contiguous-window removal prices and at most three exact-priced reconstruction
+branches. Pair roulette gives each deployed pair one first-use probe, then uses
+smoothed 8/3/1 reward with 10% exploration. Reward stays at pair level; it is
+not assigned to individual phases.
+
+At the post-freeze check, all four rows (two reserved instances x two seeds)
+favored manual ALNS. The reference combination lost by a mean 10.36%; the best
+single LLM combination lost 12.76%; the best two-LLM-member composition lost
+10.67%. These IDs have historical E14 descriptive use, so this is a small
+development transfer check, not independent validation. The recommended
+deployment remains manual ALNS; no generated member or structural reference is
+promoted after the transfer result.
+
+The deterministic structural mechanism accounts for its development gain over
+manual ALNS in this sample. LLM evolution produced distinct behavior and one
+development member close to the reference, but did not outperform it, improve
+the multi-member composition, or pass the post-freeze check. This run cannot
+attribute the deterministic mechanism's gain to LLM evolution; a matched
+feedback/representation ablation is absent. No superiority or novelty claim is
+established. The structural-feedback hypothesis remains unconfirmed.
+
+Integrity review found that repair branching could exceed the declared width
+exponentially. The host now caps live branches at width three and records the
+maximum. The pre-fix 63,478-second `r1_c3` result is preserved as
+`outputs/structural_population/run_001/development/r1_c3_invalid_unbounded.json`
+and excluded from selection summaries. The same member was rerun across all 12
+development rows under the branch cap; its mean was 2.46% worse than manual and
+no run exceeded 12.69 seconds end to end.
+
+**Next priority:** improve the deterministic state-chain search and branch
+pruning/anytime policy without another LLM batch. Then freeze a new structural
+split and predeclare a matched LLM-versus-reference mechanism comparison. The
+current bottleneck is transfer and combination quality, not candidate count.
+
+Replay the frozen development deployment without model calls:
+
+```powershell
+$env:PYTHONPATH='src'
+python -m mrta_rect_coverage.experiments.structural_deploy --freeze outputs/structural_population/run_001/freeze.json --instance development/BOTTLENECK/R4_T60_0 --seed 23 --output outputs/structural_population/run_001/replay.json
+```
+
+The sections below describe the older subsystem and remain compatibility notes.
+
 ## Why repair-first
 Repair operators directly decide how removed tasks are reinserted and therefore dominate final makespan quality in this MRTA setting. We evaluate repair operators with strict fairness (same partial solutions, same seeds, same benchmark set).
 

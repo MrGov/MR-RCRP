@@ -21,7 +21,8 @@ Recommended order: README → research positioning → program status → modeli
 These documents describe a specific technical contract, model decision, or implementation and are not independent research-positioning authorities:
 
 - [`instance_protocol.md`](instance_protocol.md), [`dataset_protocol.md`](dataset_protocol.md), [`instance_families.md`](instance_families.md): instance schema, generation protocol, and intrinsic family definitions. Read together with the current data README; their planned matrices are not all executed datasets.
-- [`llm_operator_evolution_spec.md`](llm_operator_evolution_spec.md), [`operator_evolution.md`](operator_evolution.md): operator interfaces and evolution subsystem reference. Separate specification language from implemented evidence.
+- [`llm_operator_evolution_spec.md`](llm_operator_evolution_spec.md): historical operator interface specification; separate specified behavior from implementation evidence.
+- [`operator_evolution.md`](operator_evolution.md): current structural population method, original-paper check, run_001 results, and legacy interfaces.
 - [`RUNBOOK.md`](RUNBOOK.md): runtime commands and environment notes; historical machine paths are examples only.
 - [`implementation_revision_alns_solver.md`](implementation_revision_alns_solver.md): scoped historical hash/equivalence record, not a general proof for later source revisions.
 - [`statistical_analysis_plan.md`](statistical_analysis_plan.md), [`reproducibility_checklist.md`](reproducibility_checklist.md), [`final_test_lockbox_protocol.md`](final_test_lockbox_protocol.md): statistical and lockbox technical references. Proposed hypotheses/conditions require a current study-specific protocol before use.

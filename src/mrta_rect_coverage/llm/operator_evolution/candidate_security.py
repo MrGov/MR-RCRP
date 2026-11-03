@@ -72,7 +72,8 @@ def code_sha256(source: str) -> str:
 
 
 def candidate_function_name(operator_type: str) -> str:
-    return {"repair": "repair", "destroy": "destroy", "pair_strategy": "rank_pairs"}[operator_type]
+    return {"repair": "repair", "destroy": "destroy", "pair_strategy": "rank_pairs",
+            "structural": "search_step"}[operator_type]
 
 
 def validate_candidate_source(source: str, operator_type: str) -> ast.Module:
@@ -84,6 +85,7 @@ def validate_candidate_source(source: str, operator_type: str) -> ast.Module:
         "repair": ["partial_solution", "unassigned_tasks", "context", "rng"],
         "destroy": ["solution", "context", "rng"],
         "pair_strategy": ["features", "rng"],
+        "structural": ["features", "rng"],
     }[operator_type]
 
     target_functions = [
@@ -109,7 +111,7 @@ def validate_candidate_source(source: str, operator_type: str) -> ast.Module:
         raise ValueError(f"Invalid signature {actual_args}, expected {expected_args}")
 
     for node in ast.walk(tree):
-        if operator_type == "pair_strategy":
+        if operator_type in {"pair_strategy", "structural"}:
             # This narrow interface needs only arithmetic/list logic. In particular,
             # it cannot import the solver/DP or mutate persistent imported modules.
             if isinstance(node, ast.Import) and any(a.name != "math" for a in node.names):

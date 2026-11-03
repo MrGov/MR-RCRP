@@ -13,6 +13,21 @@ python -m mrta_rect_coverage.main --config configs/default.yaml
 
 `configs/default.yaml` runs the configured B1 ALNS solver on its development/smoke instance and writes visualization output beneath `outputs/`. For an explicit E12 literature-comparison development run, see the command and fixed sample description in [`docs/experiment_protocol.md`](docs/experiment_protocol.md). Do not use that command with test split inputs.
 
+The current structural-population experiment is described in
+[`docs/operator_evolution.md`](docs/operator_evolution.md). Its bounded real-call
+entry point is:
+
+```powershell
+$env:PYTHONPATH='src'
+python -m mrta_rect_coverage.experiments.structural_population --config configs/structural_population.json
+```
+
+An existing output directory is refused unless `--resume` is explicit. Resume
+uses recorded requests and completed evaluations; it does not retry uncertain
+provider calls. `configs/structural_population.json` freezes the current batch's
+data, budgets and 32-request ceiling. Frozen deployment can be replayed without
+model calls using `python -m mrta_rect_coverage.experiments.structural_deploy --help`.
+
 ## Documentation
 
 Start with [`docs/README.md`](docs/README.md), then read:

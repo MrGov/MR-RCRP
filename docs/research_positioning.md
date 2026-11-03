@@ -18,7 +18,26 @@ The implemented solver separates three responsibilities:
 
 The repository contains real provider-backed candidate records and deployment integrations alongside manual baselines. It has exercised initial generation, feedback-driven revision, candidate selection, and fixed-source deployment. These are implemented stages of the offline operator pipeline; their existence does not by itself establish that evolution improves end-to-end makespan or that a particular feedback mechanism is novel.
 
-The current small research prototype holds destroy, initialization, acceptance, and local search fixed while replaying existing real-provider repair artifacts on paired states from a baseline ALNS trajectory. It selects a small repair set by feasible behavior and incremental post-local-search state coverage, then checks the selected set against a single score champion, score top-k, and the hand-written pool in short ALNS runs. Its first two development variants retained one repair, while the short ALNS selected score top-two by a one-unit difference on the selection instance and that pair lost 93 units on the separate stage-end instance. This result argues for cautious replacement checks and stronger development coverage; it does not support a complementarity or LLM-revision benefit. No new provider call was made in this phase.
+The current 2026-11-02 method evolves structural destruction and reconstruction
+programs using exact state-chain and joint-action evidence, then evaluates small
+explicit destroy-repair deployments under matched complete-solve budgets.
+Initialization, acceptance and priced local search are fixed. The candidate
+archive, surviving population and actual deployment are distinct. The earlier
+repair-only archive replay and its mixed single-scale results remain historical
+evidence on the status page; they do not constrain this batch to one member.
+
+The direct original-paper check in `operator_evolution.md` establishes that
+G-LNS already co-evolves destroy/repair operators, full-component ALNS evolution
+already studies seven modules and composition effects, and evALNS already mixes
+expert and LLM lineages. These generic mechanisms are not novelty claims here.
+The problem-specific structural-feedback hypothesis and complete-solve portfolio
+benefit require empirical support, including a deterministic mechanism reference.
+The completed run_001 batch did not establish an LLM increment: its best single
+generated member was slightly behind the deterministic state-chain reference on
+development, and the two-member set was worse than the single member. All four
+batch-held rows favored manual ALNS; those instances have prior descriptive use
+and do not constitute independent validation. The structural-feedback and
+portfolio-complementarity hypotheses remain unconfirmed.
 
 ## Contribution Candidates and Evidence
 

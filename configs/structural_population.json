@@ -1,0 +1,22 @@
+{
+  "output_dir": "outputs/structural_population/run_001",
+  "development": ["development/BASE/R2_T20_0", "development/HV-GEOM/R2_T20_0", "development/SPATIAL/R4_T40_0", "development/BOTTLENECK/R4_T60_0", "development/TRAVEL-HIGH/R8_T80_0", "development/SWEEP-NARROW/R8_T100_0"],
+  "reserved": ["development/TURN-HIGH/R4_T60_1", "development/SWEEP-NARROW/R8_T100_1"],
+  "instance_rule": "Fixed before outcomes: replicate 0, six family/scale cells spanning 20-100 tasks and 2/4/8 robots. Reserve replicate 1 at T60 and T100 in two structural families. No result-dependent sample selection.",
+  "reserved_history": "Both reserved IDs have E14 descriptive state-regret records in outputs/e14_state_regret_instrument/v1/development and dataset_summary.json. Reserved only from this batch; not independent or untouched validation. No test/final/lockbox access.",
+  "seeds": [23, 29],
+  "seconds_by_tasks": {"20": 3, "40": 5, "60": 7, "80": 10, "100": 12},
+  "constructor": "spatial_sort",
+  "rounds": 4,
+  "children_per_round": 4,
+  "max_requests": 32,
+  "max_output_tokens": 7500,
+  "population_capacity": 10,
+  "population_quality_floor": 0.05,
+  "stagnant_rounds": 2,
+  "beam_width": 3,
+  "price_cap": 80000,
+  "selection": "Mean per-instance relative makespan vs manual full pool, plus 0.10 times worst positive instance regression. Simpler deployment breaks ties within 0.0005. Complete timed solves determine survival and composition; distinct feasible behaviors are admitted without local-gain gate.",
+  "composition": "Per round: complementary two-generated-member addition, replacement of one manual pair by that pair-set, and cross-phase pairing of two generated sources. At final selection test removal of up to two generated members of the best multi-member proposal. Final may be manual-only.",
+  "stop": "4 rounds or 32 real requests or 2 consecutive rounds with neither improved best composition nor new behavior that is within 5% of manual mean and improves at least one instance. One engineering repair per candidate; no automatic provider retries."
+}
