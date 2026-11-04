@@ -55,6 +55,22 @@ development checks do not access the official benchmark test split.
 
 ## Documentation
 
+The completed construction follow-up to `external_location_004` is runnable
+without model calls:
+
+```powershell
+$env:PYTHONPATH='src'
+python -m mrta_rect_coverage.experiments.constructor_followup --stage run
+python -m mrta_rect_coverage.experiments.constructor_attribution
+```
+
+It retains frozen r4_c2 and its two manual pairs, changes only initialization,
+and compares 24 new complete solves with the 48 matching historical controls.
+The second command is a limited native-reference check on T100/dispersed T40.
+Both resume hash-matched records. See the
+[results and decision](outputs/structural_population/constructor_followup_005/REPORT.md).
+The initializer is opt-in research code; it does not replace the default.
+
 Start with [`docs/README.md`](docs/README.md), then read:
 
 1. [`docs/research_positioning.md`](docs/research_positioning.md) for the single current research objective and claim boundaries.

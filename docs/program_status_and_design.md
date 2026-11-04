@@ -2,12 +2,56 @@
 
 This is the current factual status page. It describes the repository at the reviewed local HEAD and available records; it is not an authorization to run providers, experiments, or locked data. Historical reports and raw outputs are preserved as recorded.
 
-**Current development scope (2026-11-04):** the frozen structural-population
-method remains intact. The current concentrated executor change and frozen
-deployment check are in `experiments/structural_deploy_check.py`; no candidate,
-search action, branch width, pricing cap, initialization, acceptance or local
-search was changed. The original four-instance cache recheck remains historical
-evidence in `outputs/bounded_repair_search/cache_opportunity_001/analysis.json`.
+**Current development scope (2026-11-04):** `constructor_followup_005` completes
+one initialization change and its full regression evaluation. The frozen
+`external_location_004` implementation remains intact. No candidate source,
+pair, reward rule, acceptance formula or local-search code was changed; no LLM
+requests were made. The opt-in work/travel initializer borrows the first CDABC
+heuristic ordering, uses shared incremental exact insertion prices, and retains
+the complete spatial seed if construction exceeds 20% of the total allowance
+or 10,000 prices. All construction costs are charged to the original budget.
+
+The preceding external comparison (`external_location_004`) had 8 instances x
+3 seeds, with the frozen r4_c2 portfolio vs the project-adapted CDABC: +0.027%
+equal-instance mean, -0.113% median, 3/1/4 wins/ties/losses, and a 1.338% T100
+loss. These inputs are now consumed development regressions. Formal data was
+not accessed. Original records and hashes remain unchanged.
+
+One seed-17 T100 replay shows spatial initialization at 8845.027; CDABC's two
+heuristic constructions reach 4962.198 and 4976.066. Its 4898.371 first occurs
+in onlooker search, not construction. A supplied-4962.198 candidate diagnostic
+reaches 4913.951. All saved route snapshots pass the public evaluator; assignment
+comparisons maximize task-set overlap over homogeneous robot permutations.
+
+The new 24-run comparison reuses the 48 identity-matched frozen/CDABC rows.
+Modified vs frozen: mean +0.139%, median +0.301%, 4/1/3 instances, maximum loss
+1.614%. Modified vs CDABC: mean +0.168%, median +0.242%, 4/1/3, maximum loss
+2.079%. T100 mean changes 4963.905 -> 4911.554, reducing the CDABC gap by 79.88%
+(1.338% -> 0.269%). Dispersed T40 retains +1.895% over CDABC (91.05% of its old
+advantage); the other six average +0.041% over frozen. High-HV clustered T40
+loses 1.614% to frozen, so the gain is not uniformly transferable.
+
+All 24 new results are feasible, with zero construction stops/structural
+errors and 21 separately recorded incomplete iterations. Construction averages
+0.145 seconds; end-to-end solve time averages 7.407 seconds, maximum overshoot
+0.259 seconds. The historical frozen maximum overshoot is 0.499 seconds,
+correcting the earlier conversational 0.129-second statement. A limited native
+reference check on the two priority instances uses the same new construction
+and two manual pairs: reference reaches 4898.371 on all three T100 seeds and
+ties r4_c2's dispersed T40 mean within 0.004%. This supports initialization
+value, not new LLM increment or a pure execution-independent policy attribution.
+
+**Current decision and sole next development:** keep frozen external_location_004
+as the conservative default and retain the new initializer as a research option.
+Do not resume LLM evolution. Next test bounded two-start search that preserves
+both spatial and work/travel starting solutions under one shared allowance,
+rather than selecting a start solely by initial makespan. This is an untested
+hypothesis to recover the high-HV loss while retaining T100/T40 gains. Historical
+controls are not contemporaneous reruns; the small mean change is descriptive.
+See [the complete report](../outputs/structural_population/constructor_followup_005/REPORT.md),
+`seed_results.csv`, and the frozen `protocol.json` for commands, all results,
+costs, safeguards and continuation criteria. The earlier deployment findings
+below remain historical evidence.
 
 **Historical run_001 report (2026-11-03; superseded for current selection):**
 `outputs/structural_population/run_001/summary.json` records four rounds, 18
@@ -106,7 +150,7 @@ groups completed 33-56 iterations per solve versus 70-281 for base ALNS; early
 incomplete iteration counts ranged from 0 to 1 per pair solve. Per-seed target,
 time, iteration, pair credit and phase-cost values are retained in the JSON.
 
-**Current decision and sole next priority:** classify this as B: the structural
+**Historical deploy_check_003 decision (superseded above):** classify this as B: the structural
 search portfolio helps over original ALNS on this small new development check,
 but `r4_c2` does not show sufficiently consistent gains over the deterministic
 reference. Keep original ALNS as production fallback; retain `r4_c2` as a frozen

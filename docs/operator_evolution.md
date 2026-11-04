@@ -1,5 +1,19 @@
 # Offline Operator Evolution
 
+**2026-11-04 follow-up:** the population/archive/portfolio method below is retained;
+`constructor_followup_005` adds no candidate and makes zero model requests. Its
+sole change is an opt-in deterministic work/travel exact-insertion initializer
+before the frozen two-manual-pair + r4_c2 solve. Ordering comes from the project's
+CDABC adaptation; incremental pricing, retained complete fallback and explicit
+construction budget provide a deployable implementation. This is initialization
+work, not a claimed LLM contribution. The 8 x 3 development regression improves
+mean makespan only 0.139% over frozen with a 1.614% worst loss; a two-case matched
+native-reference check does not show new generated-member increment. LLM
+evolution remains inactive. The next single development is bounded two-start
+search under one shared allowance; it is not yet implemented. Current evidence
+and the default decision are in `program_status_and_design.md` and the
+[follow-up report](../outputs/structural_population/constructor_followup_005/REPORT.md).
+
 ## Current method: structural population and deployment selection (2026-11-02)
 
 This section supersedes the repair-first scope below for the current batch. The
