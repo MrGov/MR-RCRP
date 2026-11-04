@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import hashlib
 import multiprocessing
+from multiprocessing.reduction import ForkingPickler
 import sys
 import types
 import warnings
@@ -39,6 +40,7 @@ class CandidateExecutionResult:
     route_dp_cache_misses: int = 0
     startup_ms: float = 0.0
     validation_import_ms: float | None = None
+    execution_stages: dict[str, float] | None = None
 
 
 @dataclass
@@ -116,6 +118,10 @@ def execute_candidate_process(
     process.daemon = True
     process.start()
     child_conn.close()
+    execution_stages = {"worker_startup": 0.0, "source_hash_check": 0.0,
+        "source_validation": 0.0, "compile": 0.0, "namespace_setup": 0.0,
+        "input_serialize": 0.0, "input_send": 0.0, "policy": 0.0,
+        "return_wait": 0.0, "return_deserialize": 0.0}
 
     try:
         if not parent_conn.poll(import_timeout_s):
@@ -150,9 +156,19 @@ def execute_candidate_process(
 
         started = perf_counter()
         startup_ms = (started - wall_started) * 1000.0
-        parent_conn.send(("run", tuple(args)))
+        execution_stages["worker_startup"] = startup_ms
+        if len(ready) > 2:
+            execution_stages.update(ready[2])
+        stage_started = perf_counter()
+        payload = ForkingPickler.dumps(("run", tuple(args)))
+        execution_stages["input_serialize"] = (perf_counter() - stage_started) * 1000.0
+        stage_started = perf_counter()
+        parent_conn.send_bytes(payload)
+        execution_stages["input_send"] = (perf_counter() - stage_started) * 1000.0
         timeout_s = max(0.0, timeout_ms / 1000.0)
+        stage_started = perf_counter()
         if not parent_conn.poll(timeout_s):
+            execution_stages["return_wait"] = (perf_counter() - stage_started) * 1000.0
             runtime_ms = (perf_counter() - started) * 1000.0
             _terminate(process)
             return CandidateExecutionResult(
@@ -163,7 +179,13 @@ def execute_candidate_process(
                 wall_time_ms=(perf_counter() - wall_started) * 1000.0,
             )
 
-        message = parent_conn.recv()
+        response_payload = parent_conn.recv_bytes()
+        execution_stages["return_wait"] = (perf_counter() - stage_started) * 1000.0
+        stage_started = perf_counter()
+        message = ForkingPickler.loads(response_payload)
+        execution_stages["return_deserialize"] = (perf_counter() - stage_started) * 1000.0
+        if len(message) > 7:
+            execution_stages.update(message[7])
         runtime_ms = (perf_counter() - started) * 1000.0
         process.join(timeout=0.2)
         if process.is_alive():
@@ -194,6 +216,7 @@ def execute_candidate_process(
                 route_dp_calls=message[6].get("calls", 0) if len(message) > 6 else 0,
                 route_dp_cache_misses=message[6].get("cache_misses", 0) if len(message) > 6 else 0,
                 startup_ms=startup_ms,
+                execution_stages=execution_stages,
             )
         return CandidateExecutionResult(
             status="runtime_error",
@@ -232,8 +255,11 @@ def _candidate_worker(
         warnings.showwarning = _compact_showwarning
         try:
             candidate_path = Path(path)
+            stage_times = {}
+            stage_started = perf_counter()
             source_text = candidate_path.read_text(encoding="utf-8")
             current_code_hash = hashlib.sha256(source_text.encode("utf-8")).hexdigest()
+            stage_times["source_hash_check"] = (perf_counter() - stage_started) * 1000.0
             if current_code_hash != expected_code_hash:
                 connection.send(
                     (
@@ -246,6 +272,7 @@ def _candidate_worker(
                     )
                 )
                 return
+            stage_started = perf_counter()
             try:
                 validate_candidate_source(source_text, operator_type)
             except Exception as exc:  # noqa: BLE001 - untrusted source boundary.
@@ -260,17 +287,22 @@ def _candidate_worker(
                     )
                 )
                 return
+            stage_times["source_validation"] = (perf_counter() - stage_started) * 1000.0
+            stage_started = perf_counter()
+            compiled = compile(source_text, str(candidate_path), "exec")
+            stage_times["compile"] = (perf_counter() - stage_started) * 1000.0
+            stage_started = perf_counter()
             module_name = f"isolated_operator_{candidate_path.stem}_{multiprocessing.current_process().pid}"
             module = types.ModuleType(module_name)
             module.__file__ = str(candidate_path)
             sys.modules[module_name] = module
-            compiled = compile(source_text, str(candidate_path), "exec")
             exec(compiled, module.__dict__)
             fn_name = candidate_function_name(operator_type)
             function = getattr(module, fn_name, None)
             if function is None:
                 raise AttributeError(f"Missing required function: {fn_name}")
-            connection.send(("ready", ""))
+            stage_times["namespace_setup"] = (perf_counter() - stage_started) * 1000.0
+            connection.send(("ready", "", stage_times))
             command, args = connection.recv()
             if command != "run":
                 raise RuntimeError(f"Unknown candidate command: {command}")
@@ -285,7 +317,9 @@ def _candidate_worker(
                 dp_counts["cache_misses"] += evaluator._cache_misses - misses
                 return value
             RouteDPEvaluator.evaluate_route = counted_evaluate
+            stage_started = perf_counter()
             result = function(*args)
+            stage_times["policy"] = (perf_counter() - stage_started) * 1000.0
             connection.send(
                 (
                     "success",
@@ -295,6 +329,7 @@ def _candidate_worker(
                     captured_stdout.truncated,
                     captured_stderr.truncated,
                     dp_counts,
+                    stage_times,
                 )
             )
         except Exception as exc:  # noqa: BLE001

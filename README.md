@@ -40,6 +40,19 @@ It writes to `outputs/structural_population/review_002/`, resumes completed
 groups, records implementation and candidate hashes, and labels the previously
 viewed stage instances as development regressions.
 
+The frozen executor optimization and 48-solve new development check use no model
+calls and can be reproduced with:
+
+```powershell
+$env:PYTHONPATH='src'
+python -m mrta_rect_coverage.experiments.structural_deploy_check
+```
+
+The first run freezes generated input identities, source hashes, seeds, budgets
+and four comparison groups under `outputs/structural_population/deploy_check_003/`.
+It resumes only results with that exact configuration hash. These generated
+development checks do not access the official benchmark test split.
+
 ## Documentation
 
 Start with [`docs/README.md`](docs/README.md), then read:

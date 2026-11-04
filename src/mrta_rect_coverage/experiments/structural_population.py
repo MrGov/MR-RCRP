@@ -33,7 +33,12 @@ def sha(p): return hashlib.sha256(Path(p).read_bytes()).hexdigest()
 def emit(**kw): print(json.dumps(kw,ensure_ascii=True),flush=True)
 def instance(e):
     if e['split']!='development': raise ValueError('development inputs only')
-    p=DATA/e['path']
+    if 'input_path' in e:
+        p=(ROOT/e['input_path']).resolve()
+        allowed=(ROOT/'outputs/structural_population/deploy_check_003/inputs').resolve()
+        if not p.is_relative_to(allowed): raise ValueError('custom input escaped frozen check inputs')
+    else:
+        p=DATA/e['path']
     if sha(p)!=e['sha256']: raise ValueError('instance hash mismatch')
     return load_instance(p)
 

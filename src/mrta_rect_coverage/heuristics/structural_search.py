@@ -66,15 +66,35 @@ class StructuralExecutor:
     def close(self): self.backend.close()
 
     def __call__(self,features,rng):
-        outcome=self.backend.execute((deepcopy(features),deepcopy(rng)),
+        # Pipe serialization gives the child an isolated input object; a host-side
+        # deepcopy would duplicate the same large feature graph before pickling.
+        outcome=self.backend.execute((features,rng),
                                      timeout_ms=min(self.backend.timeout_ms,
                                          max(1.,1000*features.get('budget_remaining_seconds',1e6))))
+        started=perf_counter()
         self.samples.append({k:getattr(outcome,k) for k in
                              ('status','wall_time_ms','runtime_ms','startup_ms','validation_import_ms')})
         if outcome.status!='success':
             self.close()
             raise RuntimeError(f'{outcome.status}: {outcome.error_message}')
-        return validate_actions(outcome.result,features)
+        result=validate_actions(outcome.result,features)
+        sample=self.samples[-1]
+        stages=outcome.execution_stages or {}
+        sample['execution_stages']={
+            'input_copy':0.0,
+            'input_serialize':stages.get('input_serialize',0.0),
+            'input_send':stages.get('input_send',0.0),
+            'source_hash_check':stages.get('source_hash_check',0.0),
+            'source_validation':stages.get('source_validation',0.0),
+            'compile':stages.get('compile',0.0),
+            'namespace_setup':stages.get('namespace_setup',0.0),
+            'policy':stages.get('policy',0.0),
+            'return_wait':stages.get('return_wait',0.0),
+            'return_deserialize':stages.get('return_deserialize',0.0),
+            'return_validation':(perf_counter()-started)*1000.0,
+            'worker_startup':stages.get('worker_startup',0.0),
+        }
+        return result
 
 
 def reference_step(features,rng):

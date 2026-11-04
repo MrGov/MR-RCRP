@@ -2,14 +2,12 @@
 
 This is the current factual status page. It describes the repository at the reviewed local HEAD and available records; it is not an authorization to run providers, experiments, or locked data. Historical reports and raw outputs are preserved as recorded.
 
-**Current development scope (2026-11-03):** the authorized structural-population
-batch supersedes the previous call/skip-only next step. Its method and original-
-paper comparison are in `operator_evolution.md`; implementation is
-`heuristics/structural_search.py`, with runner `experiments/structural_population.py`.
-The batch uses explicit destroy-repair deployment actions, structural generation,
-multiple parents, complete timed solve selection and a reserved post-freeze check.
-The original four-instance cache recheck remains historical evidence, unchanged,
-in `outputs/bounded_repair_search/cache_opportunity_001/analysis.json`.
+**Current development scope (2026-11-04):** the frozen structural-population
+method remains intact. The current concentrated executor change and frozen
+deployment check are in `experiments/structural_deploy_check.py`; no candidate,
+search action, branch width, pricing cap, initialization, acceptance or local
+search was changed. The original four-instance cache recheck remains historical
+evidence in `outputs/bounded_repair_search/cache_opportunity_001/analysis.json`.
 
 **Historical run_001 report (2026-11-03; superseded for current selection):**
 `outputs/structural_population/run_001/summary.json` records four rounds, 18
@@ -66,17 +64,58 @@ current evaluations for the affected candidates were rerun. History remains
 unchanged in `run_001`; failed first-pass review rows are preserved beside the
 corrected rows in `review_002`.
 
-**Current decision and sole next priority:** do not make another LLM request.
-Keep original manual ALNS as the production fallback. For development, retain
-the smaller `random_destroy/greedy_insertion`,
-`bottleneck_route_destroy/regret_k_insertion`, and `r4_c2` pair set as the
-current structural candidate; do not retain `r2_c2` in that composition. The
-sole next action is to batch or reuse checked-executor inputs to reduce its
-measured copy/process overhead without changing policy actions, then rerun a
-matched complete-solve comparison on a newly predeclared development sample.
-Continue LLM evolution only after that comparison shows repeatable practical
-value beyond the native reference. No external strong-algorithm comparison or
-generalization claim has been established.
+**Frozen executor and deployment check (deploy_check_003, 2026-11-04):**
+`outputs/structural_population/deploy_check_003/analysis.json` records 48
+complete solves over four deterministically generated, predeclared development
+identities (R4/T40, R4/T60, R8/T80, R8/T100), three seeds each, and fixed 5/7/10/12
+second budgets. These are new project-generator checks, not untouched official
+benchmark confirmation; all official structural benchmark development IDs had
+prior E11/E14 or earlier use. No final/lockbox content was accessed and no LLM
+request was made. Sources, samples, seeds, budgets and compositions were hashed
+before the full comparison.
+
+The only production-path optimization removes redundant host-side feature/RNG
+deepcopies and keeps the already existing checked subprocess alive between
+calls. IPC serialization still gives each invocation a separate object graph;
+the child still verifies source hash and AST, recompiles and creates a fresh
+module namespace for every call, checks the returned action, and is discarded
+on timeout/error or solver cleanup. `r4_c2` action output matched the old
+per-call executor on three same-state/RNG calls; four fixed ALNS iterations had
+identical route and selection traces. Changed-state, fresh-namespace and timeout
+cleanup tests passed. The deterministic reference matched executor destroy and
+repair actions on a representative new input.
+
+Three-call median boundary time fell from 190.6 ms (per-call process) to 3.25 ms
+(warm process); policy computation itself was about 0.07 ms. In full r4_c2 runs,
+2,908 policy calls accumulated 1.95 s policy compute, 8.30 s source validation,
+4.08 s compilation, 2.06 s input serialization, and 3.96 s waiting for results.
+Thus process reuse substantially improves practical cost while repeated source
+checks and compilation remain visible. It does not establish that the generated
+search logic is superior by itself.
+
+On the new check, original ALNS is the reference. Two fixed manual pairs alone
+average -0.91% (4 wins/8 losses), showing a material effect from pair selection.
+The same pair skeleton plus the native deterministic reference averages +2.44%
+(9/12 wins); plus `r4_c2` averages +3.07% (7/12 wins). Against the matched native
+reference, `r4_c2` averages only +0.66% and has 7 wins/5 losses. By instance,
+its matched-reference changes are +0.12% on BASE R4/T40, +1.33% on clustered /
+high-turn R4/T60, -0.24% on dispersed / travel-heavy R8/T80, and +1.41% on
+multi-cluster / high-HV R8/T100. The gain is concentrated in two structures;
+stable LLM increment is not established. All 48 solutions were feasible. Pair
+groups completed 33-56 iterations per solve versus 70-281 for base ALNS; early
+incomplete iteration counts ranged from 0 to 1 per pair solve. Per-seed target,
+time, iteration, pair credit and phase-cost values are retained in the JSON.
+
+**Current decision and sole next priority:** classify this as B: the structural
+search portfolio helps over original ALNS on this small new development check,
+but `r4_c2` does not show sufficiently consistent gains over the deterministic
+reference. Keep original ALNS as production fallback; retain `r4_c2` as a frozen
+research elite seed, not as a proven deployment winner. The sole next action is
+to record actual per-depth destroy/repair choices and their post-local-search
+outcomes on the weak BASE/T40 and dispersed/T80 structures, then make one
+targeted evolution round only if those traces reveal a concrete missing
+transition behavior. No external strong-algorithm comparison or generalization
+claim has been established.
 
 ## Implemented Solver
 
