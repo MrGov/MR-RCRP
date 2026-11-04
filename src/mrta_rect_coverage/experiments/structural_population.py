@@ -190,6 +190,7 @@ class Study:
                     'price_requests':sum(r['price_requests'] for r in kernel_rows),
                     'policy_calls':sum(r['policy_calls'] for r in kernel_rows),
                     'max_live_branches':max((r['max_live_branches'] for r in kernel_rows),default=0)},
+                structural_events={name:k.events for name,k in kernels.items()},
                 history=result.iteration_history)
         return row
 
